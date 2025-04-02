@@ -17,7 +17,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("ConnectFrontend",
         policy =>
         {
-            policy.WithOrigins("http://localhost:3000")
+            policy.WithOrigins("https://kind-ground-08eb7501e.6.azurestaticapps.net")
                 .AllowAnyHeader()
                 .AllowAnyMethod();
         });
