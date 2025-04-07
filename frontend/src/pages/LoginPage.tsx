@@ -40,8 +40,8 @@ function LoginPage() {
     }
 
     const loginUrl = rememberme
-    ? 'https://intex-2025.azurewebsites.net/auth/login?useCookies=true'
-    : 'https://intex-2025.azurewebsites.net/auth/login?useSessionCookies=true';
+    ? 'https://intex-2025.azurewebsites.net/login?useCookies=true'
+    : 'https://intex-2025.azurewebsites.net/login?useSessionCookies=true';
 
     try {
       const response = await fetch(loginUrl, {
