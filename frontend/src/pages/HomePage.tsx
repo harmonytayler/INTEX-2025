@@ -1,4 +1,4 @@
-import TestComponent from '../components/TestComponent';
+import MovieComponent from '../components/MovieComponent';
 import Logout from '../components/security/Logout';
 import AuthorizeView, {
   AuthorizedUser,
@@ -24,7 +24,7 @@ function HomePage() {
         <p className="mb-6 text-gray-600">
           This is the home page that displays all test items:
         </p>
-        <TestComponent />
+        <MovieComponent />
       </div>
     </AuthorizeView>
   );

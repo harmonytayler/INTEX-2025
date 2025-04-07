@@ -1,21 +1,36 @@
 import { Movie as Movie } from '../types/Movie';
 
-const API_URL = 'https://localhost:5000/Test';
+interface FetchMoviesResponse {
+  movies: Movie[];
+  totalNumMovies: number;
+}
 
-export const fetchMovies = async (): Promise<Movie[]> => {
+const API_URL = 'https://localhost:5000/Movie';
+
+export const fetchMovies = async (
+  pageSize: number,
+  pageNum: number,
+  selectedCategories: string[],
+): Promise<FetchMoviesResponse> => {
   try {
-    const response = await fetch(`${API_URL}/AllTestItems`, {
-      credentials: 'include', // Include cookies in the request for authentication (security)
-    });
+      const categoryParams = selectedCategories
+          .map((cat) => `movieTypes=${encodeURIComponent(cat)}`)
+          .join('&');
 
-    if (!response.ok) {
-      throw new Error('Failed to fetch movies');
-    }
+      const response = await fetch(
+          `${API_URL}/AllMovies?pageSize=${pageSize}&pageNum=${pageNum}${selectedCategories.length ? `&${categoryParams}` : ''}`,
+          {
+              credentials: 'include',
+          }
+      );
 
-    return await response.json();
+      if (!response.ok) {
+          throw new Error(`Failed to fetch projects`);
+      }
+      return await response.json();
   } catch (error) {
-    console.error('Error fetching movies:', error);
-    throw error;
+      console.error("Error fetching projects:", error);
+      throw error;
   }
 };
 
@@ -61,7 +76,7 @@ export const updateMovie = async (show_id: number, updatedMovie: Movie): Promise
   }
 }
 
-export const deleteProject = async (show_id: number): Promise<void> => {
+export const deleteMovie = async (show_id: number): Promise<void> => {
   try {
       const response = await fetch(`${API_URL}/DeleteMovie/${show_id}`,
           {
