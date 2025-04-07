@@ -7,32 +7,42 @@ function TestComponent() {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        const loadTestItems = async () => {
+        const loadTests = async () => {
             try {
                 const data = await fetchTests();
-
                 setTestItems(data);
-            } catch (error) {
-                setError((error as Error).message);
+            } catch (err) {
+                setError((err as Error).message);
             }
         };
 
-        loadTestItems();
+        loadTests();
     }, []);
 
-    if (error) return <p>Error: {error}</p>
+    if (error) {
+        return <p className="text-red-500">Error: {error}</p>;
+    }
 
     return (
-        <>
-            {testItems.map((t) => {
-                return (
-                    <div key={t.testItemId}>
-                        <h3>{t.testItemId}</h3>
-                        <h4>{t.testItemName}</h4>
-                    </div>
-                )
-            })}
-        </>
+        <div className="p-6">
+            <h3 className="text-2xl font-bold mb-4">Test Items</h3>
+            <table className="min-w-full border border-gray-300">
+                <thead className="bg-gray-100">
+                    <tr>
+                        <th className="px-4 py-2 border">ID</th>
+                        <th className="px-4 py-2 border">Name</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {testItems.map((item) => (
+                        <tr key={item.testItemId}>
+                            <td className="px-4 py-2 border text-center">{item.testItemId}</td>
+                            <td className="px-4 py-2 border">{item.testItemName}</td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
     );
 }
 
