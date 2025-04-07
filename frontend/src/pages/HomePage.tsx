@@ -13,8 +13,9 @@ function HomePage() {
     //The AuthorizeView component will also provide the user context to the page
     //The AuthorizedUser component will be used to display the user's email
     //The Logout component will be used to log the user out
-    <AuthorizeView>
-      <span>
+    //<AuthorizeView>
+    <>
+          <span>
         <Logout>
           Logout <AuthorizedUser value="email" />
         </Logout>
@@ -26,7 +27,8 @@ function HomePage() {
         </p>
         <TestComponent />
       </div>
-    </AuthorizeView>
+    </>
+    //</AuthorizeView>
   );
 }
 
