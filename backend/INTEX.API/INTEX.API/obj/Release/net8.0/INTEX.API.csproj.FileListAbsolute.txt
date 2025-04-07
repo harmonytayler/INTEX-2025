@@ -607,3 +607,9 @@ C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\ob
 C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\obj\Release\net8.0\INTEX.API.pdb
 C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\obj\Release\net8.0\INTEX.API.genruntimeconfig.cache
 C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\obj\Release\net8.0\ref\INTEX.API.dll
+C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bin\Release\net8.0\Microsoft.Bcl.Memory.dll
+C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bin\Release\net8.0\Microsoft.IdentityModel.Abstractions.dll
+C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bin\Release\net8.0\Microsoft.IdentityModel.JsonWebTokens.dll
+C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bin\Release\net8.0\Microsoft.IdentityModel.Logging.dll
+C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bin\Release\net8.0\Microsoft.IdentityModel.Tokens.dll
+C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bin\Release\net8.0\System.IdentityModel.Tokens.Jwt.dll

@@ -11,6 +11,7 @@ C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\pu
 C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\publish\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
 C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\publish\Microsoft.AspNetCore.Razor.Language.dll
 C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\publish\Microsoft.Bcl.AsyncInterfaces.dll
+C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\publish\Microsoft.Bcl.Memory.dll
 C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\publish\Microsoft.Build.dll
 C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\publish\Microsoft.Build.Framework.dll
 C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\publish\Microsoft.CodeAnalysis.AnalyzerUtilities.dll
@@ -39,6 +40,10 @@ C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\pu
 C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\publish\Microsoft.Extensions.Logging.dll
 C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\publish\Microsoft.Extensions.Logging.Abstractions.dll
 C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\publish\Microsoft.Extensions.Options.dll
+C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\publish\Microsoft.IdentityModel.Abstractions.dll
+C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\publish\Microsoft.IdentityModel.JsonWebTokens.dll
+C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\publish\Microsoft.IdentityModel.Logging.dll
+C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\publish\Microsoft.IdentityModel.Tokens.dll
 C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\publish\Microsoft.NET.StringTools.dll
 C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\publish\Microsoft.OpenApi.dll
 C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\publish\Microsoft.VisualStudio.Web.CodeGeneration.dll
@@ -74,6 +79,7 @@ C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\pu
 C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\publish\System.Composition.TypedParts.dll
 C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\publish\System.Configuration.ConfigurationManager.dll
 C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\publish\System.Drawing.Common.dll
+C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\publish\System.IdentityModel.Tokens.Jwt.dll
 C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\publish\System.Reflection.MetadataLoadContext.dll
 C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\publish\System.Security.Cryptography.ProtectedData.dll
 C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\publish\System.Security.Permissions.dll
