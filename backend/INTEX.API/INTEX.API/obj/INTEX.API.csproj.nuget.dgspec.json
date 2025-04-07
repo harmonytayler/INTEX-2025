@@ -1,31 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\harmo\\OneDrive\\Information Systems\\INTEX\\backend\\INTEX.API\\INTEX.API\\INTEX.API.csproj": {}
+    "/Users/kenna/Desktop/INTEX-2025/backend/INTEX.API/INTEX.API/INTEX.API.csproj": {}
   },
   "projects": {
-    "C:\\Users\\harmo\\OneDrive\\Information Systems\\INTEX\\backend\\INTEX.API\\INTEX.API\\INTEX.API.csproj": {
+    "/Users/kenna/Desktop/INTEX-2025/backend/INTEX.API/INTEX.API/INTEX.API.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\harmo\\OneDrive\\Information Systems\\INTEX\\backend\\INTEX.API\\INTEX.API\\INTEX.API.csproj",
+        "projectUniqueName": "/Users/kenna/Desktop/INTEX-2025/backend/INTEX.API/INTEX.API/INTEX.API.csproj",
         "projectName": "INTEX.API",
-        "projectPath": "C:\\Users\\harmo\\OneDrive\\Information Systems\\INTEX\\backend\\INTEX.API\\INTEX.API\\INTEX.API.csproj",
-        "packagesPath": "C:\\Users\\harmo\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\harmo\\OneDrive\\Information Systems\\INTEX\\backend\\INTEX.API\\INTEX.API\\obj\\",
+        "projectPath": "/Users/kenna/Desktop/INTEX-2025/backend/INTEX.API/INTEX.API/INTEX.API.csproj",
+        "packagesPath": "/Users/kenna/.nuget/packages/",
+        "outputPath": "/Users/kenna/Desktop/INTEX-2025/backend/INTEX.API/INTEX.API/obj/",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\harmo\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/Users/kenna/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -43,20 +37,39 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        },
-        "SdkAnalysisLevel": "9.0.200"
+        }
       },
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[8.0.14, )"
+            },
             "Microsoft.EntityFrameworkCore": {
               "target": "Package",
               "version": "[8.*, )"
             },
+            "Microsoft.EntityFrameworkCore.Design": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[8.0.14, )"
+            },
             "Microsoft.EntityFrameworkCore.Sqlite": {
               "target": "Package",
               "version": "[8.*, )"
+            },
+            "Microsoft.EntityFrameworkCore.Tools": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[8.0.14, )"
+            },
+            "Microsoft.VisualStudio.Web.CodeGeneration.Design": {
+              "target": "Package",
+              "version": "[8.0.7, )"
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
@@ -82,7 +95,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.201/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.309/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

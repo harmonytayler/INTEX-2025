@@ -34,9 +34,32 @@
 }
 
 .card {
-  padding: 2em;
+  padding: 1em;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
 }
 
 .read-the-docs {
   color: #888;
+}
+
+.row {
+  background-color: white;
+}
+
+.logout {
+  color: #fff;
+  font-size: large;
+  font-weight: bold;
+}
+
+.resultsCount {
+  margin: 1em;
+}
+
+.Header {
+  font-family: 'Noto Sans', system-ui;
+  font-weight: 200;
+  font-weight: bold;
+  margin: 0.5em;
 }
