@@ -41,7 +41,7 @@ function LoginPage() {
 
     const loginUrl = rememberme
       ? 'https://localhost:5000/login?useCookies=true'
-      : 'https://localhost:5000/login?useSessionCookies=true';
+      : 'https://intex-2025.azurewebsites.net/login?useSessionCookies=true';
 
     try {
       const response = await fetch(loginUrl, {
