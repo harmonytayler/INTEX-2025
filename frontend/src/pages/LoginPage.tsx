@@ -44,7 +44,7 @@ function LoginPage() {
     : 'https://intex-2025.azurewebsites.net/login?useSessionCookies=true';
 
     try {
-      const response = await fetch("https://intex-2025.azurewebsites.net/login", {
+      const response = await fetch("https://intex-2025.azurewebsites.net/login?useCookies=true", {
         method: 'POST',
         credentials: 'include', // ✅ Ensures cookies are sent & received
         headers: { 'Content-Type': 'application/json' },
