@@ -64,8 +64,6 @@ builder.Services.AddSingleton<IEmailSender<IdentityUser>, NoOpEmailSender<Identi
 
 var app = builder.Build();
 
-app.MapGet("/ping", () => "pong");
-
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
