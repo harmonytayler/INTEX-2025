@@ -52,7 +52,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("ConnectFrontend",
         policy =>
         {
-            policy.WithOrigins("http://localhost:3000", "https://kind-ground-08eb7501e.6.azurestaticapps.net")
+            policy.WithOrigins("http://localhost:3000", "https://kind-ground-08eb7501e.6.azurestaticapps.net", "https://intex-2025.azurewebsites.net")
                 .AllowCredentials() //Required to allow cookies
                 .AllowAnyHeader()
                 .AllowAnyMethod();
