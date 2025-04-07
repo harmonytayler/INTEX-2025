@@ -13,8 +13,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<TestDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("TestConnection")));
+builder.Services.AddDbContext<MovieDbContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("MovieConnection")));
 
 //builder for identity (auth)
 builder.Services.AddDbContext<ApplicationDbContext>(options =>

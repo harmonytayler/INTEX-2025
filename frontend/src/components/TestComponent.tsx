@@ -1,22 +1,22 @@
 import { useEffect, useState } from "react";
-import { fetchTests } from "../api/TestAPI";
-import { TestItem } from "../types/TestItem";
+import { fetchMovies } from "../api/MovieAPI";
+import { Movie } from "../types/Movie";
 
-function TestComponent() {
-    const [testItems, setTestItems] = useState<TestItem[]>([]);
+function MovieComponent() {
+    const [movies, setMovies] = useState<Movie[]>([]);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        const loadTests = async () => {
+        const loadMovies = async () => {
             try {
-                const data = await fetchTests();
-                setTestItems(data);
+                const data = await fetchMovies();
+                setMovies(data);
             } catch (err) {
                 setError((err as Error).message);
             }
         };
 
-        loadTests();
+        loadMovies();
     }, []);
 
     if (error) {
@@ -25,7 +25,7 @@ function TestComponent() {
 
     return (
         <div className="p-6">
-            <h3 className="text-2xl font-bold mb-4">Test Items</h3>
+            <h3 className="text-2xl font-bold mb-4">Movies</h3>
             <table className="min-w-full border border-gray-300">
                 <thead className="bg-gray-100">
                     <tr>
@@ -34,10 +34,10 @@ function TestComponent() {
                     </tr>
                 </thead>
                 <tbody>
-                    {testItems.map((item) => (
-                        <tr key={item.testItemId}>
-                            <td className="px-4 py-2 border text-center">{item.testItemId}</td>
-                            <td className="px-4 py-2 border">{item.testItemName}</td>
+                    {movies.map((item) => (
+                        <tr key={item.show_id}>
+                            <td className="px-4 py-2 border text-center">{item.show_id}</td>
+                            <td className="px-4 py-2 border">{item.title}</td>
                         </tr>
                     ))}
                 </tbody>
@@ -46,4 +46,4 @@ function TestComponent() {
     );
 }
 
-export default TestComponent;
+export default MovieComponent;
