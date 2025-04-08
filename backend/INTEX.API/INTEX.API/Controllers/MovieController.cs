@@ -1,8 +1,6 @@
 using INTEX.API.Data;
-using INTEX.API.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Linq;
 
 namespace INTEX.API.Controllers
 {
@@ -15,159 +13,14 @@ namespace INTEX.API.Controllers
         public MovieController(MovieDbContext temp) => _movieContext = temp;
 
         [HttpGet("AllMovies")]
-        public IActionResult GetItems([FromQuery] int pageSize = 10, [FromQuery] int pageNum = 1, [FromQuery] string? searchTerm = null, [FromQuery] string? genres = null)
+        public IActionResult GetItems()
         {
             try
             {
                 var query = _movieContext.movies_titles.AsQueryable();
+                var movies = query.ToList();
 
-                // Apply search filter if searchTerm is provided
-                if (!string.IsNullOrWhiteSpace(searchTerm))
-                {
-                    searchTerm = searchTerm.ToLower();
-                    
-                    // First try exact match
-                    var exactMatches = query.Where(m => m.Title.ToLower().Contains(searchTerm));
-                    
-                    // If no exact matches, try fuzzy search
-                    if (!exactMatches.Any())
-                    {
-                        // Convert to list for fuzzy search since we can't use FuzzyMatch in LINQ expression trees
-                        var allMovies = query.ToList();
-                        var fuzzyMatches = allMovies.Where(m => FuzzySearchHelper.FuzzyMatch(m.Title, searchTerm));
-                        query = fuzzyMatches.AsQueryable();
-                    }
-                    else
-                    {
-                        query = exactMatches;
-                    }
-                }
-
-                // Apply genre filter if genres are provided
-                if (!string.IsNullOrWhiteSpace(genres))
-                {
-                    var genreList = genres.Split(',').ToList();
-                    foreach (var genre in genreList)
-                    {
-                        Console.WriteLine($"Applying filter for genre: {genre}");
-                        
-                        // Use switch for exact property matching instead of reflection
-                        switch (genre)
-                        {
-                            case "Action":
-                                query = query.Where(m => m.Action == 1);
-                                break;
-                            case "Adventure":
-                                query = query.Where(m => m.Adventure == 1);
-                                break;
-                            case "AnimeSeriesInternationalTVShows":
-                                query = query.Where(m => m.AnimeSeriesInternationalTVShows == 1);
-                                break;
-                            case "BritishTVShowsDocuseriesInternationalTVShows":
-                                query = query.Where(m => m.BritishTVShowsDocuseriesInternationalTVShows == 1);
-                                break;
-                            case "Children":
-                                query = query.Where(m => m.Children == 1);
-                                break;
-                            case "Comedies":
-                                query = query.Where(m => m.Comedies == 1);
-                                break;
-                            case "ComediesDramasInternationalMovies":
-                                query = query.Where(m => m.ComediesDramasInternationalMovies == 1);
-                                break;
-                            case "ComediesInternationalMovies":
-                                query = query.Where(m => m.ComediesInternationalMovies == 1);
-                                break;
-                            case "ComediesRomanticMovies":
-                                query = query.Where(m => m.ComediesRomanticMovies == 1);
-                                break;
-                            case "CrimeTVShowsDocuseries":
-                                query = query.Where(m => m.CrimeTVShowsDocuseries == 1);
-                                break;
-                            case "Documentaries":
-                                query = query.Where(m => m.Documentaries == 1);
-                                break;
-                            case "DocumentariesInternationalMovies":
-                                query = query.Where(m => m.DocumentariesInternationalMovies == 1);
-                                break;
-                            case "Docuseries":
-                                query = query.Where(m => m.Docuseries == 1);
-                                break;
-                            case "Dramas":
-                                query = query.Where(m => m.Dramas == 1);
-                                break;
-                            case "DramasInternationalMovies":
-                                query = query.Where(m => m.DramasInternationalMovies == 1);
-                                break;
-                            case "DramasRomanticMovies":
-                                query = query.Where(m => m.DramasRomanticMovies == 1);
-                                break;
-                            case "FamilyMovies":
-                                query = query.Where(m => m.FamilyMovies == 1);
-                                break;
-                            case "Fantasy":
-                                query = query.Where(m => m.Fantasy == 1);
-                                break;
-                            case "HorrorMovies":
-                                query = query.Where(m => m.HorrorMovies == 1);
-                                break;
-                            case "InternationalMoviesThrillers":
-                                query = query.Where(m => m.InternationalMoviesThrillers == 1);
-                                break;
-                            case "InternationalTVShowsRomanticTVShowsTVDramas":
-                                query = query.Where(m => m.InternationalTVShowsRomanticTVShowsTVDramas == 1);
-                                break;
-                            case "KidsTV":
-                                query = query.Where(m => m.KidsTV == 1);
-                                break;
-                            case "LanguageTVShows":
-                                query = query.Where(m => m.LanguageTVShows == 1);
-                                break;
-                            case "Musicals":
-                                query = query.Where(m => m.Musicals == 1);
-                                break;
-                            case "NatureTV":
-                                query = query.Where(m => m.NatureTV == 1);
-                                break;
-                            case "RealityTV":
-                                query = query.Where(m => m.RealityTV == 1);
-                                break;
-                            case "Spirituality":
-                                query = query.Where(m => m.Spirituality == 1);
-                                break;
-                            case "TVAction":
-                                query = query.Where(m => m.TVAction == 1);
-                                break;
-                            case "TVComedies":
-                                query = query.Where(m => m.TVComedies == 1);
-                                break;
-                            case "TVDramas":
-                                query = query.Where(m => m.TVDramas == 1);
-                                break;
-                            case "TalkShowsTVComedies":
-                                query = query.Where(m => m.TalkShowsTVComedies == 1);
-                                break;
-                            case "Thrillers":
-                                query = query.Where(m => m.Thrillers == 1);
-                                break;
-                            default:
-                                Console.WriteLine($"Unknown genre: {genre}");
-                                break;
-                        }
-                    }
-                }
-
-                var totalCount = query.Count();
-                
-                var movies = query
-                    .Skip((pageNum - 1) * pageSize)
-                    .Take(pageSize)
-                    .ToList();
-
-                return Ok(new { 
-                    movies = movies,
-                    totalNumMovies = totalCount
-                });
+                return Ok(movies);
             }
             catch (Exception ex)
             {
@@ -204,7 +57,7 @@ namespace INTEX.API.Controllers
                 existingMovie.Rating = movie.Rating;
                 existingMovie.Duration = movie.Duration;
                 existingMovie.Description = movie.Description;
-                
+
                 // Update genre properties
                 existingMovie.Action = movie.Action;
                 existingMovie.Adventure = movie.Adventure;
