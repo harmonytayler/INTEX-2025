@@ -11,13 +11,21 @@ export const fetchMovies = async (
   pageSize: number,
   pageNum: number,
   selectedCategories: string[],
+  searchTerm?: string,
+  selectedGenres?: string[]
 ): Promise<FetchMoviesResponse> => {
   try {
       const categoryParams = selectedCategories
           .map((cat) => `movieTypes=${encodeURIComponent(cat)}`)
           .join('&');
 
-      const url = `${API_URL}/AllMovies?pageSize=${pageSize}&pageNum=${pageNum}${selectedCategories.length ? `&${categoryParams}` : ''}`;
+      const searchParam = searchTerm ? `&searchTerm=${encodeURIComponent(searchTerm)}` : '';
+      
+      const genreParams = selectedGenres && selectedGenres.length > 0
+          ? `&genres=${selectedGenres.map(genre => encodeURIComponent(genre)).join(',')}`
+          : '';
+      
+      const url = `${API_URL}/AllMovies?pageSize=${pageSize}&pageNum=${pageNum}${selectedCategories.length ? `&${categoryParams}` : ''}${searchParam}${genreParams}`;
       console.log("Fetching from URL:", url);
 
       const response = await fetch(url, {
