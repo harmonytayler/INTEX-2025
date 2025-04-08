@@ -66,26 +66,7 @@ public class MovieController : ControllerBase
 
 
 
-        private string GenerateNextShowId()
-        {
-            // Get all existing show IDs
-            var existingIds = _movieContext.movies_titles
-                .Select(m => m.ShowId)
-                .ToList();
-
-            // Find the highest number in existing IDs
-            int maxNumber = 0;
-            foreach (var id in existingIds)
-            {
-                if (id.StartsWith("s") && int.TryParse(id.Substring(1), out int number))
-                {
-                    maxNumber = Math.Max(maxNumber, number);
-                }
-            }
-
-            // Generate the next ID
-            return $"s{maxNumber + 1}";
-        }
+        // Removed duplicate method
 
         private string GenerateNextShowId()
         {
