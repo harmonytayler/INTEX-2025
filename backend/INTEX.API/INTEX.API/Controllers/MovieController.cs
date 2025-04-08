@@ -1,6 +1,8 @@
 using INTEX.API.Data;
+using INTEX.API.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 
 namespace INTEX.API.Controllers
 {
@@ -23,7 +25,22 @@ namespace INTEX.API.Controllers
                 if (!string.IsNullOrWhiteSpace(searchTerm))
                 {
                     searchTerm = searchTerm.ToLower();
-                    query = query.Where(m => m.Title.ToLower().Contains(searchTerm));
+                    
+                    // First try exact match
+                    var exactMatches = query.Where(m => m.Title.ToLower().Contains(searchTerm));
+                    
+                    // If no exact matches, try fuzzy search
+                    if (!exactMatches.Any())
+                    {
+                        // Convert to list for fuzzy search since we can't use FuzzyMatch in LINQ expression trees
+                        var allMovies = query.ToList();
+                        var fuzzyMatches = allMovies.Where(m => FuzzySearchHelper.FuzzyMatch(m.Title, searchTerm));
+                        query = fuzzyMatches.AsQueryable();
+                    }
+                    else
+                    {
+                        query = exactMatches;
+                    }
                 }
 
                 // Apply genre filter if genres are provided

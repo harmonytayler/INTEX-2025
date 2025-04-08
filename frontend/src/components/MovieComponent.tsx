@@ -65,15 +65,6 @@ function MovieList({selectedCategories}: {selectedCategories: string[]}) {
         loadMovies();
     }, [pageSize, pageNum, selectedCategories, activeSearchTerm, selectedGenres]);
 
-    // Display loading state
-    if (loading) return <p>Loading movies...</p>;
-    
-    // Display error if any
-    if (error) return <p className="text-danger">Error: {error}</p>;
-    
-    // Display message if no movies found
-    if (!movies || movies.length === 0) return <p>No movies found.</p>;
-
     return (
         <div className="flex flex-col md:flex-row gap-6">
             {/* Genre Filter Sidebar */}
@@ -104,32 +95,51 @@ function MovieList({selectedCategories}: {selectedCategories: string[]}) {
                         </button>
                     </div>
 
-                    <h3>Movies Found: {movies.length}</h3>
-                    <div className="row">
-                        {movies.map((movie, index) => (
-                            <div key={movie.showId|| `movie-${index}`} className="col-md-6 mb-3">
-                                <div className="card">
-                                    <div className="card-body">
-                                        <h5 className="card-title">{movie.title || 'Unknown Title'}</h5>
-                                        <p className="card-text">Type: {movie.type || 'Unknown'}</p>
-                                        {/* Only include the most essential information */}
-                                        {movie.director && <p className="card-text">Director: {movie.director}</p>}
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+                    {/* Display loading state */}
+                    {loading && <p>Loading movies...</p>}
                     
-                    <Pagination
-                        currentPage={pageNum}
-                        totalPages={totalPages}
-                        pageSize={pageSize}
-                        onPageChange={setPageNum}
-                        onPageSizeChange={(newSize) => {
-                            setPageSize(newSize);
-                            setPageNum(1);
-                        }}
-                    />
+                    {/* Display error if any */}
+                    {error && <p className="text-danger">Error: {error}</p>}
+                    
+                    {/* Display message if no movies found */}
+                    {!loading && !error && (!movies || movies.length === 0) && (
+                        <p className="text-gray-600 mb-4">No movies found. Try adjusting your search or filters.</p>
+                    )}
+
+                    {/* Display movies count and list if there are results */}
+                    {!loading && !error && movies && movies.length > 0 && (
+                        <>
+                            <h3>Movies Found: {movies.length}</h3>
+                            <div className="row">
+                                {movies.map((movie, index) => (
+                                    <div key={movie.showId|| `movie-${index}`} className="col-md-6 mb-3">
+                                        <div className="card">
+                                            <div className="card-body">
+                                                <h5 className="card-title">{movie.title || 'Unknown Title'}</h5>
+                                                <p className="card-text">Type: {movie.type || 'Unknown'}</p>
+                                                {/* Only include the most essential information */}
+                                                {movie.director && <p className="card-text">Director: {movie.director}</p>}
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </>
+                    )}
+                    
+                    {/* Always show pagination if there are any pages */}
+                    {totalPages > 0 && (
+                        <Pagination
+                            currentPage={pageNum}
+                            totalPages={totalPages}
+                            pageSize={pageSize}
+                            onPageChange={setPageNum}
+                            onPageSizeChange={(newSize) => {
+                                setPageSize(newSize);
+                                setPageNum(1);
+                            }}
+                        />
+                    )}
                 </div>
             </div>
         </div>
