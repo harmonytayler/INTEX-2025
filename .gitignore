@@ -69,16 +69,9 @@ _deploy/
 *.zip
 *.tar.gz
 
-# SQLite databases
-*.db
-*.db-shm
-*.db-wal
-
-# Logs and databases
+# Logs
 logs/
 *.log
-*.sqlite
-*.sqlite3
 
 # Temporary files
 tmp/
