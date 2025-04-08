@@ -8,8 +8,6 @@ interface FetchMoviesResponse {
 const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://localhost:5001';
 const API_URL = `${baseUrl}/Movie`;
 
-// const API_URL = `https://localhost:5001/Movie`;
-
 export const fetchMovies = async (
   pageSize: number,
   pageNum: number,

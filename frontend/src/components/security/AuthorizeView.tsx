@@ -43,7 +43,8 @@ function AuthorizeView(props: { children: React.ReactNode }) {
       }
     }
 
-    fetchWithRetry('https://localhost:5001/pingauth', {
+    const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://localhost:5001';
+    fetchWithRetry(`${baseUrl}/pingauth`, {
       method: 'GET',
       credentials: 'include',
     });

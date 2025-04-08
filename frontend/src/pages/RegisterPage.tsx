@@ -38,7 +38,8 @@ function Register() {
       // clear error message
       setError('');
       // post data to the /register api
-      fetch('https://intex-2025.azurewebsites.net/register', {
+      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://localhost:5001';
+      fetch(`${baseUrl}/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
