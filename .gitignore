@@ -72,6 +72,8 @@ _deploy/
 # Logs
 logs/
 *.log
+*.sqlite-shm
+*.sqlite-wal
 
 # Temporary files
 tmp/
