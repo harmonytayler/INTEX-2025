@@ -1,142 +1,154 @@
-import { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import MovieRow from '../components/MovieRow';
+import SearchDropdown from '../components/SearchDropdown';
 import { Movie } from '../types/Movie';
 import { fetchMovies } from '../api/MovieAPI';
-import MovieRow from '../components/MovieRow';
 import Logout from '../components/security/Logout';
 import AuthorizeView, { AuthorizedUser } from '../components/security/AuthorizeView';
 
-// Define main genres for the rows
+// Define the main genres we want to display
 const MAIN_GENRES = [
   'Action',
   'Comedy',
   'Drama',
   'Horror',
-  'Documentary',
+  'Romance',
+  'Sci-Fi',
   'Thriller',
-  'Family',
-  'Romance'
+  'Documentary',
+  'Animation',
+  'Family'
 ];
 
 // Map display genres to database field names
-const GENRE_MAPPING: Record<string, string> = {
+const GENRE_MAPPING: Record<string, keyof Movie> = {
   'Action': 'action',
   'Comedy': 'comedies',
   'Drama': 'dramas',
   'Horror': 'horrorMovies',
-  'Documentary': 'documentaries',
+  'Romance': 'comediesRomanticMovies',
+  'Sci-Fi': 'fantasy', // Using fantasy as a proxy for Sci-Fi
   'Thriller': 'thrillers',
-  'Family': 'familyMovies',
-  'Romance': 'comediesRomanticMovies'
+  'Documentary': 'documentaries',
+  'Animation': 'animeSeriesInternationalTVShows', // Using anime as a proxy for Animation
+  'Family': 'familyMovies'
 };
 
-function HomePage() {
-  const [moviesByGenre, setMoviesByGenre] = useState<{ [key: string]: Movie[] }>({});
+const HomePage: React.FC = () => {
+  const navigate = useNavigate();
+  const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showSearchDropdown, setShowSearchDropdown] = useState(false);
 
   useEffect(() => {
-    const loadMoviesByGenre = async () => {
+    const loadMovies = async () => {
       try {
         setLoading(true);
-        setError(null);
-
-        // Fetch all movies first
+        // Fetch all movies with a large page size to get everything at once
         const response = await fetchMovies(100, 1, [], '', []);
-        
-        if (response && Array.isArray(response.movies)) {
-          const allMovies = response.movies;
-          
-          // Categorize movies by genre
-          const genreMovies: { [key: string]: Movie[] } = {};
-          
-          // Initialize empty arrays for each genre
-          MAIN_GENRES.forEach(genre => {
-            genreMovies[genre] = [];
-          });
-          
-          // Categorize each movie into appropriate genres
-          allMovies.forEach(movie => {
-            MAIN_GENRES.forEach(displayGenre => {
-              const dbField = GENRE_MAPPING[displayGenre];
-              if (dbField && movie[dbField as keyof Movie] === 1) {
-                genreMovies[displayGenre].push(movie);
-              }
-            });
-          });
-          
-          setMoviesByGenre(genreMovies);
-        } else {
-          console.warn("Unexpected data format:", response);
-          setMoviesByGenre({});
-        }
-      } catch (error) {
-        console.error('Error loading movies:', error);
-        setError((error as Error).message);
+        setMovies(response.movies);
+        setError(null);
+      } catch (err) {
+        setError('Failed to load movies. Please try again later.');
+        console.error('Error loading movies:', err);
       } finally {
         setLoading(false);
       }
     };
 
-    loadMoviesByGenre();
+    loadMovies();
   }, []);
+
+  // Categorize movies by genre
+  const moviesByGenre = MAIN_GENRES.reduce((acc, genre) => {
+    const dbField = GENRE_MAPPING[genre];
+    if (!dbField) return acc;
+
+    const genreMovies = movies.filter(movie => movie[dbField] === 1);
+    if (genreMovies.length > 0) {
+      acc[genre] = genreMovies;
+    }
+    return acc;
+  }, {} as Record<string, Movie[]>);
 
   const handleMovieClick = (movie: Movie) => {
     navigate(`/movie/${movie.showId}`);
   };
 
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+    setShowSearchDropdown(true);
+  };
+
+  const handleSearchMovieSelect = (movie: Movie) => {
+    handleMovieClick(movie);
+    setSearchTerm('');
+    setShowSearchDropdown(false);
+  };
+
+  const handleSearchClose = () => {
+    setShowSearchDropdown(false);
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-600"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-red-600 text-xl">{error}</div>
+      </div>
+    );
+  }
+
   return (
     <AuthorizeView>
-      <div className="min-h-screen bg-black">
-        {/* Header with search and user info */}
-        <div className="bg-black/80 fixed top-0 left-0 right-0 z-50 p-4 flex justify-between items-center">
-          <div className="flex-1 max-w-2xl">
+      <div className="min-h-screen bg-gray-900 text-white p-4">
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-3xl font-bold mb-6">Movie Streaming</h1>
+          
+          {/* Search Bar */}
+          <div className="relative mb-8">
             <input
               type="text"
-              className="w-full p-2 rounded-lg bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-600"
-              placeholder="Search movies..."
+              placeholder="Search for movies, directors, or actors..."
+              className="w-full p-3 bg-gray-800 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-red-600"
+              value={searchTerm}
+              onChange={handleSearchChange}
             />
+            
+            {/* Search Dropdown */}
+            {showSearchDropdown && (
+              <SearchDropdown
+                searchTerm={searchTerm}
+                movies={movies}
+                onMovieSelect={handleSearchMovieSelect}
+                onClose={handleSearchClose}
+              />
+            )}
           </div>
-          <div className="ml-4">
-            <Logout>
-              <span className="text-white">
-                <AuthorizedUser value="email" />
-              </span>
-            </Logout>
-          </div>
-        </div>
-
-        {/* Main content */}
-        <div className="pt-20 px-4 md:px-8 pb-8">
-          {loading && (
-            <div className="text-white text-center py-8">Loading movies...</div>
-          )}
-
-          {error && (
-            <div className="text-red-500 text-center py-8">
-              Error: {error}
-            </div>
-          )}
-
-          {!loading && !error && (
-            <div className="movie-rows-container space-y-8">
-              {MAIN_GENRES.map((genre) => (
-                moviesByGenre[genre] && moviesByGenre[genre].length > 0 && (
-                  <MovieRow
-                    key={genre}
-                    genre={genre}
-                    movies={moviesByGenre[genre]}
-                    onMovieClick={handleMovieClick}
-                  />
-                )
-              ))}
-            </div>
-          )}
+          
+          {/* Movie Rows */}
+          {Object.entries(moviesByGenre).map(([genre, genreMovies]) => (
+            <MovieRow
+              key={genre}
+              genre={genre}
+              movies={genreMovies}
+              onMovieClick={handleMovieClick}
+            />
+          ))}
         </div>
       </div>
     </AuthorizeView>
   );
-}
+};
 
 export default HomePage;

@@ -14,7 +14,7 @@ export default defineConfig({
         "img-src 'self' data:; " +
         "frame-ancestors 'none'; " +
         "font-src 'self' fonts.gstatic.com data:; " +
-        "connect-src 'self' https://localhost:5001 https://intex-2025.azurewebsites.net https://accounts.google.com https://oauth2.googleapis.com; " + // ✅ Allow OAuth token exchange
+        "connect-src 'self' https://localhost:5000 https://intex-2025.azurewebsites.net https://accounts.google.com https://oauth2.googleapis.com; " + // ✅ Allow OAuth token exchange
         "object-src 'none'; " +
         "base-uri 'self'; " +
         "form-action 'self'; " +

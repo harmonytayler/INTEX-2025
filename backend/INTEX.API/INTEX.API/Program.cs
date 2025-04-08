@@ -11,10 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options => 
-{
-    options.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
-});
+builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<MovieDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("MovieConnection")));
@@ -43,7 +40,7 @@ builder.Services.AddScoped<IUserClaimsPrincipalFactory<IdentityUser>, CustomUser
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
-    // Don't set a specific domain for localhost
+    options.Cookie.Domain = "intex-2025.azurewebsites.net";
     options.Cookie.HttpOnly = true;
     options.Cookie.SameSite = SameSiteMode.None;
     options.Cookie.Name = ".AspNetCore.Identity.Application";
@@ -57,10 +54,10 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins(
                 "http://localhost:3000",
-                "https://kind-ground-08eb7501e.6.azurestaticapps.net", "http://localhost:5000", "http://localhost:5001", "https://localhost:5001", "https://intex-2025.azurewebsites.net")
-            .AllowAnyMethod()
+                "https://kind-ground-08eb7501e.6.azurestaticapps.net", "http://localhost:5000", "https://intex-2025.azurewebsites.net")
+            .AllowCredentials()
             .AllowAnyHeader()
-            .AllowCredentials();
+            .AllowAnyMethod();
     });
 });
 
@@ -116,15 +113,6 @@ app.MapPost("/login", async (HttpContext context, SignInManager<IdentityUser> si
     return Results.Json(new { message = "Invalid email or password" }, statusCode: StatusCodes.Status401Unauthorized);
 });
 
-// GET endpoint for login page to handle redirects
-app.MapGet("/login", (HttpContext context) =>
-{
-    // Return a simple HTML page for login
-    return Results.Content(
-        "<!DOCTYPE html><html><head><title>Login</title></head><body><h1>Login Required</h1><p>Please log in to access this resource.</p></body></html>",
-        "text/html"
-    );
-});
 
 // Logout endpoint to remove cookie
 app.MapPost("/logout", async (HttpContext context, SignInManager<IdentityUser> signInManager) =>
@@ -154,5 +142,4 @@ app.MapGet("/pingauth", (ClaimsPrincipal user) =>
     return Results.Json(new { email = email }); //returns user email as json
 }).RequireAuthorization();
 
-// Explicitly set the port to avoid conflicts
-app.Run("https://localhost:5001");
+app.Run();
