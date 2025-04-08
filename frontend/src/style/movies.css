@@ -1,0 +1,73 @@
+/* Hide scrollbar for Chrome, Safari and Opera */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* Movie row container */
+.movie-row-container {
+  display: flex;
+  flex-direction: row;
+  overflow-x: auto;
+  padding-bottom: 16px;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  gap: 8px;
+}
+
+/* Movie row hover effect */
+.movie-row:hover .movie-card {
+  transform: scale(1.05);
+  transition: transform 0.3s ease-in-out;
+}
+
+/* Movie card hover effect */
+.movie-card {
+  position: relative;
+  transition: all 0.3s ease-in-out;
+  flex-shrink: 0;
+}
+
+.movie-card:hover {
+  z-index: 1;
+}
+
+/* Poster placeholder gradient */
+.poster-placeholder {
+  background: linear-gradient(45deg, #1a1a1a, #2a2a2a);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Smooth scrolling for movie rows */
+.movie-row > div {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch; /* For smooth scrolling on iOS */
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .movie-card {
+    width: 100px;
+  }
+  
+  .poster-placeholder {
+    height: 180px;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .movie-card {
+    width: 120px;
+  }
+}
+
+@media (min-width: 1025px) {
+  .movie-card {
+    width: 130px;
+  }
+} 
