@@ -1,4 +1,7 @@
 import { useNavigate } from 'react-router-dom';
+import { backendUrl } from '../../types/env';
+
+const API_URL = `${backendUrl}`;
 
 function Logout(props: { children: React.ReactNode }) {
   const navigate = useNavigate();
@@ -7,7 +10,7 @@ function Logout(props: { children: React.ReactNode }) {
     e.preventDefault();
 
     try {
-      const response = await fetch('https://intex-2025.azurewebsites.net/logout', {
+      const response = await fetch(`${API_URL}/logout`, {
         method: 'POST',
         credentials: 'include', // Ensure cookies are sent
         headers: {

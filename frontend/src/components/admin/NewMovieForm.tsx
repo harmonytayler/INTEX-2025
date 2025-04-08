@@ -1,48 +1,166 @@
-import { useState } from "react";
-import { Movie } from "../types/Movie";
-import { updateMovie } from "../api/MovieAPI";
+import { useState } from 'react';
+import { Movie } from '../../types/Movie';
+import { addMovie } from '../../api/MovieAPI';
 
-interface EditMovieFormProps {
-    movie: Movie;
-    onSuccess: () => void;
-    onCancel: () => void;
+interface NewMovieFormProps {
+  onSuccess: () => void;
+  onCancel: () => void;
 }
 
-const EditMovieForm = ({
-    movie,
-    onSuccess,
-    onCancel,
-}: EditMovieFormProps) => {
-    const [formData, setFormData] = useState<Movie>({...movie});
+const NewMovieForm = ({ onSuccess, onCancel }: NewMovieFormProps) => {
+  const [formData, setFormData] = useState<Movie>({
+    showId: '',
+    type: '',
+    title: '',
+    director: '',
+    cast: '',
+    country: '',
+    releaseYear: 0,
+    rating: '',
+    duration: '',
+    description: '',
+    action: 0,
+    adventure: 0,
+    animeSeriesInternationalTVShows: 0,
+    britishTVShowsDocuseriesInternationalTVShows: 0,
+    children: 0,
+    comedies: 0,
+    comediesDramasInternationalMovies: 0,
+    comediesInternationalMovies: 0,
+    comediesRomanticMovies: 0,
+    crimeTVShowsDocuseries: 0,
+    documentaries: 0,
+    documentariesInternationalMovies: 0,
+    docuseries: 0,
+    dramas: 0,
+    dramasInternationalMovies: 0,
+    dramasRomanticMovies: 0,
+    familyMovies: 0,
+    fantasy: 0,
+    horrorMovies: 0,
+    internationalMoviesThrillers: 0,
+    internationalTVShowsRomanticTVShowsTVDramas: 0,
+    kidsTV: 0,
+    languageTVShows: 0,
+    musicals: 0,
+    natureTV: 0,
+    realityTV: 0,
+    spirituality: 0,
+    tVAction: 0,
+    tVComedies: 0,
+    tVDramas: 0,
+    talkShowsTVComedies: 0,
+    thrillers: 0,
+  });
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value, type } = e.target;
-        setFormData({
-            ...formData, 
-            [name]: type === 'number' ? parseInt(value) : value
-        });
-    };
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type } = e.target;
+    setFormData({
+      ...formData,
+      [name]: type === 'number' ? parseInt(value) : value,
+    });
+  };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        await updateMovie(formData.showId, formData);
-        onSuccess();
-    };
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await addMovie(formData);
+    onSuccess();
+  };
 
-    return (
-        <form onSubmit={handleSubmit}>
-            <h2>Edit Movie</h2>
-            <label>Show ID:<input type="text" name="showId" value={formData.showId} onChange={handleChange} readOnly /></label>
-            <label>Type:<input type="text" name="type" value={formData.type} onChange={handleChange} /></label>
-            <label>Title:<input type="text" name="title" value={formData.title} onChange={handleChange} /></label>
-            <label>Director:<input type="text" name="director" value={formData.director || ""} onChange={handleChange} /></label>
-            <label>Cast:<input type="text" name="cast" value={formData.cast || ""} onChange={handleChange} /></label>
-            <label>Country:<input type="text" name="country" value={formData.country || ""} onChange={handleChange} /></label>
-            <label>Release Year:<input type="number" name="releaseYear" value={formData.releaseYear} onChange={handleChange} /></label>
-            <label>Rating:<input type="text" name="rating" value={formData.rating || ""} onChange={handleChange} /></label>
-            <label>Duration:<input type="text" name="duration" value={formData.duration || ""} onChange={handleChange} /></label>
-            <label>Description:<input type="text" name="description" value={formData.description || ""} onChange={handleChange} /></label>
-            <label>Action:<input type="number" name="action" value={formData["action"]} onChange={handleChange} /></label>
+  return (
+    <form onSubmit={handleSubmit}>
+      <h2>Add New Movie</h2>
+      <label>
+        Show ID:
+        <input
+          type="text"
+          name="showId"
+          value={formData.showId}
+          onChange={handleChange}
+        />
+      </label>
+      <label>
+        Type:
+        <input
+          type="text"
+          name="type"
+          value={formData.type}
+          onChange={handleChange}
+        />
+      </label>
+      <label>
+        Title:
+        <input
+          type="text"
+          name="title"
+          value={formData.title}
+          onChange={handleChange}
+        />
+      </label>
+      <label>
+        Director:
+        <input
+          type="text"
+          name="director"
+          value={formData.director || ''}
+          onChange={handleChange}
+        />
+      </label>
+      <label>
+        Cast:
+        <input
+          type="text"
+          name="cast"
+          value={formData.cast || ''}
+          onChange={handleChange}
+        />
+      </label>
+      <label>
+        Country:
+        <input
+          type="text"
+          name="country"
+          value={formData.country || ''}
+          onChange={handleChange}
+        />
+      </label>
+      <label>
+        Release Year:
+        <input
+          type="number"
+          name="releaseYear"
+          value={formData.releaseYear}
+          onChange={handleChange}
+        />
+      </label>
+      <label>
+        Rating:
+        <input
+          type="text"
+          name="rating"
+          value={formData.rating || ''}
+          onChange={handleChange}
+        />
+      </label>
+      <label>
+        Duration:
+        <input
+          type="text"
+          name="duration"
+          value={formData.duration || ''}
+          onChange={handleChange}
+        />
+      </label>
+      <label>
+        Description:
+        <input
+          type="text"
+          name="description"
+          value={formData.description || ''}
+          onChange={handleChange}
+        />
+      </label>
+      {/* <label>Action:<input type="number" name="action" value={formData["action"]} onChange={handleChange} /></label>
             <label>Adventure:<input type="number" name="adventure" value={formData["adventure"]} onChange={handleChange} /></label>
             <label>Anime Series International TV Shows:<input type="number" name="animeSeriesInternationalTVShows" value={formData["animeSeriesInternationalTVShows"]} onChange={handleChange} /></label>
             <label>British TV Shows Docuseries International TV Shows:<input type="number" name="britishTVShowsDocuseriesInternationalTVShows" value={formData["britishTVShowsDocuseriesInternationalTVShows"]} onChange={handleChange} /></label>
@@ -73,10 +191,14 @@ const EditMovieForm = ({
             <label>TV Comedies:<input type="number" name="tVComedies" value={formData["tVComedies"]} onChange={handleChange} /></label>
             <label>TV Dramas:<input type="number" name="tVDramas" value={formData["tVDramas"]} onChange={handleChange} /></label>
             <label>Talk Shows TV Comedies:<input type="number" name="talkShowsTVComedies" value={formData["talkShowsTVComedies"]} onChange={handleChange} /></label>
-            <label>Thrillers:<input type="number" name="thrillers" value={formData["thrillers"]} onChange={handleChange} /></label>
-            <button type="submit" className="btn btn-primary">Update Movie</button>
-            <button type="button" onClick={onCancel}>Cancel</button>
-        </form>
-    );
-};      
-export default EditMovieForm;
+            <label>Thrillers:<input type="number" name="thrillers" value={formData["thrillers"]} onChange={handleChange} /></label> */}
+      <button type="submit" className="btn btn-primary">
+        Add Movie
+      </button>
+      <button type="button" onClick={onCancel}>
+        Cancel
+      </button>
+    </form>
+  );
+};
+export default NewMovieForm;

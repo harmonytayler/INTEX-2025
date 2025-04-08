@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../style/identity.css';
+import { backendUrl } from '../types/env';
 
 function Register() {
   // state variables for email and passwords
@@ -8,6 +9,7 @@ function Register() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const navigate = useNavigate();
+  const API_URL = `${backendUrl}`;
 
   // state variable for error messages
   const [error, setError] = useState('');
@@ -38,7 +40,7 @@ function Register() {
       // clear error message
       setError('');
       // post data to the /register api
-      fetch('https://intex-2025.azurewebsites.net/register', {
+      fetch(`${API_URL}/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

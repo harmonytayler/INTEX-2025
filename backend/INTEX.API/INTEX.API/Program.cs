@@ -42,7 +42,16 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.Cookie.SameSite = SameSiteMode.None;
     options.Cookie.Name = ".AspNetCore.Identity.Application";
     options.LoginPath = "/login";
-    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    
+    // Conditionally set secure policy based on the environment
+    if (builder.Environment.IsDevelopment())
+    {
+        options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest; // Allow cookies in dev for HTTP
+    }
+    else
+    {
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Enforce HTTPS in production
+    }
 });
 
 // Authorization

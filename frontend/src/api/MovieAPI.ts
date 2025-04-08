@@ -1,11 +1,13 @@
 import { Movie as Movie } from '../types/Movie';
+import { backendUrl } from '../types/env';
+
 
 interface FetchMoviesResponse {
   movies: Movie[];
   totalNumMovies: number;
 }
-
-const API_URL = 'https://intex-2025.azurewebsites.net/Movie';
+// import { backendUrl } from '../types/env';
+const API_URL = `${backendUrl}/Movies`;
 
 export const fetchMovies = async (
   pageSize: number,

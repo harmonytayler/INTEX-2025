@@ -2,12 +2,15 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../style/identity.css';
 import '@fortawesome/fontawesome-free/css/all.css';
+import { backendUrl } from '../types/env';
+
 
 function LoginPage() {
   // state variables for email and passwords
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [rememberme, setRememberme] = useState<boolean>(false);
+  const API_URL = `${backendUrl}`;
 
   // state variable for error messages
   const [error, setError] = useState<string>('');
@@ -40,8 +43,8 @@ function LoginPage() {
     }
 
     const loginUrl = rememberme
-    ? 'https://intex-2025.azurewebsites.net/login?useCookies=true'
-    : 'https://intex-2025.azurewebsites.net/login?useSessionCookies=true';
+    ? `${API_URL}/login?useCookies=true`
+    : `${API_URL}/login?useSessionCookies=true`;
 
     try {
       const response = await fetch(loginUrl, {
