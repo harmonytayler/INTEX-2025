@@ -24,7 +24,7 @@ function HomePage() {
         <p className="mb-6 text-gray-600">
           This is the home page that displays all test items:
         </p>
-        <MovieComponent />
+        <MovieComponent selectedCategories={[]} />
       </div>
     </AuthorizeView>
   );

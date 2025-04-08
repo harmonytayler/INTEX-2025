@@ -15,10 +15,17 @@ namespace INTEX.API.Controllers
         [HttpGet("AllMovies")]
         public IActionResult GetItems()
         {
-            var query = _movieContext.movies_titles.AsQueryable();
-            var movies = query.Take(5).ToList();
+            try
+            {
+                var query = _movieContext.movies_titles.AsQueryable();
+                var movies = query.ToList();
 
-            return Ok(movies);
+                return Ok(movies);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
     }
 }

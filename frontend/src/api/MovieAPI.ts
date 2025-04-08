@@ -17,20 +17,41 @@ export const fetchMovies = async (
           .map((cat) => `movieTypes=${encodeURIComponent(cat)}`)
           .join('&');
 
-      const response = await fetch(
-          `${API_URL}/AllMovies?pageSize=${pageSize}&pageNum=${pageNum}${selectedCategories.length ? `&${categoryParams}` : ''}`,
-          {
-              credentials: 'include',
-          }
-      );
+      const url = `${API_URL}/AllMovies?pageSize=${pageSize}&pageNum=${pageNum}${selectedCategories.length ? `&${categoryParams}` : ''}`;
+      console.log("Fetching from URL:", url);
+
+      const response = await fetch(url, {
+          credentials: 'include',
+      });
 
       if (!response.ok) {
-          throw new Error(`Failed to fetch projects`);
+          console.error("API error response:", response.status, response.statusText);
+          throw new Error(`Failed to fetch movies: ${response.status} ${response.statusText}`);
       }
-      return await response.json();
+
+      const data = await response.json();
+      console.log("API response data:", data);
+
+      // The backend might return the data directly, not wrapped in a movies property
+      if (Array.isArray(data)) {
+          return {
+              movies: data,
+              totalNumMovies: data.length
+          };
+      }
+      
+      // Provide default values if the response structure is unexpected
+      return {
+          movies: Array.isArray(data.movies) ? data.movies : [],
+          totalNumMovies: data.totalNumMovies || 0
+      };
   } catch (error) {
-      console.error("Error fetching projects:", error);
-      throw error;
+      console.error("Error fetching movies:", error);
+      // Return a valid empty response structure instead of throwing
+      return {
+          movies: [],
+          totalNumMovies: 0
+      };
   }
 };
 
@@ -55,9 +76,9 @@ export const addMovie = async (newMovie: Movie): Promise<Movie> => {
   }
 };
 
-export const updateMovie = async (show_id: number, updatedMovie: Movie): Promise<Movie> => {
+export const updateMovie = async (showId: string, updatedMovie: Movie): Promise<Movie> => {
   try {
-      const response = await fetch(`${API_URL}/Update/${show_id}`, {
+      const response = await fetch(`${API_URL}/Update/${showId}`, {
           method: "PUT",
           headers: {
               "Content-Type": "application/json",
@@ -76,9 +97,9 @@ export const updateMovie = async (show_id: number, updatedMovie: Movie): Promise
   }
 }
 
-export const deleteMovie = async (show_id: number): Promise<void> => {
+export const deleteMovie = async (showId: string): Promise<void> => {
   try {
-      const response = await fetch(`${API_URL}/DeleteMovie/${show_id}`,
+      const response = await fetch(`${API_URL}/DeleteMovie/${showId}`,
           {
               method: 'DELETE'
           }

@@ -6,45 +6,45 @@ import NewMovieForm from "../components/NewMovieForm";
 import EditProjectForm from "../components/EditMovieForm.tsx";
 
 // List of all genre keys in the Movie interface
-// const genreKeys: (keyof Movie)[] = [
-//     "action",
-//     "adventure",
-//     "anime_Series_International_TV_Shows",
-//     "british_TV_Shows_Docuseries_International_TV_Shows",
-//     "children",
-//     "comedies",
-//     "comedies_Dramas_International_Movies",
-//     "comedies_International_Movies",
-//     "comedies_Romatic_Movies",
-//     "crime_TV_Shows_Docuseries",
-//     "documentaries",
-//     "documentaries_International_Movies",
-//     "docuseries",
-//     "dramas",
-//     "dramas_International_Movies",
-//     "dramas_Romantic_Movies",
-//     "family_Movies",
-//     "fantasy",
-//     "horror_Movies",
-//     "international_Movies_Thrillers",
-//     "international_TV_Shows_Romantic_TV_Shows_TV_Dramas",
-//     "kids_TV",
-//     "language_TV_Shows",
-//     "musicals",
-//     "nature_TV",
-//     "reality_TV",
-//     "spirituality",
-//     "tv_Action",
-//     "tv_Comedies",
-//     "tv_Dramas",
-//     "talk_Shows_TV_Comedies",
-//     "thrillers"
-// ];
+const genreKeys: (keyof Movie)[] = [
+    "action",
+    "adventure",
+    "animeSeriesInternationalTVShows",
+    "britishTVShowsDocuseriesInternationalTVShows",
+    "children",
+    "comedies",
+    "comediesDramasInternationalMovies",
+    "comediesInternationalMovies",
+    "comediesRomanticMovies",
+    "crimeTVShowsDocuseries",
+    "documentaries",
+    "documentariesInternationalMovies",
+    "docuseries",
+    "dramas",
+    "dramasInternationalMovies",
+    "dramasRomanticMovies",
+    "familyMovies",
+    "fantasy",
+    "horrorMovies",
+    "internationalMoviesThrillers",
+    "internationalTVShowsRomanticTVShowsTVDramas",
+    "kidsTV",
+    "languageTVShows",
+    "musicals",
+    "natureTV",
+    "realityTV",
+    "spirituality",
+    "tVAction",
+    "tVComedies",
+    "tVDramas",
+    "talkShowsTVComedies",
+    "thrillers"
+];
 
 // Helper function that detects which genre property equals 1 and returns them as a comma-separated string
-// const getGenres = (movie: Movie): string => {
-//     return genreKeys.filter((key) => movie[key] === 1).join(", ");
-// };
+const getGenres = (movie: Movie): string => {
+    return genreKeys.filter((key) => movie[key] === 1).join(", ");
+};
 
 const AdminProjectsPage = () => {
     const [movies, setMovies] = useState<Movie[]>([]);
@@ -72,13 +72,13 @@ const AdminProjectsPage = () => {
         loadMovies();
     }, [pageSize, pageNum]);
 
-    const handleDelete = async (show_id: number) => {
+    const handleDelete = async (showId: string) => {
         const confirmDelete = window.confirm("Are you sure you want to delete this project?");
         if (!confirmDelete) return;
 
         try {
-            await deleteMovie(show_id);
-            setMovies(movies.filter((m) => m.show_id !== show_id));
+            await deleteMovie(showId);
+            setMovies(movies.filter((m) => m.showId !== showId));
         } catch (error) {
             alert("Failed to delete project. Please try again.");
         }
@@ -144,18 +144,18 @@ const AdminProjectsPage = () => {
                 </thead>
                 <tbody>
                     {movies.map((movie) => (
-                        <tr key={movie.show_id}>
-                            <td>{movie.show_id}</td>
+                        <tr key={movie.showId}>
+                            <td>{movie.showId}</td>
                             <td>{movie.type}</td>
                             <td>{movie.title}</td>
                             <td>{movie.director}</td>
                             <td>{movie.cast}</td>
                             <td>{movie.country}</td>
-                            <td>{movie.release_year}</td>
+                            <td>{movie.releaseYear}</td>
                             <td>{movie.rating}</td>
                             <td>{movie.duration}</td>
                             <td>{movie.description}</td>
-                            {/* <td>{getGenres(movie)}</td> */}
+                            <td>{getGenres(movie)}</td>
                             <td>
                                 <button
                                     className="btn btn-primary btn-sm w-100 mb-1"
@@ -165,7 +165,7 @@ const AdminProjectsPage = () => {
                                 </button>
                                 <button
                                     className="btn btn-danger btn-sm w-100"
-                                    onClick={() => handleDelete(movie.show_id)}
+                                    onClick={() => handleDelete(movie.showId)}
                                 >
                                     Delete
                                 </button>

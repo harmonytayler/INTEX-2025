@@ -8,7 +8,7 @@ namespace INTEX.API.Data
     {
         [Key]
         [Column("show_id")]
-        public int ShowId { get; set; }
+        public string ShowId { get; set; }
 
         [Required]
         [Column("type")]
@@ -19,25 +19,25 @@ namespace INTEX.API.Data
         public string Title { get; set; }
 
         [Column("director")]
-        public string Director { get; set; }
+        public string? Director { get; set; }
 
         [Column("cast")]
-        public string Cast { get; set; }
+        public string? Cast { get; set; }
 
         [Column("country")]
-        public string Country { get; set; }
+        public string? Country { get; set; }
 
         [Column("release_year")]
         public int ReleaseYear { get; set; }
 
         [Column("rating")]
-        public string Rating { get; set; }
+        public string? Rating { get; set; }
 
         [Column("duration")]
-        public string Duration { get; set; }
+        public string? Duration { get; set; }
 
         [Column("description")]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         [Column("Action")]
         public int Action { get; set; }
