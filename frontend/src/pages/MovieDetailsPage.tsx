@@ -4,6 +4,7 @@ import { Movie } from '../types/Movie';
 import { fetchMovies } from '../api/MovieAPI';
 import Logout from '../components/security/Logout';
 import AuthorizeView, { AuthorizedUser } from '../components/security/AuthorizeView';
+import SearchBar from '../components/SearchBar';
 
 const MovieDetailsPage: React.FC = () => {
   const { movieId } = useParams<{ movieId: string }>();
@@ -18,23 +19,27 @@ const MovieDetailsPage: React.FC = () => {
         setLoading(true);
         setError(null);
 
-        // Fetch all movies and find the one with matching ID
-        const response = await fetchMovies(100, 1, [], '', []);
+        // Fetch ALL movies by using a very large pageSize
+        // This ensures we get every movie in the database
+        const response = await fetchMovies(10000, 1, [], '', []);
         
         if (response && Array.isArray(response.movies)) {
-          const foundMovie = response.movies.find(m => m.showId === movieId);
+          // Convert both values to strings for comparison
+          const foundMovie = response.movies.find(m => String(m.showId) === String(movieId));
           
           if (foundMovie) {
             setMovie(foundMovie);
           } else {
-            setError('Movie not found');
+            // More user-friendly error message
+            setError(`Movie with ID "${movieId}" not found. The movie may have been removed or the ID is incorrect.`);
+            console.error(`Movie with ID ${movieId} not found. Available IDs:`, response.movies.map(m => m.showId));
           }
         } else {
-          setError('Failed to load movie data');
+          setError('Failed to load movie data. Please try again later.');
         }
       } catch (error) {
         console.error('Error loading movie details:', error);
-        setError((error as Error).message);
+        setError('An error occurred while loading the movie. Please try again later.');
       } finally {
         setLoading(false);
       }
@@ -71,17 +76,22 @@ const MovieDetailsPage: React.FC = () => {
   return (
     <AuthorizeView>
       <div className="min-h-screen bg-black text-white">
-        {/* Header with back button and user info */}
+        {/* Header with back button, search, and user info */}
         <div className="bg-black/80 fixed top-0 left-0 right-0 z-50 p-4 flex justify-between items-center">
-          <button 
-            onClick={handleBackClick}
-            className="flex items-center text-white hover:text-red-500 transition-colors"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
-            </svg>
-            Back to Home
-          </button>
+          <div className="flex items-center">
+            <button 
+              onClick={handleBackClick}
+              className="flex items-center text-white hover:text-red-500 transition-colors mr-4"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
+              </svg>
+              Back to Home
+            </button>
+            <div className="w-64">
+              <SearchBar placeholder="Search movies..." />
+            </div>
+          </div>
           <div>
             <Logout>
               <span className="text-white">

@@ -106,8 +106,23 @@
   .movie-card {
     width: 130px; /* Default width for larger screens */
   }
-
-  .poster-placeholder {
+  
+.poster-placeholder {
     height: 195px; /* Default height for larger screens */
   }
 }
+}
+
+/* Search Bar Styles */
+.search-suggestion-item {
+  transition: background-color 0.2s ease;
+}
+
+.search-suggestion-item:hover {
+  background-color: rgba(239, 68, 68, 0.2);
+}
+
+.search-dropdown {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(75, 85, 99, 0.3);
+} 
