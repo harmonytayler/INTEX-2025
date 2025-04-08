@@ -12,8 +12,13 @@ function Register() {
   // state variable for error messages
   const [error, setError] = useState('');
 
-  const handleLoginClick = () => {
-    navigate('/login');
+  const handleContinueClick = () => {
+    // Only navigate to the next page if the email and passwords are valid
+    if (email && password && confirmPassword && password === confirmPassword) {
+      navigate('/register/userinfo', { state: { email: email } }); 
+    } else {
+      setError('Please fill in all fields and ensure passwords match.');
+    }
   };
 
   // handle change events for input fields
@@ -37,8 +42,8 @@ function Register() {
     } else {
       // clear error message
       setError('');
-      // post data to the /register api
-      fetch('https://intex-2025.azurewebsites.net/register', {
+      // post data to the /register API
+      fetch('https://localhost:5000/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -52,7 +57,7 @@ function Register() {
         .then((data) => {
           // handle success or error from the server
           console.log(data);
-          if (data.ok) setError('Successful registration. Please log in.');
+          if (data.ok) setError('Successful registration. Please continue to fill in the user information.');
           else setError('Error registering.');
         })
         .catch((error) => {
@@ -114,12 +119,14 @@ function Register() {
                   Register
                 </button>
               </div>
+              {/* Ensure 'Continue' button does not trigger form submission */}
               <div className="d-grid mb-2">
                 <button
                   className="btn btn-primary btn-login text-uppercase fw-bold"
-                  onClick={handleLoginClick}
+                  type="button"  // Prevent form submission on click
+                  onClick={handleContinueClick} // Navigate to the user info form
                 >
-                  Go to Login
+                  Continue
                 </button>
               </div>
             </form>

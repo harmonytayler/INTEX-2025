@@ -73,118 +73,130 @@ const AdminProjectsPage = () => {
     }, [pageSize, pageNum]);
 
     const handleDelete = async (showId: string) => {
-        const confirmDelete = window.confirm("Are you sure you want to delete this project?");
+        const confirmDelete = window.confirm("Are you sure you want to delete this movie?");
         if (!confirmDelete) return;
 
         try {
             await deleteMovie(showId);
             setMovies(movies.filter((m) => m.showId !== showId));
         } catch (error) {
-            alert("Failed to delete project. Please try again.");
+            alert("Failed to delete movie. Please try again.");
         }
     };
 
-    if (loading) return <p>Loading projects...</p>;
-    if (error) return <p className="text-red-500">Error: {error}</p>;
+    if (loading) return <div className="flex justify-center items-center h-64"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div></div>;
+    if (error) return <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert"><strong className="font-bold">Error:</strong> <span className="block sm:inline">{error}</span></div>;
 
     return (
-        <div>
-            <h1>Admin Projects</h1>
-
-            {!showForm && (
-                <button
-                    className="btn btn-success mb-3"
-                    onClick={() => setShowForm(true)}
-                >
-                    Add Project
-                </button>
-            )}
+        <div className="container mx-auto px-4 py-8">
+            <div className="flex justify-between items-center mb-6">
+                <h1 className="text-3xl font-bold text-gray-800">Movie Management</h1>
+                {!showForm && (
+                    <button
+                        className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded shadow-md transition duration-300 ease-in-out"
+                        onClick={() => setShowForm(true)}
+                    >
+                        <i className="fas fa-plus mr-2"></i>Add New Movie
+                    </button>
+                )}
+            </div>
 
             {showForm && (
-                <NewMovieForm
-                    onSuccess={() => {
-                        setShowForm(false);
-                        fetchMovies(pageSize, pageNum, []).then((data) =>
-                            setMovies(data.movies)
-                        );
-                    }}
-                    onCancel={() => setShowForm(false)}
-                />
+                <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <NewMovieForm
+                        onSuccess={() => {
+                            setShowForm(false);
+                            fetchMovies(pageSize, pageNum, []).then((data) =>
+                                setMovies(data.movies)
+                            );
+                        }}
+                        onCancel={() => setShowForm(false)}
+                    />
+                </div>
             )}
 
             {editingMovie && (
-                <EditProjectForm
-                    movie={editingMovie}
-                    onSuccess={() => {
-                        setEditingMovie(null);
-                        fetchMovies(pageSize, pageNum, []).then((data) =>
-                            setMovies(data.movies)
-                        );
-                    }}
-                    onCancel={() => setEditingMovie(null)}
-                />
+                <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <EditProjectForm
+                        movie={editingMovie}
+                        onSuccess={() => {
+                            setEditingMovie(null);
+                            fetchMovies(pageSize, pageNum, []).then((data) =>
+                                setMovies(data.movies)
+                            );
+                        }}
+                        onCancel={() => setEditingMovie(null)}
+                    />
+                </div>
             )}
 
-            <table className="table table-border table-striped">
-                <thead className="table-dark">
-                    <tr>
-                        <th>Show ID</th>
-                        <th>Type</th>
-                        <th>Title</th>
-                        <th>Director</th>
-                        <th>Cast</th>
-                        <th>Country</th>
-                        <th>Release Year</th>
-                        <th>Rating</th>
-                        <th>Duration</th>
-                        <th>Description</th>
-                        <th>Genre</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {movies.map((movie) => (
-                        <tr key={movie.showId}>
-                            <td>{movie.showId}</td>
-                            <td>{movie.type}</td>
-                            <td>{movie.title}</td>
-                            <td>{movie.director}</td>
-                            <td>{movie.cast}</td>
-                            <td>{movie.country}</td>
-                            <td>{movie.releaseYear}</td>
-                            <td>{movie.rating}</td>
-                            <td>{movie.duration}</td>
-                            <td>{movie.description}</td>
-                            <td>{getGenres(movie)}</td>
-                            <td>
-                                <button
-                                    className="btn btn-primary btn-sm w-100 mb-1"
-                                    onClick={() => setEditingMovie(movie)}
+            <div className="bg-white rounded-lg shadow-md overflow-hidden">
+                <div className="overflow-x-auto bg-white">
+                    <table className="min-w-full divide-y divide-gray-200 bg-white">
+                        <thead className="bg-gray-800 text-white">
+                            <tr>
+                                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Show ID</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Type</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Title</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Director</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Release Year</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Rating</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Genre</th>
+                                <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                            {movies.map((movie, index) => (
+                                <tr 
+                                    key={movie.showId} 
+                                    className={`${
+                                        index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
+                                    } hover:bg-gray-100 transition-colors duration-150`}
                                 >
-                                    Edit
-                                </button>
-                                <button
-                                    className="btn btn-danger btn-sm w-100"
-                                    onClick={() => handleDelete(movie.showId)}
-                                >
-                                    Delete
-                                </button>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{movie.showId}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{movie.type}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{movie.title}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{movie.director || "-"}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{movie.releaseYear}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{movie.rating || "-"}</td>
+                                    <td className="px-6 py-4 text-sm text-gray-500">
+                                        <div className="max-w-xs truncate" title={getGenres(movie)}>
+                                            {getGenres(movie)}
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                                        <button
+                                            className="text-indigo-600 hover:text-indigo-900 transition-colors duration-200"
+                                            onClick={() => setEditingMovie(movie)}
+                                        >
+                                            <i className="fas fa-edit"></i> Edit
+                                        </button>
+                                        <button
+                                            className="text-red-600 hover:text-red-900 transition-colors duration-200 ml-2"
+                                            onClick={() => handleDelete(movie.showId)}
+                                        >
+                                            <i className="fas fa-trash"></i> Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-            <Pagination
-                currentPage={pageNum}
-                totalPages={totalPages}
-                pageSize={pageSize}
-                onPageChange={setPageNum}
-                onPageSizeChange={(newSize) => {
-                    setPageSize(newSize);
-                    setPageNum(1);
-                }}
-            />
+            <div className="mt-6">
+                <Pagination
+                    currentPage={pageNum}
+                    totalPages={totalPages}
+                    pageSize={pageSize}
+                    onPageChange={setPageNum}
+                    onPageSizeChange={(newSize) => {
+                        setPageSize(newSize);
+                        setPageNum(1);
+                    }}
+                />
+            </div>
         </div>
     );
 };
