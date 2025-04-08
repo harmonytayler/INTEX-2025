@@ -37,6 +37,7 @@ builder.Services.AddScoped<IUserClaimsPrincipalFactory<IdentityUser>, CustomUser
 // Identity cookie settings
 builder.Services.ConfigureApplicationCookie(options =>
 {
+    options.Cookie.Domain = "intex-2025.azurewebsites.net";
     options.Cookie.HttpOnly = true;
     options.Cookie.SameSite = SameSiteMode.None;
     options.Cookie.Name = ".AspNetCore.Identity.Application";
@@ -81,6 +82,38 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.MapIdentityApi<IdentityUser>();
+
+// Endpoint to log in a user
+app.MapPost("/login", async (HttpContext context, SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager) =>
+{
+    // Get login details from the request body (e.g., email and password)
+    var loginRequest = await context.Request.ReadFromJsonAsync<LoginRequest>();
+
+    if (loginRequest == null || string.IsNullOrEmpty(loginRequest.Email) || string.IsNullOrEmpty(loginRequest.Password))
+    {
+        return Results.BadRequest(new { message = "Email and password are required" });
+    }
+
+    // Find the user by email
+    var user = await userManager.FindByEmailAsync(loginRequest.Email);
+    if (user == null)
+    {
+        return Results.Unauthorized();
+    }
+
+    // Sign in the user
+    var result = await signInManager.PasswordSignInAsync(user, loginRequest.Password, false, false);
+
+    if (result.Succeeded)
+    {
+        // Successful login, return response
+        return Results.Ok(new { message = "Login successful" });
+    }
+
+    // Failed login attempt
+    return Results.Json(new { message = "Invalid email or password" }, statusCode: StatusCodes.Status401Unauthorized);
+});
+
 
 // Logout endpoint to remove cookie
 app.MapPost("/logout", async (HttpContext context, SignInManager<IdentityUser> signInManager) =>

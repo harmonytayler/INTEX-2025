@@ -274,12 +274,14 @@
 C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bin\Debug\net8.0\appsettings.Development.json
 C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bin\Debug\net8.0\appsettings.json
 C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bin\Debug\net8.0\INTEX.API.staticwebassets.endpoints.json
+C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bin\Debug\net8.0\Identity.sqlite
 C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bin\Debug\net8.0\Test.sqlite
 C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bin\Debug\net8.0\INTEX.API.exe
 C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bin\Debug\net8.0\INTEX.API.deps.json
 C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bin\Debug\net8.0\INTEX.API.runtimeconfig.json
 C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bin\Debug\net8.0\INTEX.API.dll
 C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bin\Debug\net8.0\INTEX.API.pdb
+C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bin\Debug\net8.0\DotNetEnv.dll
 C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bin\Debug\net8.0\Humanizer.dll
 C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bin\Debug\net8.0\Microsoft.AspNetCore.Cryptography.Internal.dll
 C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bin\Debug\net8.0\Microsoft.AspNetCore.Cryptography.KeyDerivation.dll
@@ -341,6 +343,7 @@ C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bi
 C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bin\Debug\net8.0\NuGet.ProjectModel.dll
 C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bin\Debug\net8.0\NuGet.Protocol.dll
 C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bin\Debug\net8.0\NuGet.Versioning.dll
+C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bin\Debug\net8.0\Sprache.dll
 C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bin\Debug\net8.0\SQLitePCLRaw.batteries_v2.dll
 C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bin\Debug\net8.0\SQLitePCLRaw.core.dll
 C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bin\Debug\net8.0\SQLitePCLRaw.provider.e_sqlite3.dll
@@ -547,12 +550,3 @@ C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\ob
 C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\obj\Debug\net8.0\INTEX.API.pdb
 C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\obj\Debug\net8.0\INTEX.API.genruntimeconfig.cache
 C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\obj\Debug\net8.0\ref\INTEX.API.dll
-C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bin\Debug\net8.0\publish\web.config
-C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bin\Debug\net8.0\publish\appsettings.Development.json
-C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bin\Debug\net8.0\publish\appsettings.json
-C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bin\Debug\net8.0\publish\INTEX.API.deps.json
-C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bin\Debug\net8.0\publish\INTEX.API.runtimeconfig.json
-C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bin\Debug\net8.0\publish\INTEX.API.staticwebassets.endpoints.json
-C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bin\Debug\net8.0\Identity.sqlite
-C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bin\Debug\net8.0\DotNetEnv.dll
-C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bin\Debug\net8.0\Sprache.dll

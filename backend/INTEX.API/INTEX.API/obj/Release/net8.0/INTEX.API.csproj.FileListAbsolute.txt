@@ -613,3 +613,6 @@ C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bi
 C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bin\Release\net8.0\Microsoft.IdentityModel.Logging.dll
 C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bin\Release\net8.0\Microsoft.IdentityModel.Tokens.dll
 C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bin\Release\net8.0\System.IdentityModel.Tokens.Jwt.dll
+C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bin\Release\net8.0\Identity.sqlite
+C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bin\Release\net8.0\DotNetEnv.dll
+C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bin\Release\net8.0\Sprache.dll
