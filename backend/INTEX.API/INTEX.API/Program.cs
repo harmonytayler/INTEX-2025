@@ -54,8 +54,7 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins(
                 "http://localhost:3000",
-                "https://kind-ground-08eb7501e.6.azurestaticapps.net",
-                "https://intex-2025.azurewebsites.net")
+                "https://kind-ground-08eb7501e.6.azurestaticapps.net")
             .AllowCredentials()
             .AllowAnyHeader()
             .AllowAnyMethod();
