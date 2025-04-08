@@ -5,7 +5,8 @@ interface FetchMoviesResponse {
   totalNumMovies: number;
 }
 
-const API_URL = 'https://localhost:5001/Movie';
+const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://localhost:5001';
+const API_URL = `${baseUrl}/Movie`;
 
 export const fetchMovies = async (
   pageSize: number,

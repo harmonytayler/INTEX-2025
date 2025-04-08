@@ -3,8 +3,7 @@ using INTEX.API.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
-using Azure.Storage.Blobs;
-using Azure.Storage.Sas;
+
 
 namespace INTEX.API.Controllers
 {
@@ -16,14 +15,13 @@ public class MovieController : ControllerBase
     private MovieDbContext _movieContext;
 
     // SAS Token (replace with your actual SAS token)
-    private readonly string sasToken = "SECRET";
-
+    private readonly string _sasToken;
     private readonly string containerName = "images";
 
-    public MovieController(MovieDbContext temp)
+    public MovieController(MovieDbContext movieContext, IConfiguration config)
     {
-        _movieContext = temp;
-        Console.WriteLine("MovieController initialized.");
+        _movieContext = movieContext;
+        _sasToken = config["Azure:BlobSasToken"];
     }
 
     [HttpGet("PosterUrl/{showId}")]
@@ -44,7 +42,7 @@ public class MovieController : ControllerBase
         string sanitizedTitle = RemoveUnwantedCharacters(title);
 
         // Construct the URL for the image with the SAS token
-        string blobUrl = $"https://intexmovieposters.blob.core.windows.net/{containerName}/{sanitizedTitle}.jpg?{sasToken}";
+        string blobUrl = $"https://intexmovieposters.blob.core.windows.net/{containerName}/{sanitizedTitle}.jpg?{_sasToken}";
 
         return Ok(blobUrl);
     }

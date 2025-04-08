@@ -42,8 +42,9 @@ function Register() {
     } else {
       // clear error message
       setError('');
-      // post data to the /register API
-      fetch('https://localhost:5000/register', {
+      // post data to the /register api
+      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://localhost:5001';
+      fetch(`${baseUrl}/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

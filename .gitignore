@@ -98,3 +98,6 @@ release/
 *.iws
 .idea/
 .vs/
+
+#Secret stuff files
+.env
