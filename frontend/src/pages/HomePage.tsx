@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Movie } from '../types/Movie';
 import { fetchMovies } from '../api/MovieAPI';
 import MovieRow from '../components/MovieRow';
 import Logout from '../components/security/Logout';
 import AuthorizeView, { AuthorizedUser } from '../components/security/AuthorizeView';
+import SearchBar from '../components/SearchBar';
 
 // Define main genres for the rows
 const MAIN_GENRES = [
@@ -92,11 +93,7 @@ function HomePage() {
         {/* Header with search and user info */}
         <div className="bg-black/80 fixed top-0 left-0 right-0 z-50 p-4 flex justify-between items-center">
           <div className="flex-1 max-w-2xl">
-            <input
-              type="text"
-              className="w-full p-2 rounded-lg bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-600"
-              placeholder="Search movies..."
-            />
+            <SearchBar placeholder="Search movies..." />
           </div>
           <div className="ml-4">
             <Logout>
