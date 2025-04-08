@@ -13,8 +13,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // Database contexts
-builder.Services.AddDbContext<TestDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("TestConnection")));
+builder.Services.AddDbContext<MovieDbContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("MovieConnection")));
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("IdentityConnection")));
@@ -55,7 +55,7 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins(
                 "http://localhost:3000",
-                "https://kind-ground-08eb7501e.6.azurestaticapps.net")
+                "https://kind-ground-08eb7501e.6.azurestaticapps.net", "http://localhost:5000", "https://intex-2025.azurewebsites.net")
             .AllowCredentials()
             .AllowAnyHeader()
             .AllowAnyMethod();
