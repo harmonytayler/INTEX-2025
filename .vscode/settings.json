@@ -1,4 +1,0 @@
-{
-    "appService.defaultWebAppToDeploy": "undefined/subscriptions/03a930c4-b36a-4d38-b801-d96e86efec2f/resourceGroups/appsvc_windows_centralus/providers/Microsoft.Web/sites/INTEX-2025",
-    "appService.deploySubpath": "backend\\INTEX.API\\INTEX.API\\publish"
-}
