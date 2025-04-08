@@ -41,4 +41,5 @@ export interface Movie {
     "tVDramas": number;
     "talkShowsTVComedies": number;
     "thrillers": number;
+    posterUrl?: string;
 }

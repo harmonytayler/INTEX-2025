@@ -7,6 +7,7 @@ import HomePage from './pages/HomePage';
 import MovieDetailsPage from './pages/MovieDetailsPage';
 import Header from './components/Header';
 import AdminPage from './pages/AdminPage';
+import NewUserForm from './components/userInfo/UserInfoForm';
 
 function App() {
   return (
@@ -17,9 +18,11 @@ function App() {
           <Route path="/" element={<LoginPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/register/userinfo" element={<NewUserForm/>} />
           <Route path="/home" element={<HomePage />} />
           <Route path="/movie/:movieId" element={<MovieDetailsPage />} />
           <Route path="/admin" element={<AdminPage />} />
+
         </Routes>
       </Router>
     </>

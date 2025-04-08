@@ -4,15 +4,88 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 
+
 namespace INTEX.API.Controllers
 {
-    [Route("[controller]")]
-    [ApiController]
-    [Authorize] //controller now requires authentication
-    public class MovieController: ControllerBase
+[Route("[controller]")]
+[ApiController]
+[Authorize] // Controller requires authentication
+public class MovieController : ControllerBase
+{
+    private MovieDbContext _movieContext;
+
+    // SAS Token (replace with your actual SAS token)
+    private readonly string _sasToken;
+    private readonly string containerName = "images";
+
+    public MovieController(MovieDbContext movieContext, IConfiguration config)
     {
-        private MovieDbContext _movieContext;
-        public MovieController(MovieDbContext temp) => _movieContext = temp;
+        _movieContext = movieContext;
+        _sasToken = config["Azure:BlobSasToken"];
+    }
+
+    [HttpGet("PosterUrl/{showId}")]
+    public async Task<IActionResult> GetPosterUrl(string showId)
+    {
+        // Step 1: Look up the movie title from the showId
+        var ShowId = showId;
+        var movie = await _movieContext.movies_titles.FindAsync(ShowId); // Assuming the ShowId is unique in the movies_titles table
+        if (movie == null)
+        {
+            return NotFound(new { message = "Movie not found" });
+        }
+
+        // Step 2: Use the movie title to build the URL for the poster
+        string title = movie.Title;
+
+        // Step 3: Remove special characters that do not need to be encoded (e.g., & and :)
+        string sanitizedTitle = RemoveUnwantedCharacters(title);
+
+        // Construct the URL for the image with the SAS token
+        string blobUrl = $"https://intexmovieposters.blob.core.windows.net/{containerName}/{sanitizedTitle}.jpg?{_sasToken}";
+
+        return Ok(blobUrl);
+    }
+
+    // Helper method to remove unwanted characters (like &, :, etc.)
+    private string RemoveUnwantedCharacters(string input)
+    {
+        // Define the unwanted characters that should be removed
+        var unwantedChars = new[] { '&', ':', '?', '=', ';', '#', '%', '.', '$' };
+
+        // Remove unwanted characters from the title string
+        foreach (var ch in unwantedChars)
+        {
+            input = input.Replace(ch.ToString(), string.Empty);
+        }
+
+        return input;
+    }
+
+
+
+
+
+        private string GenerateNextShowId()
+        {
+            // Get all existing show IDs
+            var existingIds = _movieContext.movies_titles
+                .Select(m => m.ShowId)
+                .ToList();
+
+            // Find the highest number in existing IDs
+            int maxNumber = 0;
+            foreach (var id in existingIds)
+            {
+                if (id.StartsWith("s") && int.TryParse(id.Substring(1), out int number))
+                {
+                    maxNumber = Math.Max(maxNumber, number);
+                }
+            }
+
+            // Generate the next ID
+            return $"s{maxNumber + 1}";
+        }
 
         private string GenerateNextShowId()
         {
