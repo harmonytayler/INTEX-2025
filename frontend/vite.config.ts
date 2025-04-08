@@ -14,14 +14,14 @@ export default defineConfig({
         "img-src 'self' data:; " +
         "frame-ancestors 'none'; " +
         "font-src 'self' fonts.gstatic.com data:; " +
-        "connect-src 'self' https://localhost:5000 https://intex-2025.azurewebsites.net https://accounts.google.com https://oauth2.googleapis.com; " + // ✅ Allow OAuth token exchange
+        "connect-src 'self' https://localhost:5000 https://accounts.google.com https://oauth2.googleapis.com; " + // ✅ Allow OAuth token exchange
         "object-src 'none'; " +
         "base-uri 'self'; " +
         "form-action 'self'; " +
         "frame-src 'self' https://accounts.google.com https://oauth2.googleapis.com;", // ✅ Allow OAuth login popups
     },
     cors: {
-      origin: 'https://kind-ground-08eb7501e.6.azurestaticapps.net',
+      origin: 'http://localhost:3000',
       credentials: true, // ✅ Allow cookies for authentication
     },
   },

@@ -11,7 +11,7 @@ import AdminPage from './pages/AdminPage';
 function App() {
   return (
     <>
-      <Header />
+    <Header />
       <Router>
         <Routes>
           <Route path="/" element={<LoginPage />} />
