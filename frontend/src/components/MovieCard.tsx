@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Movie } from '../types/Movie';
 
 interface MovieCardProps {
@@ -7,18 +7,37 @@ interface MovieCardProps {
 }
 
 const MovieCard: React.FC<MovieCardProps> = ({ movie, onClick }) => {
+  const [isImageError, setIsImageError] = useState(false); // State to track if the image has failed to load
+  const imageUrl = movie.posterUrl; // Extract the URL from the JSON object
+
+  // Handle image loading error
+  const handleImageError = () => {
+    setIsImageError(true);
+  };
+
   return (
     <div 
-      className="movie-card flex-shrink-0 w-32 mx-4 cursor-pointer transform transition-transform duration-200 hover:scale-105 hover:shadow-lg hover:shadow-red-900/50"
+      className="movie-card-container"
       onClick={onClick}
       title={`Click to view details for ${movie.title}`}
     >
-      <div className="poster-placeholder bg-gray-800 w-full aspect-square rounded-md mb-1 flex items-center justify-center">
-        <span className="text-gray-400 text-xs">Poster</span>
+      <div className="poster-placeholder">
+        {!isImageError && imageUrl ? (
+          <img 
+            src={imageUrl} 
+            alt={movie.title} 
+            className="movie-poster-image"
+            onError={handleImageError} // Trigger the error handler if the image fails to load
+          />
+        ) : (
+          <div className="default-poster-message">
+            <span>This show doesn't have a poster yet! :(</span>
+          </div>
+        )}
       </div>
-      <h3 className="text-white text-xs font-medium truncate text-center hover:text-red-500 transition-colors duration-200">{movie.title}</h3>
+      <h3 className="movie-title">{movie.title}</h3>
     </div>
   );
 };
 
-export default MovieCard; 
+export default MovieCard;
