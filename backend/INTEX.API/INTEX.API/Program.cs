@@ -11,7 +11,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options => 
+{
+    options.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
+});
 
 builder.Services.AddDbContext<MovieDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("MovieConnection")));
@@ -40,6 +43,7 @@ builder.Services.AddScoped<IUserClaimsPrincipalFactory<IdentityUser>, CustomUser
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
+    // Don't set a specific domain for localhost
     options.Cookie.HttpOnly = true;
     options.Cookie.SameSite = SameSiteMode.None;
     options.Cookie.Name = ".AspNetCore.Identity.Application";
@@ -49,14 +53,15 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("ConnectFrontend",
-        policy =>
-        {
-            policy.WithOrigins("http://localhost:3000", "https://kind-ground-08eb7501e.6.azurestaticapps.net")
-                .AllowCredentials() //Required to allow cookies
-                .AllowAnyHeader()
-                .AllowAnyMethod();
-        });
+    options.AddPolicy("ConnectFrontend", policy =>
+    {
+        policy.WithOrigins(
+                "http://localhost:3000",
+                "https://kind-ground-08eb7501e.6.azurestaticapps.net", "http://localhost:5000", "http://localhost:5001", "https://localhost:5001", "https://intex-2025.azurewebsites.net")
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials();
+    });
 });
 
 //used for roles to connect to the NoOpEmailSender.cs file, delete if not using roles
@@ -80,7 +85,48 @@ app.UseAuthorization();
 app.MapControllers();
 app.MapIdentityApi<IdentityUser>();
 
-//logout endpoint to delete cookie if a user logs out
+// Endpoint to log in a user
+app.MapPost("/login", async (HttpContext context, SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager) =>
+{
+    // Get login details from the request body (e.g., email and password)
+    var loginRequest = await context.Request.ReadFromJsonAsync<LoginRequest>();
+
+    if (loginRequest == null || string.IsNullOrEmpty(loginRequest.Email) || string.IsNullOrEmpty(loginRequest.Password))
+    {
+        return Results.BadRequest(new { message = "Email and password are required" });
+    }
+
+    // Find the user by email
+    var user = await userManager.FindByEmailAsync(loginRequest.Email);
+    if (user == null)
+    {
+        return Results.Unauthorized();
+    }
+
+    // Sign in the user
+    var result = await signInManager.PasswordSignInAsync(user, loginRequest.Password, false, false);
+
+    if (result.Succeeded)
+    {
+        // Successful login, return response
+        return Results.Ok(new { message = "Login successful" });
+    }
+
+    // Failed login attempt
+    return Results.Json(new { message = "Invalid email or password" }, statusCode: StatusCodes.Status401Unauthorized);
+});
+
+// GET endpoint for login page to handle redirects
+app.MapGet("/login", (HttpContext context) =>
+{
+    // Return a simple HTML page for login
+    return Results.Content(
+        "<!DOCTYPE html><html><head><title>Login</title></head><body><h1>Login Required</h1><p>Please log in to access this resource.</p></body></html>",
+        "text/html"
+    );
+});
+
+// Logout endpoint to remove cookie
 app.MapPost("/logout", async (HttpContext context, SignInManager<IdentityUser> signInManager) =>
 {
     await signInManager.SignOutAsync();
@@ -108,4 +154,5 @@ app.MapGet("/pingauth", (ClaimsPrincipal user) =>
     return Results.Json(new { email = email }); //returns user email as json
 }).RequireAuthorization();
 
-app.Run();
+// Explicitly set the port to avoid conflicts
+app.Run("https://localhost:5001");
