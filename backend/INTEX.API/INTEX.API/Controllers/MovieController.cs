@@ -14,6 +14,27 @@ namespace INTEX.API.Controllers
         private MovieDbContext _movieContext;
         public MovieController(MovieDbContext temp) => _movieContext = temp;
 
+        private string GenerateNextShowId()
+        {
+            // Get all existing show IDs
+            var existingIds = _movieContext.movies_titles
+                .Select(m => m.ShowId)
+                .ToList();
+
+            // Find the highest number in existing IDs
+            int maxNumber = 0;
+            foreach (var id in existingIds)
+            {
+                if (id.StartsWith("s") && int.TryParse(id.Substring(1), out int number))
+                {
+                    maxNumber = Math.Max(maxNumber, number);
+                }
+            }
+
+            // Generate the next ID
+            return $"s{maxNumber + 1}";
+        }
+
         [HttpGet("AllMovies")]
         public IActionResult GetItems([FromQuery] int pageSize = 10, [FromQuery] int pageNum = 1, [FromQuery] string? searchTerm = null, [FromQuery] string? genres = null)
         {
@@ -176,11 +197,23 @@ namespace INTEX.API.Controllers
         }
 
         [HttpPost("AddMovie")]
-        public IActionResult AddMovie([FromBody] Movie newMovie)
+        public IActionResult AddMovie([FromBody] Movie movie)
         {
-            _movieContext.movies_titles.Add(newMovie);
-            _movieContext.SaveChanges();
-            return Ok(newMovie);
+            try
+            {
+                // Generate the next show ID
+                movie.ShowId = GenerateNextShowId();
+                
+                // Add the movie to the database
+                _movieContext.movies_titles.Add(movie);
+                _movieContext.SaveChanges();
+
+                return Ok(movie);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error adding movie: {ex.Message}");
+            }
         }
 
         [HttpPut("Update/{id}")]
