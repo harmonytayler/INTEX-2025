@@ -53,15 +53,15 @@ namespace INTEX.API.Migrations
 
                     b.Property<int>("ComediesDramasInternationalMovies")
                         .HasColumnType("INTEGER")
-                        .HasColumnName("Comedies Dramas International Movies");
+                        .HasColumnName("Comedies Dramas International movies_users");
 
                     b.Property<int>("ComediesInternationalMovies")
                         .HasColumnType("INTEGER")
-                        .HasColumnName("Comedies International Movies");
+                        .HasColumnName("Comedies International movies_users");
 
                     b.Property<int>("ComediesRomanticMovies")
                         .HasColumnType("INTEGER")
-                        .HasColumnName("Comedies Romantic Movies");
+                        .HasColumnName("Comedies Romantic movies_users");
 
                     b.Property<string>("Country")
                         .IsRequired()
@@ -88,7 +88,7 @@ namespace INTEX.API.Migrations
 
                     b.Property<int>("DocumentariesInternationalMovies")
                         .HasColumnType("INTEGER")
-                        .HasColumnName("Documentaries International Movies");
+                        .HasColumnName("Documentaries International movies_users");
 
                     b.Property<int>("Docuseries")
                         .HasColumnType("INTEGER")
@@ -100,11 +100,11 @@ namespace INTEX.API.Migrations
 
                     b.Property<int>("DramasInternationalMovies")
                         .HasColumnType("INTEGER")
-                        .HasColumnName("Dramas International Movies");
+                        .HasColumnName("Dramas International movies_users");
 
                     b.Property<int>("DramasRomanticMovies")
                         .HasColumnType("INTEGER")
-                        .HasColumnName("Dramas Romantic Movies");
+                        .HasColumnName("Dramas Romantic movies_users");
 
                     b.Property<string>("Duration")
                         .IsRequired()
@@ -113,7 +113,7 @@ namespace INTEX.API.Migrations
 
                     b.Property<int>("FamilyMovies")
                         .HasColumnType("INTEGER")
-                        .HasColumnName("Family Movies");
+                        .HasColumnName("Family movies_users");
 
                     b.Property<int>("Fantasy")
                         .HasColumnType("INTEGER")
@@ -121,11 +121,11 @@ namespace INTEX.API.Migrations
 
                     b.Property<int>("HorrorMovies")
                         .HasColumnType("INTEGER")
-                        .HasColumnName("Horror Movies");
+                        .HasColumnName("Horror movies_users");
 
                     b.Property<int>("InternationalMoviesThrillers")
                         .HasColumnType("INTEGER")
-                        .HasColumnName("International Movies Thrillers");
+                        .HasColumnName("International movies_users Thrillers");
 
                     b.Property<int>("InternationalTVShowsRomanticTVShowsTVDramas")
                         .HasColumnType("INTEGER")
