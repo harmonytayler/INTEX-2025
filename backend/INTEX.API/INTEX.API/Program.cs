@@ -82,36 +82,6 @@ app.UseAuthorization();
 app.MapControllers();
 app.MapIdentityApi<IdentityUser>();
 
-// Login endpoint to handle POST requests for authentication
-app.MapPost("/login", async (HttpContext context, SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager) =>
-{
-    var loginRequest = await context.Request.ReadFromJsonAsync<LoginRequest>();
-
-    if (loginRequest == null || string.IsNullOrEmpty(loginRequest.Email) || string.IsNullOrEmpty(loginRequest.Password))
-    {
-        return Results.BadRequest(new { message = "Email and password are required." });
-    }
-
-    var user = await userManager.FindByEmailAsync(loginRequest.Email);
-    if (user == null)
-    {
-        return Results.BadRequest(new { message = "Invalid email or password." });
-    }
-
-    var result = await signInManager.PasswordSignInAsync(user, loginRequest.Password, isPersistent: loginRequest.RememberMe, lockoutOnFailure: false);
-
-    if (result.Succeeded)
-    {
-        // Successful login, return Ok response
-        return Results.Ok(new { message = "Login successful" });
-    }
-
-    return Results.BadRequest(new { message = "Invalid email or password." });
-}).AllowAnonymous();
-
-// DTO for Login Request
-// Moved to a separate file or above top-level statements
-
 // Logout endpoint to remove cookie
 app.MapPost("/logout", async (HttpContext context, SignInManager<IdentityUser> signInManager) =>
 {

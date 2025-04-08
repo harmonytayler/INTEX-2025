@@ -21,7 +21,7 @@ export default defineConfig({
         "frame-src 'self' https://accounts.google.com https://oauth2.googleapis.com;", // ✅ Allow OAuth login popups
     },
     cors: {
-      origin: 'http://localhost:3000',
+      origin: 'https://kind-ground-08eb7501e.6.azurestaticapps.net',
       credentials: true, // ✅ Allow cookies for authentication
     },
   },

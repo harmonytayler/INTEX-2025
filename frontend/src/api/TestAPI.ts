@@ -1,6 +1,6 @@
 import { TestItem } from '../types/TestItem';
 
-const API_URL = 'https://localhost:5000/Test';
+const API_URL = 'https://intex-2025.azurewebsites.net/Test';
 
 export const fetchTests = async (): Promise<TestItem[]> => {
   try {

@@ -547,3 +547,12 @@ C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\ob
 C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\obj\Debug\net8.0\INTEX.API.pdb
 C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\obj\Debug\net8.0\INTEX.API.genruntimeconfig.cache
 C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\obj\Debug\net8.0\ref\INTEX.API.dll
+C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bin\Debug\net8.0\publish\web.config
+C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bin\Debug\net8.0\publish\appsettings.Development.json
+C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bin\Debug\net8.0\publish\appsettings.json
+C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bin\Debug\net8.0\publish\INTEX.API.deps.json
+C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bin\Debug\net8.0\publish\INTEX.API.runtimeconfig.json
+C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bin\Debug\net8.0\publish\INTEX.API.staticwebassets.endpoints.json
+C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bin\Debug\net8.0\Identity.sqlite
+C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bin\Debug\net8.0\DotNetEnv.dll
+C:\Users\harmo\OneDrive\Information Systems\INTEX\backend\INTEX.API\INTEX.API\bin\Debug\net8.0\Sprache.dll
