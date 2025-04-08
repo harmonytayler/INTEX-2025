@@ -18,6 +18,8 @@
   -webkit-overflow-scrolling: touch;
   scroll-behavior: smooth;
   gap: 8px;
+  padding-left: 8px;  /* Added padding to ensure space on the left */
+  padding-right: 8px; /* Added padding to ensure space on the right */
 }
 
 /* Movie row hover effect */
@@ -31,6 +33,8 @@
   position: relative;
   transition: all 0.3s ease-in-out;
   flex-shrink: 0;
+  width: 130px; /* Set default width for movie cards */
+  margin: 0 8px; /* Ensure proper spacing between cards */
 }
 
 .movie-card:hover {
@@ -41,6 +45,20 @@
 .poster-placeholder {
   background: linear-gradient(45deg, #1a1a1a, #2a2a2a);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 130px; /* Ensure the placeholder is the same width as the card */
+  height: 195px; /* Set a default height for the poster */
+  border-radius: 0px;
+}
+
+/* Ensure image sizes fit the container */
+.poster-placeholder img {
+  max-width: 100%; /* Limit width to the container size */
+  max-height: 100%; /* Limit height to the container size */
+  object-fit: cover; /* Ensure the image maintains aspect ratio */
+  border-radius: 0px; /* Round the image corners */
 }
 
 /* Smooth scrolling for movie rows */
@@ -49,27 +67,50 @@
   -webkit-overflow-scrolling: touch; /* For smooth scrolling on iOS */
 }
 
+/* Default poster message */
+.default-poster-message {
+  color: white;
+  font-size: 0.75rem; /* Adjust size of message */
+  text-align: center;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #444; /* Gray background */
+  border-radius: 0rem; /* Matches the rounded corners of other images */
+}
+
 /* Responsive adjustments */
 @media (max-width: 640px) {
   .movie-card {
-    width: 100px;
+    width: 100px; /* Smaller width for small screens */
   }
-  
+
   .poster-placeholder {
-    height: 180px;
+    height: 150px; /* Adjust height for smaller screens */
   }
 }
 
 @media (min-width: 641px) and (max-width: 1024px) {
   .movie-card {
-    width: 120px;
+    width: 120px; /* Medium width for tablets */
+  }
+
+  .poster-placeholder {
+    height: 180px; /* Adjust height for tablets */
   }
 }
 
 @media (min-width: 1025px) {
   .movie-card {
-    width: 130px;
+    width: 130px; /* Default width for larger screens */
   }
+  
+.poster-placeholder {
+    height: 195px; /* Default height for larger screens */
+  }
+}
 }
 
 /* Search Bar Styles */
