@@ -9,7 +9,6 @@ public class MovieRating
     [Column("user_id")]
     public int UserId { get; set; }
 
-    [Key]
     [Column("show_id")]
     public string ShowId { get; set; }
 

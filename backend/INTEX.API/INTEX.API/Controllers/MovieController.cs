@@ -459,7 +459,7 @@ public class MovieController : ControllerBase
             {
                 // Query the ratings from the 'movies_ratings' table for the given 'showId'
                 var ratings = _movieContext.movies_ratings
-                    .Where(m => m.ShowId == showId)  // Filter by show_id
+                    .Where(r => r.ShowId == showId)
                     .ToList();  // Get all ratings for that show_id
 
                 // If no ratings are found
@@ -470,9 +470,14 @@ public class MovieController : ControllerBase
 
                 // Calculate the average rating
                 var averageRating = ratings.Average(m => m.Rating);
+                var reviewCount = ratings.Count;
 
-                // Return the average rating
-                return Ok(new { ShowId = showId, AverageRating = averageRating });
+                // Return the average rating and review count
+                return Ok(new { 
+                    ShowId = showId, 
+                    AverageRating = averageRating,
+                    ReviewCount = reviewCount
+                });
             }
             catch (Exception ex)
             {
@@ -507,6 +512,80 @@ public class MovieController : ControllerBase
             catch (Exception ex)
             {
                 return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        [HttpPost("SubmitRating")]
+        [Authorize]
+        public IActionResult SubmitRating([FromBody] MovieRating rating)
+        {
+            try
+            {
+                // Validate the rating
+                if (rating.Rating < 1 || rating.Rating > 5)
+                {
+                    return BadRequest(new { message = "Rating must be between 1 and 5." });
+                }
+
+                // Check if the movie exists
+                var movie = _movieContext.movies_titles.Find(rating.ShowId);
+                if (movie == null)
+                {
+                    return NotFound(new { message = "Movie not found." });
+                }
+
+                // Check if the user exists
+                var user = _movieContext.movies_users.Find(rating.UserId);
+                if (user == null)
+                {
+                    return NotFound(new { message = "User not found." });
+                }
+
+                // Check if the user has already rated this movie
+                var existingRating = _movieContext.movies_ratings
+                    .FirstOrDefault(r => r.UserId == rating.UserId && r.ShowId == rating.ShowId);
+
+                if (existingRating != null)
+                {
+                    // Update the existing rating
+                    existingRating.Rating = rating.Rating;
+                    _movieContext.SaveChanges();
+                    return Ok(new { message = "Rating updated successfully." });
+                }
+                else
+                {
+                    // Add a new rating
+                    _movieContext.movies_ratings.Add(rating);
+                    _movieContext.SaveChanges();
+                    return Ok(new { message = "Rating submitted successfully." });
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"An error occurred: {ex.Message}" });
+            }
+        }
+
+        [HttpGet("UserRating/{showId}/{userId}")]
+        [Authorize]
+        public IActionResult GetUserRating(string showId, int userId)
+        {
+            try
+            {
+                // Check if the user has rated this movie
+                var rating = _movieContext.movies_ratings
+                    .FirstOrDefault(r => r.UserId == userId && r.ShowId == showId);
+
+                if (rating == null)
+                {
+                    return Ok(new { rating = 0 }); // No rating found
+                }
+
+                return Ok(new { rating = rating.Rating });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"An error occurred: {ex.Message}" });
             }
         }
     }

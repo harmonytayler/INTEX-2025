@@ -173,3 +173,68 @@ export const fetchMoviesAZ = async (
     };
   }
 };
+
+export const submitRating = async (showId: string, userId: number, rating: number): Promise<void> => {
+  try {
+    const response = await fetch(`${API_URL}/SubmitRating`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify({
+        showId,
+        userId,
+        rating,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to submit rating');
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getUserRating = async (showId: string, userId: number): Promise<number> => {
+  try {
+    const response = await fetch(`${API_URL}/UserRating/${showId}/${userId}`, {
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to get user rating');
+    }
+
+    const data = await response.json();
+    return data.rating;
+  } catch (error) {
+    console.error('Error getting user rating:', error);
+    return 0;
+  }
+};
+
+export const getAverageRating = async (showId: string): Promise<{ averageRating: number; reviewCount: number }> => {
+  try {
+    const response = await fetch(`${API_URL}/AverageRating/${showId}`, {
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        return { averageRating: 0, reviewCount: 0 };
+      }
+      throw new Error('Failed to get average rating');
+    }
+
+    const data = await response.json();
+    return { 
+      averageRating: data.averageRating, 
+      reviewCount: data.reviewCount 
+    };
+  } catch (error) {
+    return { averageRating: 0, reviewCount: 0 };
+  }
+};
