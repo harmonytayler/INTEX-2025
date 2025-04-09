@@ -9,63 +9,77 @@ const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://localhost:5001';
 const API_URL = `${baseUrl}/Movie`;
 
 export const fetchMovies = async (
-  pageSize: number,
-  pageNum: number,
-  selectedCategories: string[],
-  searchTerm?: string,
-  selectedGenres?: string[]
-): Promise<FetchMoviesResponse> => {
+  limit: number = 10,
+  page: number = 1,
+  genres: string[] = [],
+  searchTerm: string = '',
+  filters: string[] = []
+): Promise<{ movies: Movie[]; total: number }> => {
   try {
-    const categoryParams = selectedCategories
-      .map((cat) => `movieTypes=${encodeURIComponent(cat)}`)
+    const categoryParams = genres
+      .map((genre) => `movieTypes=${encodeURIComponent(genre)}`)
       .join("&");
 
     const searchParam = searchTerm
       ? `&searchTerm=${encodeURIComponent(searchTerm)}`
       : "";
 
-    const genreParams =
-      selectedGenres && selectedGenres.length > 0
-        ? `&genres=${selectedGenres.map((genre) => encodeURIComponent(genre)).join(",")}`
-        : "";
+    const filterParams = filters.length > 0
+      ? `&filters=${filters.map(filter => encodeURIComponent(filter)).join(",")}`
+      : "";
 
-    const url = `${API_URL}/AllMovies?pageSize=${pageSize}&pageNum=${pageNum}${
-      selectedCategories.length ? `&${categoryParams}` : ""
-    }${searchParam}${genreParams}`;
+    const url = `${API_URL}/AllMovies?pageSize=${limit}&pageNum=${page}${
+      genres.length ? `&${categoryParams}` : ""
+    }${searchParam}${filterParams}`;
 
     const response = await fetch(url, { credentials: "include" });
-    if (!response.ok) throw new Error(`Failed to fetch movies`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch movies');
+    }
 
     const data = await response.json();
     const movies: Movie[] = Array.isArray(data.movies) ? data.movies : data;
 
-    // Fetch poster URLs in parallel
+    // Fetch poster URLs and average ratings in parallel
     const enrichedMovies = await Promise.all(
       movies.map(async (movie) => {
         try {
+          // Fetch poster URL
           const posterRes = await fetch(`${API_URL}/PosterUrl/${movie.showId}`, {
             credentials: "include",
           });
           if (posterRes.ok) {
             movie.posterUrl = await posterRes.text();
           }
+
+          // Fetch average rating using the correct endpoint
+          const ratingRes = await fetch(`${API_URL}/AverageRating/${movie.showId}`, {
+            credentials: "include",
+          });
+          if (ratingRes.ok) {
+            const ratingData = await ratingRes.json();
+            movie.averageStarRating = ratingData.averageRating;
+          } else if (ratingRes.status === 404) {
+            movie.averageStarRating = 0;
+          }
         } catch (err) {
-          console.warn(`Failed to fetch poster for ${movie.title}`);
+          console.warn(`Failed to fetch additional data for ${movie.title}`);
+          movie.averageStarRating = 0;
         }
         return movie;
       })
     );
 
+    // Sort movies by average rating
+    enrichedMovies.sort((a, b) => (b.averageStarRating || 0) - (a.averageStarRating || 0));
+
     return {
       movies: enrichedMovies,
-      totalNumMovies: data.totalNumMovies || enrichedMovies.length,
+      total: data.totalNumMovies || enrichedMovies.length
     };
   } catch (error) {
-    console.error("Error fetching movies:", error);
-    return {
-      movies: [],
-      totalNumMovies: 0,
-    };
+    console.error('Error fetching movies:', error);
+    throw error;
   }
 };
 

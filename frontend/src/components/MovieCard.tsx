@@ -33,6 +33,9 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie, onClick, ranking }) => {
           alt={movie.title} 
           className="movie-poster-image"
           onError={handleImageError} // Trigger the error handler if the image fails to load
+          loading="lazy"
+          width={130}
+          height={195}
         />
       </div>
       <h3 className="movie-title">
