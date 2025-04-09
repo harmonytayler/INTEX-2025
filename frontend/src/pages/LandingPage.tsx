@@ -67,8 +67,6 @@ export default function LandingPage() {
           </div>
         </div>
 
-        <br/><br/><br/><br/><br/><br/><br/><br/><br/>
-
         <div className="trending-now">
           <h2>Trending Now</h2>
           {loading ? (

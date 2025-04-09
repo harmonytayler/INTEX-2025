@@ -57,10 +57,10 @@ function Header() {
     <header>
       <div className="container">
         <div className="logo-container">
-          <Link to="/" className="logo">
+          <Link to="/home" className="logo">
             <img src="/CineNiche_Logo.png" alt="CineNiche Logo" className="logo-image" />
           </Link>
-          <Link to="/" className="site-title">CineNiche</Link>
+          <Link to="/home" className="site-title">CineNiche</Link>
         </div>
 
         <div className="search-container">

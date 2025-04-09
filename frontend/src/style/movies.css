@@ -127,7 +127,7 @@
 
 @media (min-width: 1025px) {
   .movie-list-container {
-    justify-content: flex-start; /* Align movies to the left on larger screens */
+    justify-content: center; /* Align movies to the left on larger screens */
   }
 }
 
