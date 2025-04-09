@@ -13,6 +13,12 @@ public class MovieDbContext : DbContext
 
     public DbSet<MovieUser> movies_users { get; set; }
     public DbSet<Movie> movies_titles { get; set; }
+    
+    public DbSet<MovieRating> movies_ratings { get; set; }
+
+    public DbSet<ContentRecommendation> content_recommendations { get; set; }
+
+    public DbSet<CollaborativeRecommendation> collaborative_recommendations { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -46,5 +52,19 @@ public class MovieDbContext : DbContext
             entity.Property(e => e.Type).IsRequired();
             entity.Property(e => e.Title).IsRequired();
         });
+        
+        
+        // Optionally, explicitly set show_id as the primary key
+        modelBuilder.Entity<CollaborativeRecommendation>()
+            .HasKey(m => m.ShowId);  // Set ShowId as the primary key
+
+        // Optionally, explicitly set show_id as the primary key
+        modelBuilder.Entity<ContentRecommendation>()
+            .HasKey(m => m.SourceShowID);  // Set ShowId as the primary key
+
+        modelBuilder.Entity<MovieRating>()
+            .HasKey(m => m.ShowId);  // Set ShowId as the primary key
+        
+        
     }
 }
