@@ -164,9 +164,9 @@ function LoginPage() {
               <hr className="my-4" />
               <div className="d-grid mb-2">
               <button
-  className="btn btn-google btn-login"
+  className="btn btn-google btn-login text-uppercase fw-bold"
+  type="button"  // Prevents form submission
   onClick={handleGoogleLogin}
-  style={{ pointerEvents: 'auto', zIndex: 10 }}
 >
   <i className="fa-brands fa-google me-2"></i> Sign in with Google
 </button>
@@ -174,15 +174,9 @@ function LoginPage() {
 
 
 
+
               </div>
               <div className="d-grid mb-2">
-                <button
-                  className="btn btn-facebook btn-login text-uppercase fw-bold"
-                  type="button"
-                >
-                  <i className="fa-brands fa-facebook-f me-2"></i> Sign in with
-                  Facebook
-                </button>
               </div>
             </form>
             {error && <p className="error">{error}</p>}
