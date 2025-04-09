@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Movie } from '../types/Movie';
 import { fetchMovies, fetchMoviesAZ, getAverageRating } from '../api/MovieAPI';
@@ -38,14 +38,18 @@ const calculateWeightedRating = (averageRating: number, reviewCount: number, glo
 
 function HomePage() {
   const [moviesByGenre, setMoviesByGenre] = useState<{ [key: string]: Movie[] }>({});
-  const [allMoviesAZ, setAllMoviesAZ] = useState<Movie[]>([]); // State for A-Z sorted movies
-  const [topMovies, setTopMovies] = useState<Movie[]>([]); // State for top 10 movies
+  const [allMoviesAZ, setAllMoviesAZ] = useState<Movie[]>([]);
+  const [topMovies, setTopMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingAZ, setLoadingAZ] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [hasMore, setHasMore] = useState(true); // To track if there's more to load in A-Z section
-  const [loadingMore, setLoadingMore] = useState(false); // To prevent multiple load triggers in A-Z section
-  const [currentPage, setCurrentPage] = useState(1); // Track the current page in A-Z section
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
   const navigate = useNavigate();
+
+  // Cache for movie ratings to avoid duplicate API calls
+  const ratingsCache = useRef<{ [key: string]: { averageRating: number; reviewCount: number } }>({});
 
   // Fetch movies by genre
   useEffect(() => {
@@ -59,17 +63,34 @@ function HomePage() {
         if (response && Array.isArray(response.movies)) {
           const allMovies = response.movies;
 
-          // Get all movies' ratings to calculate global average
-          const movieRatings = await Promise.all(
-            allMovies.map(async (movie) => {
-              try {
-                const { averageRating, reviewCount } = await getAverageRating(movie.showId);
-                return { movie, averageRating, reviewCount };
-              } catch (error) {
-                return { movie, averageRating: 0, reviewCount: 0 };
-              }
-            })
-          );
+          // Get all movies' ratings in parallel with a batch size
+          const BATCH_SIZE = 10;
+          const movieRatings = [];
+          
+          for (let i = 0; i < allMovies.length; i += BATCH_SIZE) {
+            const batch = allMovies.slice(i, i + BATCH_SIZE);
+            const batchRatings = await Promise.all(
+              batch.map(async (movie) => {
+                // Check cache first
+                if (ratingsCache.current[movie.showId]) {
+                  return {
+                    movie,
+                    ...ratingsCache.current[movie.showId]
+                  };
+                }
+
+                try {
+                  const { averageRating, reviewCount } = await getAverageRating(movie.showId);
+                  // Cache the rating
+                  ratingsCache.current[movie.showId] = { averageRating, reviewCount };
+                  return { movie, averageRating, reviewCount };
+                } catch (error) {
+                  return { movie, averageRating: 0, reviewCount: 0 };
+                }
+              })
+            );
+            movieRatings.push(...batchRatings);
+          }
 
           // Calculate global average rating
           const globalAverageRating = movieRatings.reduce((sum, { averageRating }) => sum + averageRating, 0) / movieRatings.length;
@@ -125,6 +146,8 @@ function HomePage() {
         setError((error as Error).message);
       } finally {
         setLoading(false);
+        // Start loading A-Z movies after genre movies are loaded
+        loadAllMoviesAZ();
       }
     };
 
@@ -132,75 +155,95 @@ function HomePage() {
   }, []);
 
   // Fetch movies A-Z (All Movies A-Z)
-  useEffect(() => {
-    const loadAllMoviesAZ = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+  const loadAllMoviesAZ = async () => {
+    try {
+      setLoadingAZ(true);
+      setError(null);
 
-        // Fetch the first page of movies A-Z
-        const response = await fetchMoviesAZ(100, 1);
-        if (response && Array.isArray(response.movies)) {
-          setAllMoviesAZ(response.movies);
-          setCurrentPage(1);
-        } else {
-          console.warn('Unexpected data format:', response);
-        }
-      } catch (error) {
-        console.error('Error loading A-Z movies:', error);
-        setError((error as Error).message);
-      } finally {
-        setLoading(false);
+      // Fetch the first page of movies A-Z
+      const response = await fetchMoviesAZ(100, 1);
+      if (response && Array.isArray(response.movies)) {
+        // Pre-fetch ratings for the first batch of A-Z movies
+        const moviesWithRatings = await Promise.all(
+          response.movies.map(async (movie) => {
+            // Check cache first
+            if (ratingsCache.current[movie.showId]) {
+              return movie;
+            }
+
+            try {
+              const { averageRating, reviewCount } = await getAverageRating(movie.showId);
+              ratingsCache.current[movie.showId] = { averageRating, reviewCount };
+            } catch (error) {
+              console.error('Error fetching rating for movie:', movie.showId, error);
+            }
+            return movie;
+          })
+        );
+
+        setAllMoviesAZ(moviesWithRatings);
+        setCurrentPage(1);
+      } else {
+        console.warn('Unexpected data format:', response);
       }
-    };
-
-    loadAllMoviesAZ();
-  }, []);
+    } catch (error) {
+      console.error('Error loading A-Z movies:', error);
+      setError((error as Error).message);
+    } finally {
+      setLoadingAZ(false);
+    }
+  };
 
   // Load more movies A-Z when the user scrolls near the bottom
   const loadMoreMoviesAZ = useCallback(async () => {
-    if (loadingMore) {
+    if (loadingMore || loadingAZ) {
       return;
     }
   
     setLoadingMore(true);
   
     try {
-      // Fetch more movies A-Z by adding offset (use currentPage to determine next page)
       const nextPage = currentPage + 1;
       const response = await fetchMoviesAZ(100, nextPage);
-  
-      console.log("API response for page " + nextPage, response);
-        // Log the response
   
       if (response && Array.isArray(response.movies)) {
         const newMovies = response.movies;
   
         if (newMovies.length > 0) {
-          // Append new movies to the existing list
+          // Pre-fetch ratings for new movies in the background
+          Promise.all(
+            newMovies.map(async (movie) => {
+              if (!ratingsCache.current[movie.showId]) {
+                try {
+                  const { averageRating, reviewCount } = await getAverageRating(movie.showId);
+                  ratingsCache.current[movie.showId] = { averageRating, reviewCount };
+                } catch (error) {
+                  console.error('Error fetching rating for movie:', movie.showId, error);
+                }
+              }
+              return movie;
+            })
+          );
+
           setAllMoviesAZ((prevMovies) => [...prevMovies, ...newMovies]);
-  
-          // Only increment the page if new movies are loaded
           setCurrentPage(nextPage);
   
-          // If fewer than 100 movies were returned, there are no more pages
           if (newMovies.length < 100) {
-            setHasMore(false); // No more movies to load
+            setHasMore(false);
           }
         } else {
-          // In case no movies are returned, ensure hasMore is set to false
           setHasMore(false);
         }
       } else {
         console.warn('Error: No movies returned for next page');
-        setHasMore(false); // If no valid data is returned, set hasMore to false
+        setHasMore(false);
       }
     } catch (error) {
       console.error('Error loading more A-Z movies:', error);
     } finally {
       setLoadingMore(false);
     }
-  }, [currentPage, loadingMore, hasMore]);
+  }, [currentPage, loadingMore, loadingAZ, hasMore]);
   
   
   // Scroll event listener for infinite scroll (A-Z)
