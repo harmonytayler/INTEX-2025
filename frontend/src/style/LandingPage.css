@@ -121,7 +121,7 @@
 }
 
 .landing-button:hover {
-  background-color: #e5e7eb;
+  background-color: #FFFCF3;
   border-color: #C35D24;
 }
 
@@ -174,4 +174,35 @@
   color: rgb(237, 237, 237);
   opacity: 0.6;
   font-size: 0.75rem;
+}
+
+.div-faq {
+  max-width: 64rem;
+  width: 60%;
+  text-align: left;
+  position: relative;
+  z-index: 1;
+}
+
+.div-faq h2 {
+  font-size: 2rem;
+  font-weight: 600;
+  text-align:center;
+  color: #FFFCF3;
+  text-decoration: underline;
+}
+
+.div-faq b {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #FFFCF3;
+  margin-bottom: 0rem;
+}
+
+.trending-now h2 {
+  font-size: 2rem;
+  font-weight: 600;
+  text-align:center;
+  color: #FFFCF3;
+  text-decoration: underline;
 }
