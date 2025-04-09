@@ -199,12 +199,23 @@
   margin-bottom: 0rem;
 }
 
+.trending-now {
+  max-width: 80rem;
+  width: 100%;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+  margin-top: 25vh; /* This will position it after the background image section */
+  padding: 2rem 0;
+}
+
 .trending-now h2 {
   font-size: 2rem;
   font-weight: 600;
-  text-align:center;
+  text-align: center;
   color: #FFFCF3;
   text-decoration: underline;
+  margin-bottom: 2rem;
 }
 
 /* Login Page Styles */
