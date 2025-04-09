@@ -2,12 +2,14 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../style/identity.css';
 import '@fortawesome/fontawesome-free/css/all.css';
+import { useAuth } from '../contexts/AuthContext';
 
 function LoginPage() {
   // state variables for email and passwords
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [rememberme, setRememberme] = useState<boolean>(false);
+  const { setUser } = useAuth();
 
   // state variable for error messages
   const [error, setError] = useState<string>('');
@@ -41,13 +43,13 @@ function LoginPage() {
 
     const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://localhost:5001';
     const loginUrl = rememberme
-    ? `${baseUrl}/login?useCookies=true`
-    : `${baseUrl}/login?useSessionCookies=true`;
+      ? `${baseUrl}/login?useCookies=true`
+      : `${baseUrl}/login?useSessionCookies=true`;
 
     try {
       const response = await fetch(loginUrl, {
         method: 'POST',
-        credentials: 'include', // ✅ Ensures cookies are sent & received
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
@@ -63,6 +65,24 @@ function LoginPage() {
         throw new Error(data?.message || 'Invalid email or password.');
       }
 
+      // Fetch user data to get the user ID
+      const userResponse = await fetch(`${baseUrl}/MovieUser/GetUserByEmail?email=${encodeURIComponent(email)}`, {
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (!userResponse.ok) {
+        throw new Error('Failed to fetch user data');
+      }
+
+      const userData = await userResponse.json();
+      
+      // Set the user data in the AuthContext with both email and userId
+      setUser({ 
+        email,
+        userId: userData.userId
+      });
+      
       navigate('/home');
     } catch (error: any) {
       setError(error.message || 'Error logging in.');

@@ -95,13 +95,6 @@ function HomePage() {
           <div className="flex-1 max-w-2xl">
             <SearchBar placeholder="Search movies..." />
           </div>
-          <div className="ml-4">
-            <Logout>
-              <span className="text-white">
-                <AuthorizedUser value="email" />
-              </span>
-            </Logout>
-          </div>
         </div>
 
         {/* Main content */}
