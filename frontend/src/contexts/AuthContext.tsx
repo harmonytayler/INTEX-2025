@@ -3,15 +3,12 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 interface User {
   email: string;
   userId: number;
-  roles?: string[];
 }
 
 interface AuthContextType {
   user: User | null;
   setUser: (user: User | null) => void;
   logout: () => void;
-  loading: boolean;
-  setLoading: (loading: boolean) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -21,7 +18,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const savedUser = localStorage.getItem('user');
     return savedUser ? JSON.parse(savedUser) : null;
   });
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -37,7 +33,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, setUser, logout, loading, setLoading }}>
+    <AuthContext.Provider value={{ user, setUser, logout }}>
       {children}
     </AuthContext.Provider>
   );
