@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Movie } from '../types/Movie';
-import { fetchMovies, fetchMoviesAZ } from '../api/MovieAPI';
+import { fetchMovies, fetchMoviesAZ, getAverageRating } from '../api/MovieAPI';
 import MovieRow from '../components/MovieRow';
 import Logout from '../components/security/Logout';
 import AuthorizeView, { AuthorizedUser } from '../components/security/AuthorizeView';
@@ -31,9 +31,15 @@ const GENRE_MAPPING: Record<string, string> = {
   'Romance': 'comediesRomanticMovies'
 };
 
+// Helper function to calculate weighted rating using IMDb formula
+const calculateWeightedRating = (averageRating: number, reviewCount: number, globalAverageRating: number, minReviews: number = 3): number => {
+  return (reviewCount / (reviewCount + minReviews)) * averageRating + (minReviews / (reviewCount + minReviews)) * globalAverageRating;
+};
+
 function HomePage() {
   const [moviesByGenre, setMoviesByGenre] = useState<{ [key: string]: Movie[] }>({});
   const [allMoviesAZ, setAllMoviesAZ] = useState<Movie[]>([]); // State for A-Z sorted movies
+  const [topMovies, setTopMovies] = useState<Movie[]>([]); // State for top 10 movies
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true); // To track if there's more to load in A-Z section
@@ -53,25 +59,63 @@ function HomePage() {
         if (response && Array.isArray(response.movies)) {
           const allMovies = response.movies;
 
-          // Categorize movies by genre
-          const genreMovies: { [key: string]: Movie[] } = {};
+          // Get all movies' ratings to calculate global average
+          const movieRatings = await Promise.all(
+            allMovies.map(async (movie) => {
+              try {
+                const { averageRating, reviewCount } = await getAverageRating(movie.showId);
+                return { movie, averageRating, reviewCount };
+              } catch (error) {
+                return { movie, averageRating: 0, reviewCount: 0 };
+              }
+            })
+          );
+
+          // Calculate global average rating
+          const globalAverageRating = movieRatings.reduce((sum, { averageRating }) => sum + averageRating, 0) / movieRatings.length;
+
+          // Calculate weighted ratings for all movies
+          const moviesWithRatings = movieRatings.map(({ movie, averageRating, reviewCount }) => {
+            const weightedRating = calculateWeightedRating(averageRating, reviewCount, globalAverageRating);
+            return { movie, weightedRating };
+          });
+
+          // Sort all movies by weighted rating to get top 10
+          const sortedAllMovies = moviesWithRatings
+            .sort((a, b) => b.weightedRating - a.weightedRating)
+            .slice(0, 10)
+            .map(item => item.movie);
+          
+          setTopMovies(sortedAllMovies);
+
+          // Categorize movies by genre and calculate weighted ratings
+          const genreMovies: { [key: string]: { movie: Movie; weightedRating: number }[] } = {};
 
           // Initialize empty arrays for each genre
           MAIN_GENRES.forEach(genre => {
             genreMovies[genre] = [];
           });
 
-          // Categorize each movie into appropriate genres
-          allMovies.forEach(movie => {
+          // Categorize each movie into appropriate genres and calculate weighted ratings
+          movieRatings.forEach(({ movie, averageRating, reviewCount }) => {
             MAIN_GENRES.forEach(displayGenre => {
               const dbField = GENRE_MAPPING[displayGenre];
               if (dbField && movie[dbField as keyof Movie] === 1) {
-                genreMovies[displayGenre].push(movie);
+                const weightedRating = calculateWeightedRating(averageRating, reviewCount, globalAverageRating);
+                genreMovies[displayGenre].push({ movie, weightedRating });
               }
             });
           });
 
-          setMoviesByGenre(genreMovies);
+          // Sort movies within each genre by weighted rating
+          const sortedMoviesByGenre: { [key: string]: Movie[] } = {};
+          MAIN_GENRES.forEach(genre => {
+            sortedMoviesByGenre[genre] = genreMovies[genre]
+              .sort((a, b) => b.weightedRating - a.weightedRating)
+              .map(item => item.movie);
+          });
+
+          setMoviesByGenre(sortedMoviesByGenre);
         } else {
           console.warn('Unexpected data format:', response);
           setMoviesByGenre({});
@@ -182,6 +226,12 @@ function HomePage() {
   return (
     <AuthorizeView>
       <div className="min-h-screen bg-black">
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
         {/* Main content */}
         <div className="px-4 md:px-8 pb-8">
           {loading && (
@@ -196,6 +246,15 @@ function HomePage() {
 
           {!loading && !error && (
             <div className="movie-rows-container space-y-12">
+              {/* Top 10 Movies Section */}
+              {topMovies.length > 0 && (
+                <MovieRow
+                  genre="Top 10 Movies"
+                  movies={topMovies}
+                  onMovieClick={handleMovieClick}
+                  isTopTen={true}
+                />
+              )}
 
               {MAIN_GENRES.map((genre) => (
                 moviesByGenre[genre] && moviesByGenre[genre].length > 0 && (
