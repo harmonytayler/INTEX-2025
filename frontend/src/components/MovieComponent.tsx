@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Movie } from '../types/Movie';
 import { fetchMovies } from '../api/MovieAPI';
-import Pagination from './adminview/Pagination';
+import Pagination from './Pagination';
 import GenreFilter from './GenreFilter';
 
 function MovieList({ selectedCategories }: { selectedCategories: string[] }) {

@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Movie } from '../types/Movie';
 import { deleteMovie, fetchMovies } from '../api/MovieAPI';
-import Pagination from '../components/adminview/Pagination.tsx';
-import NewMovieForm from '../components/adminview/NewMovieForm';
-import EditProjectForm from '../components/adminview/EditMovieForm.tsx';
+import Pagination from '../components/Pagination.tsx';
+import NewMovieForm from '../components/NewMovieForm.tsx';
+import EditProjectForm from '../components/EditMovieForm.tsx';
 
 // List of all genre keys in the Movie interface
 const genreKeys: (keyof Movie)[] = [
