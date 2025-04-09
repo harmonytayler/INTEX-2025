@@ -9,7 +9,7 @@ function LoginPage() {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [rememberme, setRememberme] = useState<boolean>(false);
-  const { setUser } = useAuth();
+  const { setUser, setLoading } = useAuth();
 
   // state variable for error messages
   const [error, setError] = useState<string>('');
@@ -35,9 +35,11 @@ function LoginPage() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(''); // Clear any previous errors
+    setLoading(true);
 
     if (!email || !password) {
       setError('Please fill in all fields.');
+      setLoading(false);
       return;
     }
 
@@ -49,44 +51,40 @@ function LoginPage() {
     try {
       const response = await fetch(loginUrl, {
         method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({ email, password }),
+        credentials: 'include',
       });
-
-      // Ensure we only parse JSON if there is content
-      let data = null;
-      const contentLength = response.headers.get('content-length');
-      if (contentLength && parseInt(contentLength, 10) > 0) {
-        data = await response.json();
-      }
 
       if (!response.ok) {
-        throw new Error(data?.message || 'Invalid email or password.');
+        throw new Error('Login failed');
       }
 
-      // Fetch user data to get the user ID
-      const userResponse = await fetch(`${baseUrl}/MovieUser/GetUserByEmail?email=${encodeURIComponent(email)}`, {
+      // Fetch user info including roles
+      const userInfoResponse = await fetch(`${baseUrl}/userinfo`, {
         credentials: 'include',
-        headers: { 'Content-Type': 'application/json' }
       });
 
-      if (!userResponse.ok) {
-        throw new Error('Failed to fetch user data');
+      if (!userInfoResponse.ok) {
+        throw new Error('Failed to fetch user info');
       }
 
-      const userData = await userResponse.json();
+      const userInfo = await userInfoResponse.json();
       
-      // Set the user data in the AuthContext with both email and userId
-      setUser({ 
-        email,
-        userId: userData.userId
+      // Set user with roles
+      setUser({
+        email: userInfo.email,
+        userId: userInfo.userId,
+        roles: userInfo.roles || []
       });
-      
+
       navigate('/home');
-    } catch (error: any) {
-      setError(error.message || 'Error logging in.');
-      console.error('Fetch attempt failed:', error);
+    } catch (error) {
+      setError('Invalid email or password');
+    } finally {
+      setLoading(false);
     }
   };
 
