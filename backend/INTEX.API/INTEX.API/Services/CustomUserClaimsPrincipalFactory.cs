@@ -15,14 +15,6 @@ public class CustomUserClaimsPrincipalFactory : UserClaimsPrincipalFactory<Ident
     {
         var identity = await base.GenerateClaimsAsync(user);
         identity.AddClaim(new Claim(ClaimTypes.Email, user.Email ?? ""));
-        
-        // Add roles to claims
-        var roles = await UserManager.GetRolesAsync(user);
-        foreach (var role in roles)
-        {
-            identity.AddClaim(new Claim(ClaimTypes.Role, role));
-        }
-        
         return identity;
     }
 }

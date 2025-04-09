@@ -7,17 +7,6 @@ interface FetchMoviesResponse {
 
 const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://localhost:5001';
 const API_URL = `${baseUrl}/Movie`;
-const ADMIN_API_URL = `${baseUrl}/AdminMovie`;
-
-// Helper function to get headers with credentials
-const getHeaders = () => {
-  const token = localStorage.getItem('token');
-  return {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
-    'Authorization': token ? `Bearer ${token}` : '',
-  };
-};
 
 export const fetchMovies = async (
   limit: number = 10,
@@ -94,50 +83,67 @@ export const fetchMovies = async (
   }
 };
 
-export const addMovie = async (movie: Movie): Promise<Movie> => {
-  const response = await fetch(`${ADMIN_API_URL}/AddMovie`, {
-    method: 'POST',
-    headers: getHeaders(),
-    body: JSON.stringify(movie),
-    credentials: 'include',
-  });
+export const addMovie = async (newMovie: Movie): Promise<Movie> => {
+  try {
+      const response = await fetch(`${API_URL}/AddMovie`, {
+          method: "POST",
+          headers: {
+              "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newMovie),
+          credentials: 'include',
+          });
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || 'Failed to add movie');
-  }
+      if (!response.ok) {
+          throw new Error("Failed to add movie");
+      }
 
-  return response.json();
-};
-
-export const updateMovie = async (id: string, movie: Movie): Promise<Movie> => {
-  const response = await fetch(`${ADMIN_API_URL}/Update/${id}`, {
-    method: 'PUT',
-    headers: getHeaders(),
-    body: JSON.stringify(movie),
-    credentials: 'include',
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || 'Failed to update movie');
-  }
-
-  return response.json();
-};
-
-export const deleteMovie = async (id: string): Promise<void> => {
-  const response = await fetch(`${ADMIN_API_URL}/DeleteMovie/${id}`, {
-    method: 'DELETE',
-    headers: getHeaders(),
-    credentials: 'include',
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || 'Failed to delete movie');
+      return await response.json();
+  } catch (error) {
+      console.error("Error adding movie:", error);
+      throw error;
   }
 };
+
+export const updateMovie = async (showId: string, updatedMovie: Movie): Promise<Movie> => {
+  try {
+      const response = await fetch(`${API_URL}/Update/${showId}`, {
+          method: "PUT",
+          headers: {
+              "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updatedMovie),
+          credentials: 'include',
+      });
+
+      if (!response.ok) {
+          throw new Error(`Failed to update movie: ${response.statusText}`);
+      }
+
+      return await response.json();
+  } catch (error) {
+      console.error("Error updating movie:", error);
+      throw error;
+  }
+}
+
+export const deleteMovie = async (showId: string): Promise<void> => {
+  try {
+      const response = await fetch(`${API_URL}/DeleteMovie/${showId}`,
+          {
+              method: 'DELETE',
+              credentials: 'include'
+          }
+      );
+
+      if (!response.ok) {
+          throw new Error('Failed to delete movie');
+      }
+  } catch (error) {
+      console.error('Error deleting movie:', error);
+      throw error;
+  }
+}
 
 export const fetchMoviesAZ = async (
   pageSize: number,
