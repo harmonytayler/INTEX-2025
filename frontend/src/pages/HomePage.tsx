@@ -5,7 +5,6 @@ import { fetchMovies } from '../api/MovieAPI';
 import MovieRow from '../components/MovieRow';
 import Logout from '../components/security/Logout';
 import AuthorizeView, { AuthorizedUser } from '../components/security/AuthorizeView';
-import SearchBar from '../components/SearchBar';
 
 // Define main genres for the rows
 const MAIN_GENRES = [
@@ -90,15 +89,8 @@ function HomePage() {
   return (
     <AuthorizeView>
       <div className="min-h-screen bg-black">
-        {/* Header with search and user info */}
-        <div className="bg-black/80 fixed top-0 left-0 right-0 z-50 p-4 flex justify-between items-center">
-          <div className="flex-1 max-w-2xl">
-            <SearchBar placeholder="Search movies..." />
-          </div>
-        </div>
-
         {/* Main content */}
-        <div className="pt-20 px-4 md:px-8 pb-8">
+        <div className="px-4 md:px-8 pb-8">
           {loading && (
             <div className="text-white text-center py-8">Loading movies...</div>
           )}
@@ -110,7 +102,7 @@ function HomePage() {
           )}
 
           {!loading && !error && (
-            <div className="movie-rows-container space-y-8">
+            <div className="movie-rows-container space-y-12">
               {MAIN_GENRES.map((genre) => (
                 moviesByGenre[genre] && moviesByGenre[genre].length > 0 && (
                   <MovieRow

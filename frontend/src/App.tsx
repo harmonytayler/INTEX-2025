@@ -10,24 +10,30 @@ import AdminPage from './pages/AdminPage';
 import NewUserForm from './components/userInfo/UserInfoForm';
 import AccountsPage from './pages/AccountsPage';
 import EditingPage from './pages/EditingPage';
+import SearchResultsPage from './pages/SearchResultsPage';
 import { AuthProvider } from './contexts/AuthContext';
 
 function App() {
   return (
     <AuthProvider>
       <Router>
-        <Header />
-        <Routes>
-          <Route path="/" element={<LoginPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/register/userinfo" element={<NewUserForm/>} />
-          <Route path="/home" element={<HomePage />} />
-          <Route path="/movie/:movieId" element={<MovieDetailsPage />} />
-          <Route path="/admin" element={<AdminPage />} />
-          <Route path="/account" element={<AccountsPage />} />
-          <Route path="/account/edit" element={<EditingPage />} />
-        </Routes>
+        <div className="flex flex-col min-h-screen">
+          <Header />
+          <main className="flex-grow mt-[150px]">
+            <Routes>
+              <Route path="/" element={<LoginPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+              <Route path="/register/userinfo" element={<NewUserForm/>} />
+              <Route path="/home" element={<HomePage />} />
+              <Route path="/movie/:movieId" element={<MovieDetailsPage />} />
+              <Route path="/admin" element={<AdminPage />} />
+              <Route path="/account" element={<AccountsPage />} />
+              <Route path="/account/edit" element={<EditingPage />} />
+              <Route path="/search" element={<SearchResultsPage />} />
+            </Routes>
+          </main>
+        </div>
       </Router>
     </AuthProvider>
   );
