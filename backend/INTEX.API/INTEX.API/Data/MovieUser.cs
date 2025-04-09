@@ -6,24 +6,31 @@ namespace INTEX.API.Data;
 [Table("movies_users")]
 public class MovieUser
 {
+    [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     [Column("user_id")]
     public int UserId { get; set; }
     
     [Column("name")]
-    public string Name { get; set; }
+    [MaxLength(100)]
+    public string? Name { get; set; }
     
     [Column("phone")]
-    public string Phone { get; set; }
+    [MaxLength(20)]
+    public string? Phone { get; set; }
     
     [Column("email")]
-    public string Email { get; set; }
+    [Required]
+    [EmailAddress]
+    [MaxLength(100)]
+    public string Email { get; set; } = string.Empty;
     
     [Column("age")]
     public int Age { get; set; }
     
     [Column("gender")]
-    public string Gender { get; set; }
+    [MaxLength(10)]
+    public string? Gender { get; set; }
     
     [Column("Netflix")]
     public int Netflix { get; set; }
@@ -50,10 +57,12 @@ public class MovieUser
     public int Peacock { get; set; }
     
     [Column("city")]
-    public string City { get; set; }
+    [MaxLength(100)]
+    public string? City { get; set; }
     
     [Column("state")]
-    public string State { get; set; }
+    [MaxLength(50)]
+    public string? State { get; set; }
     
     [Column("zip")]
     public int Zip { get; set; }

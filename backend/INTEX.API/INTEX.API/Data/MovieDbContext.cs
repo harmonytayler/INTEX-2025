@@ -1,25 +1,50 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace INTEX.API.Data 
+namespace INTEX.API.Data;
+
+public class MovieDbContext : DbContext
 {
-    public class MovieDbContext : DbContext
+    public MovieDbContext(DbContextOptions<MovieDbContext> options)
+        : base(options)
     {
-        public MovieDbContext(DbContextOptions<MovieDbContext> options) : base(options)
-        {}
+        // Ensure database and tables are created
+        Database.EnsureCreated();
+    }
 
-        public DbSet<Movie> movies_titles { get; set; }
-        public DbSet<MovieUser> movies_users { get; set; }
-        
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+    public DbSet<MovieUser> movies_users { get; set; }
+    public DbSet<Movie> movies_titles { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<MovieUser>(entity =>
         {
-            // Explicitly setting the primary key if it's not detected by convention
-            modelBuilder.Entity<MovieUser>()
-                .HasKey(u => u.UserId);  // Make sure 'UserId' is set as the primary key
+            entity.ToTable("movies_users");
+            entity.HasKey(e => e.UserId);
+            
+            // Configure SQLite auto-incrementing
+            entity.Property(e => e.UserId)
+                .ValueGeneratedOnAdd()
+                .HasColumnType("INTEGER");
+            
+            // Configure string length constraints
+            entity.Property(e => e.Name).HasMaxLength(100);
+            entity.Property(e => e.Phone).HasMaxLength(20);
+            entity.Property(e => e.Email).HasMaxLength(100).IsRequired();
+            entity.Property(e => e.Gender).HasMaxLength(10);
+            entity.Property(e => e.City).HasMaxLength(100);
+            entity.Property(e => e.State).HasMaxLength(50);
+        });
 
-            // Configure 'UserId' to auto-increment if it's not already set in the database
-            modelBuilder.Entity<MovieUser>()
-                .Property(u => u.UserId)
-                .ValueGeneratedOnAdd();  // Auto-increment
-        }
+        modelBuilder.Entity<Movie>(entity =>
+        {
+            entity.ToTable("movies_titles");
+            entity.HasKey(e => e.ShowId);
+            
+            // Configure required fields
+            entity.Property(e => e.Type).IsRequired();
+            entity.Property(e => e.Title).IsRequired();
+        });
     }
 }
