@@ -286,7 +286,7 @@ function HomePage() {
               {/* Top 10 Movies Section */}
               {topMovies.length > 0 && (
                 <MovieRow
-                  genre="Top 10 Movies"
+                  genre="Top 10 Trending Movies"
                   movies={topMovies}
                   onMovieClick={handleMovieClick}
                   isTopTen={true}
