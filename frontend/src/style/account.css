@@ -148,3 +148,34 @@
   opacity: 0.6;
   font-size: 0.75rem;
 }
+
+.privacy-content {
+  color: #FFFCF3;
+  line-height: 1.6;
+}
+
+.privacy-content h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 2rem 0 1rem;
+  color: #FFFCF3;
+  text-align: left;
+  position: relative;
+  padding-top: 1rem;
+}
+
+.privacy-content h3::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(to right, transparent, #FFFCF3, transparent);
+}
+
+.privacy-content p {
+  margin-bottom: 1.5rem;
+  color: #FFFCF3;
+  text-align:left;
+}
