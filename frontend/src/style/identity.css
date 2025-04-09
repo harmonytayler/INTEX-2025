@@ -1,8 +1,8 @@
 body {
-  background: linear-gradient(to right, #0062e6, #33aeff);
   min-height: 100vh;
   margin: 0;
   padding: 0;
+  background: radial-gradient(circle at 50% 50%, #193231, #070e0e) fixed;
   overflow-x: hidden;
 }
 
@@ -15,9 +15,6 @@ body {
 .btn-google {
   color: white !important;
   background-color: #ea4335 !important;
-  pointer-events: auto !important;
-  z-index: 10;
-  position: relative; /* Ensure it's on top if anything was covering it */
 }
 
 .btn-facebook {
