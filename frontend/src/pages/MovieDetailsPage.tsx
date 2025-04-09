@@ -19,27 +19,35 @@ const MovieDetailsPage: React.FC = () => {
         setLoading(true);
         setError(null);
 
-        // Fetch ALL movies by using a very large pageSize
-        // This ensures we get every movie in the database
-        const response = await fetchMovies(10000, 1, [], '', []);
-        
-        if (response && Array.isArray(response.movies)) {
-          // Convert both values to strings for comparison
-          const foundMovie = response.movies.find(m => String(m.showId) === String(movieId));
-          
-          if (foundMovie) {
-            setMovie(foundMovie);
-          } else {
-            // More user-friendly error message
-            setError(`Movie with ID "${movieId}" not found. The movie may have been removed or the ID is incorrect.`);
-            console.error(`Movie with ID ${movieId} not found. Available IDs:`, response.movies.map(m => m.showId));
+        const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://localhost:5001';
+        const response = await fetch(`${baseUrl}/Movie/GetMovie/${movieId}`, {
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json'
           }
-        } else {
-          setError('Failed to load movie data. Please try again later.');
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('API Error Response:', errorText);
+          
+          if (response.status === 401) {
+            throw new Error('Authentication failed. Please log in again.');
+          } else if (response.status === 404) {
+            throw new Error('Movie not found.');
+          } else {
+            throw new Error(`Failed to load movie details: ${response.status} ${response.statusText}`);
+          }
         }
+
+        const data = await response.json();
+        setMovie({
+          ...data.movie,
+          posterUrl: data.posterUrl
+        });
       } catch (error) {
         console.error('Error loading movie details:', error);
-        setError('An error occurred while loading the movie. Please try again later.');
+        setError(error instanceof Error ? error.message : 'An error occurred while loading the movie. Please try again later.');
       } finally {
         setLoading(false);
       }
@@ -111,8 +119,12 @@ const MovieDetailsPage: React.FC = () => {
               <div className="flex flex-col md:flex-row gap-8">
                 {/* Poster Section */}
                 <div className="w-full md:w-1/3">
-                  <div className="poster-placeholder bg-gray-800 w-full aspect-[2/3] rounded-md flex items-center justify-center">
-                    <span className="text-gray-400">Poster</span>
+                  <div className="w-full aspect-[2/3] rounded-md overflow-hidden">
+                    <img
+                      src={movie.posterUrl || 'https://via.placeholder.com/300x450?text=No+Poster'}
+                      alt={`${movie.title} poster`}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                 </div>
                 

@@ -479,5 +479,35 @@ public class MovieController : ControllerBase
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+
+        [HttpGet("GetMovie/{showId}")]
+        public async Task<IActionResult> GetMovie(string showId)
+        {
+            try
+            {
+                var movie = await _movieContext.movies_titles.FindAsync(showId);
+                if (movie == null)
+                {
+                    return NotFound(new { message = "Movie not found" });
+                }
+
+                // Get the poster URL
+                var posterUrl = await GetPosterUrl(showId);
+                string posterUrlString = null;
+                if (posterUrl is OkObjectResult okResult)
+                {
+                    posterUrlString = okResult.Value as string;
+                }
+
+                return Ok(new { 
+                    movie = movie,
+                    posterUrl = posterUrlString
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
     }
 }
