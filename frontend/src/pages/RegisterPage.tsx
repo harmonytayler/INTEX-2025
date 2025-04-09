@@ -20,13 +20,6 @@ function Register() {
     if (name === 'confirmPassword') setConfirmPassword(value);
   };
 
-  const handleGoogleLogin = () => {
-    const api = import.meta.env.VITE_API_BASE_URL || 'https://localhost:5001';
-    const redirectUrl = `${api}/auth/google?returnUrl=/home`;
-    console.log("Redirecting to:", redirectUrl);
-    window.location.href = redirectUrl;
-  };  
-
   // handle submit event for the form
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -123,16 +116,6 @@ function Register() {
                   Register
                 </button>
               </div>
-              <div className="d-grid mb-2">
-  <button
-    className="btn btn-google btn-login text-uppercase fw-bold"
-    type="button" // Prevent form submission
-    onClick={handleGoogleLogin}
-  >
-    <i className="fa-brands fa-google me-2"></i> Sign in with Google
-  </button>
-</div>
-
             </form>
             <strong>{error && <p className="error">{error}</p>}</strong>
           </div>
