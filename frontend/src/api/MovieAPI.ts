@@ -131,13 +131,21 @@ export const deleteMovie = async (showId: string): Promise<void> => {
   }
 }
 
-export const fetchMovieById = async (movieId: string): Promise<Movie | null> => {
+export const getMovieById = async (showId: string) => {
   try {
-    const response = await fetch(`/${movieId}`);
-    if (!response.ok) throw new Error('Movie not found');
-    return await response.json();
+    const response = await fetch(`${API_URL}/GetMovieById/${showId}`);
+    console.log(response);
+    console.log(`${API_URL}/GetMovieById/${showId}`);
+    if (!response.ok) {
+      throw new Error(`Movie with ID ${showId} not found`);
+    }
+    const movieData = await response.json();
+    return movieData;
   } catch (error) {
-    console.error(error);
-    return null;
+    if (error instanceof Error) {
+      throw new Error(error.message || 'Failed to fetch movie');
+    } else {
+      throw new Error('Failed to fetch movie');
+    }
   }
 };

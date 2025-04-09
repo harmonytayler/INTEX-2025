@@ -451,6 +451,9 @@ public class MovieController : ControllerBase
         {
             try
             {
+                // Log the incoming showId to ensure it's being passed correctly
+                Console.WriteLine($"Looking for movie with ShowId: {showId}");
+
                 // Look up the movie by ShowId
                 var movie = _movieContext.movies_titles.FirstOrDefault(m => m.ShowId == showId);
 
@@ -460,11 +463,17 @@ public class MovieController : ControllerBase
                     return NotFound(new { message = $"Movie with ID {showId} not found" });
                 }
 
+                // Log the found movie for debugging purposes
+                Console.WriteLine($"Found movie: {movie.Title}");
+
                 // Return the movie data as an OK response
                 return Ok(movie);
             }
             catch (Exception ex)
             {
+                // Log the exception for debugging
+                Console.WriteLine($"Error: {ex.Message}");
+
                 // Return a 500 Internal Server Error if an exception occurs
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }

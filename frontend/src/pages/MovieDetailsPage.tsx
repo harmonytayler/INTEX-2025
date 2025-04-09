@@ -1,70 +1,57 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Movie } from '../types/Movie';
-import { fetchMovies } from '../api/MovieAPI';
+import { getMovieById } from '../api/MovieAPI'; // Import the new function
 import Logout from '../components/security/Logout';
 import AuthorizeView, { AuthorizedUser } from '../components/security/AuthorizeView';
 import SearchBar from '../components/SearchBar';
 
 const MovieDetailsPage: React.FC = () => {
-  const { movieId } = useParams<{ movieId: string }>();
+  const { showId } = useParams<{ showId: string }>();
   const navigate = useNavigate();
   const [movie, setMovie] = useState<Movie | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isImageError, setIsImageError] = useState(false); // State to track if the image has failed to load
   const imageUrl = movie ? movie.posterUrl : ''; // Extract the URL from the JSON object
-  
-    // Handle image loading error
-    const handleImageError = () => {
-      setIsImageError(true);
-    };
+
+  // Handle image loading error
+  const handleImageError = () => {
+    setIsImageError(true);
+  };
 
   useEffect(() => {
+    console.log('showId:', showId);
     const loadMovieDetails = async () => {
       try {
         setLoading(true);
         setError(null);
-        
-
-        // Fetch ALL movies by using a very large pageSize
-        // This ensures we get every movie in the database
-        const response = await fetchMovies(10000, 1, [], '', []);
-        
-        if (response && Array.isArray(response.movies)) {
-          // Convert both values to strings for comparison
-          const foundMovie = response.movies.find(m => String(m.showId) === String(movieId));
-          
-          if (foundMovie) {
-            setMovie(foundMovie);
-          } else {
-            // More user-friendly error message
-            setError(`Movie with ID "${movieId}" not found. The movie may have been removed or the ID is incorrect.`);
-            console.error(`Movie with ID ${movieId} not found. Available IDs:`, response.movies.map(m => m.showId));
-          }
-        } else {
-          setError('Failed to load movie data. Please try again later.');
+  
+        if (showId) {
+          const movieData = await getMovieById(showId);
+          console.log('Fetched movie data:', movieData); // Debugging line
+          setMovie(movieData);
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error loading movie details:', error);
-        setError('An error occurred while loading the movie. Please try again later.');
+        setError(error.message || 'An error occurred while loading the movie. Please try again later.');
       } finally {
         setLoading(false);
       }
     };
-
-    if (movieId) {
+  
+    if (showId) {
       loadMovieDetails();
     }
-  }, [movieId]);
+  }, [showId]);
+  
 
   // Helper function to get all genres for this movie
   const getGenres = () => {
     if (!movie) return '';
-    
+
     const genres: string[] = [];
-    
-    // Check each genre field and add to the list if it's 1
+
     if (movie.action === 1) genres.push('Action');
     if (movie.comedies === 1) genres.push('Comedy');
     if (movie.dramas === 1) genres.push('Drama');
@@ -73,7 +60,7 @@ const MovieDetailsPage: React.FC = () => {
     if (movie.thrillers === 1) genres.push('Thriller');
     if (movie.familyMovies === 1) genres.push('Family');
     if (movie.comediesRomanticMovies === 1) genres.push('Romance');
-    
+
     return genres.join(', ');
   };
 
@@ -84,7 +71,6 @@ const MovieDetailsPage: React.FC = () => {
   return (
     <AuthorizeView>
       <div className="min-h-screen bg-black text-white">
-        {/* Header with back button, search, and user info */}
         <div className="bg-black/80 fixed top-0 left-0 right-0 z-50 p-4 flex justify-between items-center">
           <div className="flex items-center">
             <button 
@@ -109,7 +95,6 @@ const MovieDetailsPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Main content */}
         <div className="pt-20 px-4 md:px-8 pb-8">
           {loading && (
             <div className="text-center py-8">Loading movie details...</div>
@@ -124,28 +109,25 @@ const MovieDetailsPage: React.FC = () => {
           {!loading && !error && movie && (
             <div className="max-w-4xl mx-auto">
               <div className="flex flex-col md:flex-row gap-8">
-                {/* Poster Section */}
                 <div className="w-full md:w-1/3">
-                <div className="poster-placeholder">
-                  {!isImageError && imageUrl ? (
-                    <img 
-                      src={imageUrl} 
-                      alt={movie.title} 
-                      className="movie-poster-image"
-                      onError={handleImageError} // Trigger the error handler if the image fails to load
-                    />
-                  ) : (
-                    <div className="default-poster-message">
-                      <span>This one doesn't have a poster yet! :(</span>
-                    </div>
-                  )}
+                  <div className="poster-placeholder">
+                    {!isImageError && imageUrl ? (
+                      <img 
+                        src={imageUrl} 
+                        alt={movie.title} 
+                        className="movie-poster-image"
+                        onError={handleImageError}
+                      />
+                    ) : (
+                      <div className="default-poster-message">
+                        <span>This one doesn't have a poster yet! :(</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
-                </div>
-                
-                {/* Details Section */}
+
                 <div className="w-full md:w-2/3">
                   <h1 className="text-3xl font-bold mb-4">{movie.title}</h1>
-                  
                   <div className="space-y-4">
                     <div>
                       <h3 className="text-lg font-semibold text-gray-300">Type</h3>
@@ -158,47 +140,47 @@ const MovieDetailsPage: React.FC = () => {
                         <p>{movie.director}</p>
                       </div>
                     )}
-                    
+
                     {movie.cast && (
                       <div>
                         <h3 className="text-lg font-semibold text-gray-300">Cast</h3>
                         <p>{movie.cast}</p>
                       </div>
                     )}
-                    
+
                     <div>
                       <h3 className="text-lg font-semibold text-gray-300">Genres</h3>
                       <p>{getGenres()}</p>
                     </div>
-                    
+
                     {movie.releaseYear && (
                       <div>
                         <h3 className="text-lg font-semibold text-gray-300">Release Year</h3>
                         <p>{movie.releaseYear}</p>
                       </div>
                     )}
-                    
+
                     {movie.rating && (
                       <div>
                         <h3 className="text-lg font-semibold text-gray-300">Rating</h3>
                         <p>{movie.rating}</p>
                       </div>
                     )}
-                    
+
                     {movie.duration && (
                       <div>
                         <h3 className="text-lg font-semibold text-gray-300">Duration</h3>
                         <p>{movie.duration}</p>
                       </div>
                     )}
-                    
+
                     {movie.country && (
                       <div>
                         <h3 className="text-lg font-semibold text-gray-300">Country</h3>
                         <p>{movie.country}</p>
                       </div>
                     )}
-                    
+
                     {movie.description && (
                       <div>
                         <h3 className="text-lg font-semibold text-gray-300">Description</h3>
@@ -216,4 +198,4 @@ const MovieDetailsPage: React.FC = () => {
   );
 };
 
-export default MovieDetailsPage; 
+export default MovieDetailsPage;
