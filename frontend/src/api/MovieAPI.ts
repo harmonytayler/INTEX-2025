@@ -130,3 +130,46 @@ export const deleteMovie = async (showId: string): Promise<void> => {
       throw error;
   }
 }
+
+export const fetchMoviesAZ = async (
+  pageSize: number,
+  pageNum: number
+): Promise<FetchMoviesResponse> => {
+  try {
+    const url = `${API_URL}/AllMoviesAZ?pageSize=${pageSize}&pageNum=${pageNum}`;
+
+    const response = await fetch(url, { credentials: "include" });
+    if (!response.ok) throw new Error(`Failed to fetch movies alphabetically`);
+
+    const data = await response.json();
+    const movies: Movie[] = Array.isArray(data.movies) ? data.movies : data;
+
+    // Fetch poster URLs in parallel
+    const enrichedMovies = await Promise.all(
+      movies.map(async (movie) => {
+        try {
+          const posterRes = await fetch(`${API_URL}/PosterUrl/${movie.showId}`, {
+            credentials: "include",
+          });
+          if (posterRes.ok) {
+            movie.posterUrl = await posterRes.text();
+          }
+        } catch (err) {
+          console.warn(`Failed to fetch poster for ${movie.title}`);
+        }
+        return movie;
+      })
+    );
+
+    return {
+      movies: enrichedMovies,
+      totalNumMovies: data.totalNumMovies || enrichedMovies.length,
+    };
+  } catch (error) {
+    console.error("Error fetching movies alphabetically:", error);
+    return {
+      movies: [],
+      totalNumMovies: 0,
+    };
+  }
+};

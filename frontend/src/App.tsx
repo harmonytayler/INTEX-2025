@@ -12,6 +12,8 @@ import AccountsPage from './pages/AccountsPage';
 import EditingPage from './pages/EditingPage';
 import SearchResultsPage from './pages/SearchResultsPage';
 import { AuthProvider } from './contexts/AuthContext';
+import LandingPage from './pages/LandingPage';
+import PrivacyPage from './pages/PrivacyPage';
 
 function App() {
   return (
@@ -21,7 +23,7 @@ function App() {
           <Header />
           <main className="flex-grow mt-[150px]">
             <Routes>
-              <Route path="/" element={<LoginPage />} />
+              <Route path="/" element={<LandingPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/register/userinfo" element={<NewUserForm/>} />
@@ -31,6 +33,7 @@ function App() {
               <Route path="/account" element={<AccountsPage />} />
               <Route path="/account/edit" element={<EditingPage />} />
               <Route path="/search" element={<SearchResultsPage />} />
+              <Route path="/privacy" element={<PrivacyPage />} />
             </Routes>
           </main>
         </div>
