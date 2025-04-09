@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import '../style/identity.css';
 import '@fortawesome/fontawesome-free/css/all.css';
+import CookieConsent from "react-cookie-consent";
 
 export default function LandingPage() {
   return (
@@ -76,6 +77,21 @@ export default function LandingPage() {
           </Link>
         </div>
       </main>
+
+      {/* COOKIE CONSENT */}
+      <CookieConsent
+        location="bottom"
+        buttonText="I understand"
+        cookieName="cineNicheConsent"
+        style={{ background: "#2B373B" }}
+        buttonStyle={{ color: "#ffffff", backgroundColor: "#4CAF50", fontSize: "14px", border: "none", padding: "0.5rem 1rem" }}
+        expires={150}
+      >
+        This website uses cookies to enhance the user experience. By continuing, you consent to the use of cookies.{" "}
+        <Link to="/privacy" style={{ color: "#FFD700", textDecoration: "underline" }}>
+          Learn more
+        </Link>
+      </CookieConsent>
 
       {/* FOOTER */}
       <footer
