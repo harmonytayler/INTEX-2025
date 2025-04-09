@@ -181,9 +181,9 @@ function HomePage() {
 
   return (
     <AuthorizeView>
-      <div className="min-h-screen bg-black">
+      <div className="min-h-screen">
         {/* Main content */}
-        <div className="px-4 md:px-8 pb-8">
+        <div className="px-4 md:px-8 pb-8 pt-2">
           {loading && (
             <div className="text-white text-center py-8">Loading movies...</div>
           )}
@@ -208,8 +208,11 @@ function HomePage() {
                 )
               ))}
 
+              {/* Divider before All Movies A-Z */}
+              <div className="border-t border-white/20 my-8"></div>
+
               {/* All Movies A-Z */}
-              <h2 className="text-lg font-bold text-white mb-2">All Movies A-Z</h2>
+              <h2 className="movie-row-header">All Movies A-Z</h2>
               <div className="movie-list-container">
                 {allMoviesAZ.map((movie) => (
                   <MovieCard
