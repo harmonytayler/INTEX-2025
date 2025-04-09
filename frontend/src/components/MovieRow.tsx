@@ -55,13 +55,13 @@ const MovieRow: React.FC<MovieRowProps> = ({ genre, movies, onMovieClick }) => {
 
   return (
     <div className="movie-row mb-6 relative group">
-      <h2 className="text-lg font-bold text-white mb-2">{genre}</h2>
+      <h2 className="text-xl font-bold text-white mb-4">{genre}</h2>
       
       {/* Left Arrow */}
       {showLeftArrow && (
         <button 
           onClick={scrollLeft}
-          className="absolute left-0 top-16 z-10 bg-black/50 rounded-full p-2 text-white opacity-70 hover:opacity-100 transition-opacity"
+          className="absolute left-0 top-20 z-10 bg-black/50 rounded-full p-2 text-white opacity-70 hover:opacity-100 transition-opacity"
           aria-label="Scroll left"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -74,7 +74,7 @@ const MovieRow: React.FC<MovieRowProps> = ({ genre, movies, onMovieClick }) => {
       {showRightArrow && (
         <button 
           onClick={scrollRight}
-          className="absolute right-0 top-16 z-10 bg-black/50 rounded-full p-2 text-white opacity-70 hover:opacity-100 transition-opacity"
+          className="absolute right-0 top-20 z-10 bg-black/50 rounded-full p-2 text-white opacity-70 hover:opacity-100 transition-opacity"
           aria-label="Scroll right"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">

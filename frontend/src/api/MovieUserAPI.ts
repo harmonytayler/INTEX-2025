@@ -74,7 +74,9 @@ export const fetchMovieUsers = async (pageSize: number, pageNum: number): Promis
 // Function to update movie user data
 export const updateMovieUser = async (userId: number, updatedUser: MovieUser): Promise<MovieUser> => {
     try {
-        const response = await fetch(`${API_URL}/UpdateMovieUser/${userId}`, {
+        console.log(`Updating user with ID ${userId}:`, updatedUser);
+        
+        const response = await fetch(`${API_URL}/Update/${userId}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
@@ -84,7 +86,9 @@ export const updateMovieUser = async (userId: number, updatedUser: MovieUser): P
         });
 
         if (!response.ok) {
-            throw new Error(`Failed to update movie user: ${response.statusText}`);
+            const errorText = await response.text();
+            console.error(`Server responded with status ${response.status}:`, errorText);
+            throw new Error(`Failed to update movie user: ${response.statusText}. Details: ${errorText}`);
         }
 
         return await response.json();
@@ -97,13 +101,15 @@ export const updateMovieUser = async (userId: number, updatedUser: MovieUser): P
 // Function to delete a movie user
 export const deleteMovieUser = async (userId: number): Promise<void> => {
     try {
-        const response = await fetch(`${API_URL}/DeleteMovieUser/${userId}`, {
+        const response = await fetch(`${API_URL}/DeleteUser/${userId}`, {
             method: "DELETE",
             credentials: 'include',
         });
 
         if (!response.ok) {
-            throw new Error('Failed to delete movie user');
+            const errorText = await response.text();
+            console.error(`Server responded with status ${response.status}:`, errorText);
+            throw new Error(`Failed to delete movie user: ${response.statusText}. Details: ${errorText}`);
         }
     } catch (error) {
         console.error('Error deleting movie user:', error);

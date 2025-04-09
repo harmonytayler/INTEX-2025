@@ -8,26 +8,37 @@ import MovieDetailsPage from './pages/MovieDetailsPage';
 import Header from './components/Header';
 import AdminPage from './pages/AdminPage';
 import NewUserForm from './components/userInfo/UserInfoForm';
+import AccountsPage from './pages/AccountsPage';
+import EditingPage from './pages/EditingPage';
+import SearchResultsPage from './pages/SearchResultsPage';
+import { AuthProvider } from './contexts/AuthContext';
 import LandingPage from './pages/LandingPage';
 import PrivacyPage from './pages/PrivacyPage';
 
 function App() {
   return (
-    <Router>
-      {/* Header outside Routes so it appears on every page */}
-      <Header />
-
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/register/userinfo" element={<NewUserForm />} />
-        <Route path="/home" element={<HomePage />} />
-        <Route path="/movie/:movieId" element={<MovieDetailsPage />} />
-        <Route path="/admin" element={<AdminPage />} />
-        <Route path="/privacy" element={<PrivacyPage />} />
-      </Routes>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <div className="flex flex-col min-h-screen">
+          <Header />
+          <main className="flex-grow mt-[150px]">
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+              <Route path="/register/userinfo" element={<NewUserForm/>} />
+              <Route path="/home" element={<HomePage />} />
+              <Route path="/movie/:movieId" element={<MovieDetailsPage />} />
+              <Route path="/admin" element={<AdminPage />} />
+              <Route path="/account" element={<AccountsPage />} />
+              <Route path="/account/edit" element={<EditingPage />} />
+              <Route path="/search" element={<SearchResultsPage />} />
+              <Route path="/privacy" element={<PrivacyPage />} />
+            </Routes>
+          </main>
+        </div>
+      </Router>
+    </AuthProvider>
   );
 }
 
