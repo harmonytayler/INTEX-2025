@@ -9,6 +9,12 @@
   scrollbar-width: none;  /* Firefox */
 }
 
+/* Main content spacing */
+.movie-rows-container {
+  margin-top: 2rem;
+  padding-top: 1rem;
+}
+
 /* Movie row container */
 .movie-row-container {
   display: flex;
@@ -18,8 +24,11 @@
   -webkit-overflow-scrolling: touch;
   scroll-behavior: smooth;
   gap: 8px;
-  padding-left: 8px;  /* Added padding to ensure space on the left */
-  padding-right: 8px; /* Added padding to ensure space on the right */
+  padding-left: 8px;
+  padding-right: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: #224544 transparent;
+  margin-bottom: 2rem;
 }
 
 /* Movie list container - will wrap cards into the next row when necessary */
@@ -33,9 +42,10 @@
 }
 
 /* Movie row hover effect */
-.movie-row:hover .movie-card {
+.movie-card:hover {
   transform: scale(1.05);
   transition: transform 0.3s ease-in-out;
+  z-index: 1;
 }
 
 /* Movie card styling */
@@ -47,13 +57,20 @@
   margin: 0 8px; /* Ensure proper spacing between cards */
 }
 
-.movie-card:hover {
-  z-index: 1;
+.movie-title {
+  font-size: 0.75rem; /* Smaller font size */
+  color: #FFFCF3;
+  margin-top: 0.5rem;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
 }
 
 /* Poster placeholder gradient */
 .poster-placeholder {
-  background: linear-gradient(45deg, #1a1a1a, #2a2a2a);
+  background: black;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   display: flex;
   justify-content: center;
@@ -79,7 +96,7 @@
 
 /* Default poster message */
 .default-poster-message {
-  color: white;
+  color: #FFFCF3; /* Dark green text to contrast with white background */
   font-size: 0.75rem; /* Adjust size of message */
   text-align: center;
   width: 100%;
@@ -87,11 +104,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #444; /* Gray background */
+  background-color: black;
   border-radius: 0rem; /* Matches the rounded corners of other images */
 }
 
-/* Responsive adjustments for wrapping */
+/* Responsive adjustmenwhiter wrapping */
 @media (max-width: 640px) {
   .movie-list-container {
     justify-content: center; /* Center items on smaller screens */
@@ -126,4 +143,14 @@
 .search-dropdown {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   border: 1px solid rgba(75, 85, 99, 0.3);
+}
+
+/* Movie row header */
+.movie-row-header {
+  color: #FFFCF3;
+  font-size: 1.5rem;
+  font-weight: 600;
+  text-align: left;
+  padding-left: 0.5rem;
+  margin-bottom: 0.5rem;
 }
