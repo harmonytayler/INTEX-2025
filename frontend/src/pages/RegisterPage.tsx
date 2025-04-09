@@ -12,15 +12,6 @@ function Register() {
   // state variable for error messages
   const [error, setError] = useState('');
 
-  const handleContinueClick = () => {
-    // Only navigate to the next page if the email and passwords are valid
-    if (email && password && confirmPassword && password === confirmPassword) {
-      navigate('/register/userinfo', { state: { email: email } }); 
-    } else {
-      setError('Please fill in all fields and ensure passwords match.');
-    }
-  };
-
   // handle change events for input fields
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -30,7 +21,7 @@ function Register() {
   };
 
   // handle submit event for the form
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // validate email and passwords
     if (!email || !password || !confirmPassword) {
@@ -42,30 +33,35 @@ function Register() {
     } else {
       // clear error message
       setError('');
-      // post data to the /register api
+      
       const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://localhost:5001';
-      fetch(`${baseUrl}/register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: email,
-          password: password,
-        }),
-      })
-        //.then((response) => response.json())
-        .then((data) => {
-          // handle success or error from the server
-          console.log(data);
-          if (data.ok) setError('Successful registration. Please continue to fill in the user information.');
-          else setError('Error registering.');
-        })
-        .catch((error) => {
-          // handle network error
-          console.error(error);
-          setError('Error registering.');
+      
+      try {
+        // First create the authentication account
+        const authResponse = await fetch(`${baseUrl}/register`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, password }),
         });
+
+        if (!authResponse.ok) {
+          const errorData = await authResponse.json();
+          throw new Error(errorData.message || 'Failed to create authentication account');
+        }
+
+        // If authentication account was created successfully, navigate to user info form
+        navigate('/register/userinfo', { 
+          state: { 
+            email,
+            isAuthenticated: true // Add this flag to ensure the user came from the registration page
+          } 
+        });
+      } catch (error: any) {
+        console.error('Registration error:', error);
+        setError(error.message || 'Error registering. Please try again.');
+      }
     }
   };
 
@@ -118,16 +114,6 @@ function Register() {
                   type="submit"
                 >
                   Register
-                </button>
-              </div>
-              {/* Ensure 'Continue' button does not trigger form submission */}
-              <div className="d-grid mb-2">
-                <button
-                  className="btn btn-primary btn-login text-uppercase fw-bold"
-                  type="button"  // Prevent form submission on click
-                  onClick={handleContinueClick} // Navigate to the user info form
-                >
-                  Continue
                 </button>
               </div>
             </form>
