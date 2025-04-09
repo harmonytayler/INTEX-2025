@@ -374,16 +374,23 @@ public class MovieController : ControllerBase
 
                 // Get the requested page of movies
                 var movies = query
-                    .Skip((pageNum - 1) * pageSize)  // Skip to the correct page
-                    .Take(pageSize)                  // Take the number of movies for the current page
+                    .Skip((pageNum - 1) * pageSize) // Skip to the correct page
+                    .Take(pageSize) // Take the number of movies for the current page
                     .ToList();
 
-                return Ok(new 
-                { 
-                    movies = movies, 
-                    totalNumMovies = totalCount 
-        
-        
+                return Ok(new
+                {
+                    movies = movies,
+                    totalNumMovies = totalCount
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+
         [HttpGet("ContentRecommendations/{showId}")]
         public IActionResult GetContentRecommendations(string showId)
         {
