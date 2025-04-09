@@ -1,8 +1,9 @@
 body {
-  background: radial-gradient(circle at 50% 50%, #193231, #070e0e) fixed;
   min-height: 100vh;
   margin: 0;
   padding: 0;
+  background: radial-gradient(circle at 50% 50%, #193231, #070e0e) fixed;
+  overflow-x: hidden;
 }
 
 .btn-login {
