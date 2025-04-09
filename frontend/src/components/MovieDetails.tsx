@@ -10,7 +10,7 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({ movie, onClose }) => {
   // Helper function to get all genres for this movie
   const getGenres = () => {
     const genres: string[] = [];
-    
+
     // Check each genre field and add to the list if it's 1
     if (movie.action === 1) genres.push('Action');
     if (movie.comedies === 1) genres.push('Comedy');
@@ -20,7 +20,7 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({ movie, onClose }) => {
     if (movie.thrillers === 1) genres.push('Thriller');
     if (movie.familyMovies === 1) genres.push('Family');
     if (movie.comediesRomanticMovies === 1) genres.push('Romance');
-    
+
     return genres.join(', ');
   };
 
@@ -34,77 +34,100 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({ movie, onClose }) => {
               <span className="text-gray-400">Poster</span>
             </div>
           </div>
-          
+
           {/* Details Section */}
           <div className="w-full md:w-2/3 p-4 text-white">
             <div className="flex justify-between items-start mb-4">
               <h2 className="text-2xl font-bold">{movie.title}</h2>
-              <button 
+              <button
                 onClick={onClose}
                 className="text-gray-400 hover:text-white"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
-            
+
             <div className="space-y-4">
               <div>
                 <h3 className="text-lg font-semibold text-gray-300">Type</h3>
                 <p>{movie.type}</p>
               </div>
-              
+
               {movie.director && (
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-300">Director</h3>
+                  <h3 className="text-lg font-semibold text-gray-300">
+                    Director
+                  </h3>
                   <p>{movie.director}</p>
                 </div>
               )}
-              
+
               {movie.cast && (
                 <div>
                   <h3 className="text-lg font-semibold text-gray-300">Cast</h3>
                   <p>{movie.cast}</p>
                 </div>
               )}
-              
+
               <div>
                 <h3 className="text-lg font-semibold text-gray-300">Genres</h3>
                 <p>{getGenres()}</p>
               </div>
-              
+
               {movie.releaseYear && (
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-300">Release Year</h3>
+                  <h3 className="text-lg font-semibold text-gray-300">
+                    Release Year
+                  </h3>
                   <p>{movie.releaseYear}</p>
                 </div>
               )}
-              
+
               {movie.rating && (
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-300">Rating</h3>
+                  <h3 className="text-lg font-semibold text-gray-300">
+                    Rating
+                  </h3>
                   <p>{movie.rating}</p>
                 </div>
               )}
-              
+
               {movie.duration && (
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-300">Duration</h3>
+                  <h3 className="text-lg font-semibold text-gray-300">
+                    Duration
+                  </h3>
                   <p>{movie.duration}</p>
                 </div>
               )}
-              
+
               {movie.country && (
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-300">Country</h3>
+                  <h3 className="text-lg font-semibold text-gray-300">
+                    Country
+                  </h3>
                   <p>{movie.country}</p>
                 </div>
               )}
-              
+
               {movie.description && (
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-300">Description</h3>
+                  <h3 className="text-lg font-semibold text-gray-300">
+                    Description
+                  </h3>
                   <p className="whitespace-pre-line">{movie.description}</p>
                 </div>
               )}
@@ -116,4 +139,4 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({ movie, onClose }) => {
   );
 };
 
-export default MovieDetails; 
+export default MovieDetails;

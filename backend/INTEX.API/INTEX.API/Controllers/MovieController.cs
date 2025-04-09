@@ -357,5 +357,96 @@ public class MovieController : ControllerBase
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+        
+        [HttpGet("ContentRecommendations/{showId}")]
+        public IActionResult GetContentRecommendations(string showId)
+        {
+            try
+            {
+                // Retrieve content-based recommendations that match the show_id
+                var recommendations = _movieContext.content_recommendations
+                    .Where(c => c.SourceShowID == showId)
+                    .Take(10)
+                    .ToList();
+
+                if (recommendations.Count == 0)
+                {
+                    return NotFound(new { message = "No content-based recommendations found for this movie." });
+                }
+
+                return Ok(recommendations);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+        
+        [HttpGet("CollaborativeRecommendations/{showId}")]
+        public IActionResult GetCollaborativeRecommendations(string showId)
+        {
+            try
+            {
+                // Fetch recommendations for the provided show ID from the collaborative recommender table
+                var recommendations = _movieContext.collaborative_recommendations
+                    .FirstOrDefault(cr => cr.ShowId == showId);
+
+                if (recommendations == null)
+                {
+                    return NotFound(new { message = "No collaborative recommendations found for the provided show ID" });
+                }
+
+                // Return the recommendations
+                return Ok(new
+                {
+                    recommendations.Rec1,
+                    recommendations.Rec2,
+                    recommendations.Rec3,
+                    recommendations.Rec4,
+                    recommendations.Rec5,
+                    recommendations.Rec6,
+                    recommendations.Rec7,
+                    recommendations.Rec8,
+                    recommendations.Rec9,
+                    recommendations.Rec10
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+        
+        [HttpGet("AverageRating/{showId}")]
+        public IActionResult GetAverageRating(string showId)
+        {
+            try
+            {
+                // Query the ratings from the 'movies_ratings' table for the given 'showId'
+                var ratings = _movieContext.movies_ratings
+                    .Where(m => m.ShowId == showId)  // Filter by show_id
+                    .ToList();  // Get all ratings for that show_id
+
+                // If no ratings are found
+                if (ratings.Count == 0)
+                {
+                    return NotFound(new { message = "No ratings found for this movie." });
+                }
+
+                // Calculate the average rating
+                var averageRating = ratings.Average(m => m.Rating);
+
+                // Return the average rating
+                return Ok(new { ShowId = showId, AverageRating = averageRating });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+
+
+
     }
 }
