@@ -69,4 +69,6 @@ public class RoleController : Controller
 
         return StatusCode(500, "An error occurred while assigning the role.");
     }
-}
+
+    [HttpGet("CheckUserRole")]
+    [AllowAnonymous] // Allow anyone to
