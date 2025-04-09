@@ -17,7 +17,7 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie, onClick }) => {
 
   return (
     <div 
-      className="movie-card-container"
+      className="movie-card"
       onClick={onClick}
       title={`Click to view details for ${movie.title}`}
     >
@@ -31,7 +31,7 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie, onClick }) => {
           />
         ) : (
           <div className="default-poster-message">
-            <span>This show doesn't have a poster yet! :(</span>
+            <span>This one doesn't have a poster yet! :(</span>
           </div>
         )}
       </div>

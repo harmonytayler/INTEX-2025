@@ -235,5 +235,23 @@ namespace INTEX.API.Controllers
         {
             return _context.movies_users.Any(e => e.UserId == id);
         }
+
+        [HttpGet("GetUserByEmail")]
+        public async Task<ActionResult<MovieUser>> GetUserByEmail([FromQuery] string email)
+        {
+            try
+            {
+                var user = await _context.movies_users.FirstOrDefaultAsync(u => u.Email == email);
+                if (user == null)
+                {
+                    return NotFound($"User with email {email} not found");
+                }
+                return user;
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
     }
 }

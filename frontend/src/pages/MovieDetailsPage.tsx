@@ -92,13 +92,6 @@ const MovieDetailsPage: React.FC = () => {
               <SearchBar placeholder="Search movies..." />
             </div>
           </div>
-          <div>
-            <Logout>
-              <span className="text-white">
-                <AuthorizedUser value="email" />
-              </span>
-            </Logout>
-          </div>
         </div>
 
         {/* Main content */}
