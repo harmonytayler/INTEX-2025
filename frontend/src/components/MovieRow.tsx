@@ -18,7 +18,7 @@ const MovieRow: React.FC<MovieRowProps> = ({ genre, movies, onMovieClick }) => {
       <div className="movie-row-container" ref={rowRef}>
         {movies.map((movie) => (
           <MovieCard
-            key={movie.showId}
+            key={movie.showId || `movie-${movie.title}`}
             movie={movie}
             onClick={() => onMovieClick(movie)}
           />
@@ -28,4 +28,4 @@ const MovieRow: React.FC<MovieRowProps> = ({ genre, movies, onMovieClick }) => {
   );
 };
 
-export default MovieRow; 
+export default MovieRow;
