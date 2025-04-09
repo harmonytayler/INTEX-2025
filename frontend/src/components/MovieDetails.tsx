@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Movie } from '../types/Movie';
 
 interface MovieDetailsProps {
@@ -8,8 +8,16 @@ interface MovieDetailsProps {
 
 const MovieDetails: React.FC<MovieDetailsProps> = ({ movie, onClose }) => {
   // Helper function to get all genres for this movie
+  const [isImageError, setIsImageError] = useState(false); // State to track if the image has failed to load
+  const imageUrl = movie.posterUrl; // Extract the URL from the JSON object
+
+  const handleImageError = () => {
+    setIsImageError(true);
+  };
+
   const getGenres = () => {
     const genres: string[] = [];
+    
     
     // Check each genre field and add to the list if it's 1
     if (movie.action === 1) genres.push('Action');
@@ -30,9 +38,20 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({ movie, onClose }) => {
         <div className="flex flex-col md:flex-row">
           {/* Poster Section */}
           <div className="w-full md:w-1/3 p-4">
-            <div className="poster-placeholder bg-gray-800 w-full aspect-[2/3] rounded-md flex items-center justify-center">
-              <span className="text-gray-400">Poster</span>
-            </div>
+          <div className="poster-placeholder">
+        {!isImageError && imageUrl ? (
+          <img 
+            src={imageUrl} 
+            alt={movie.title} 
+            className="movie-poster-image"
+            onError={handleImageError} // Trigger the error handler if the image fails to load
+          />
+        ) : (
+          <div className="default-poster-message">
+            <span>This one doesn't have a poster yet! :(</span>
+          </div>
+        )}
+      </div>
           </div>
           
           {/* Details Section */}

@@ -31,7 +31,7 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie, onClick }) => {
           />
         ) : (
           <div className="default-poster-message">
-            <span>This show doesn't have a poster yet! :(</span>
+            <span>This one doesn't have a poster yet! :(</span>
           </div>
         )}
       </div>

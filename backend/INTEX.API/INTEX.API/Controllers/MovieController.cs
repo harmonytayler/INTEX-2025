@@ -445,5 +445,29 @@ public class MovieController : ControllerBase
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+
+        [HttpGet("GetMovieById/{showId}")]
+        public IActionResult GetMovieById(string showId)
+        {
+            try
+            {
+                // Look up the movie by ShowId
+                var movie = _movieContext.movies_titles.FirstOrDefault(m => m.ShowId == showId);
+
+                // If no movie is found, return a 404 Not Found response
+                if (movie == null)
+                {
+                    return NotFound(new { message = $"Movie with ID {showId} not found" });
+                }
+
+                // Return the movie data as an OK response
+                return Ok(movie);
+            }
+            catch (Exception ex)
+            {
+                // Return a 500 Internal Server Error if an exception occurs
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
     }
 }

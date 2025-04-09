@@ -130,3 +130,14 @@ export const deleteMovie = async (showId: string): Promise<void> => {
       throw error;
   }
 }
+
+export const fetchMovieById = async (movieId: string): Promise<Movie | null> => {
+  try {
+    const response = await fetch(`/${movieId}`);
+    if (!response.ok) throw new Error('Movie not found');
+    return await response.json();
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+};

@@ -12,12 +12,20 @@ const MovieDetailsPage: React.FC = () => {
   const [movie, setMovie] = useState<Movie | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isImageError, setIsImageError] = useState(false); // State to track if the image has failed to load
+  const imageUrl = movie ? movie.posterUrl : ''; // Extract the URL from the JSON object
+  
+    // Handle image loading error
+    const handleImageError = () => {
+      setIsImageError(true);
+    };
 
   useEffect(() => {
     const loadMovieDetails = async () => {
       try {
         setLoading(true);
         setError(null);
+        
 
         // Fetch ALL movies by using a very large pageSize
         // This ensures we get every movie in the database
@@ -118,9 +126,20 @@ const MovieDetailsPage: React.FC = () => {
               <div className="flex flex-col md:flex-row gap-8">
                 {/* Poster Section */}
                 <div className="w-full md:w-1/3">
-                  <div className="poster-placeholder bg-gray-800 w-full aspect-[2/3] rounded-md flex items-center justify-center">
-                    <span className="text-gray-400">Poster</span>
-                  </div>
+                <div className="poster-placeholder">
+                  {!isImageError && imageUrl ? (
+                    <img 
+                      src={imageUrl} 
+                      alt={movie.title} 
+                      className="movie-poster-image"
+                      onError={handleImageError} // Trigger the error handler if the image fails to load
+                    />
+                  ) : (
+                    <div className="default-poster-message">
+                      <span>This one doesn't have a poster yet! :(</span>
+                    </div>
+                  )}
+                </div>
                 </div>
                 
                 {/* Details Section */}
