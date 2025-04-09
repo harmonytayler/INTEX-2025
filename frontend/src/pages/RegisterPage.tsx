@@ -1,16 +1,21 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import '../style/identity.css';
+import '@fortawesome/fontawesome-free/css/all.css';
+import '../style/header.css';
+import '../style/LandingPage.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faGoogle } from '@fortawesome/free-brands-svg-icons';
 
-function Register() {
+const RegisterPage: React.FC = () => {
   // state variables for email and passwords
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [confirmPassword, setConfirmPassword] = useState<string>('');
   const navigate = useNavigate();
 
   // state variable for error messages
-  const [error, setError] = useState('');
+  const [error, setError] = useState<string>('');
 
   // handle change events for input fields
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -19,13 +24,6 @@ function Register() {
     if (name === 'password') setPassword(value);
     if (name === 'confirmPassword') setConfirmPassword(value);
   };
-
-  const handleGoogleLogin = () => {
-    const api = import.meta.env.VITE_API_BASE_URL || 'https://localhost:5001';
-    const redirectUrl = `${api}/auth/google?returnUrl=/home`;
-    console.log("Redirecting to:", redirectUrl);
-    window.location.href = redirectUrl;
-  };  
 
   // handle submit event for the form
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -62,7 +60,7 @@ function Register() {
         navigate('/register/userinfo', { 
           state: { 
             email,
-            isAuthenticated: true // Add this flag to ensure the user came from the registration page
+            isAuthenticated: true
           } 
         });
       } catch (error: any) {
@@ -73,73 +71,84 @@ function Register() {
   };
 
   return (
-    <div className="container">
-      <div className="row">
-        <div className="card border-0 shadow rounded-3 ">
-          <div className="card-body p-4 p-sm-5">
-            <h5 className="card-title text-center mb-5 fw-light fs-5">
-              Register
-            </h5>
-            <form onSubmit={handleSubmit}>
-              <div className="form-floating mb-3">
-                <input
-                  className="form-control"
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={email}
-                  onChange={handleChange}
-                />
-                <label htmlFor="email">Email address</label>
-              </div>
-              <div className="form-floating mb-3">
-                <input
-                  className="form-control"
-                  type="password"
-                  id="password"
-                  name="password"
-                  value={password}
-                  onChange={handleChange}
-                />
-                <label htmlFor="password">Password</label>
-              </div>
-              <div className="form-floating mb-3">
-                <input
-                  className="form-control"
-                  type="password"
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  value={confirmPassword}
-                  onChange={handleChange}
-                />
-                <label htmlFor="confirmPassword">Confirm Password</label>
-              </div>
-
-              <div className="d-grid mb-2">
-                <button
-                  className="btn btn-primary btn-login text-uppercase fw-bold"
-                  type="submit"
-                >
-                  Register
-                </button>
-              </div>
-              <div className="d-grid mb-2">
-  <button
-    className="btn btn-google btn-login text-uppercase fw-bold"
-    type="button" // Prevent form submission
-    onClick={handleGoogleLogin}
-  >
-    <i className="fa-brands fa-google me-2"></i> Sign in with Google
-  </button>
-</div>
-
-            </form>
-            <strong>{error && <p className="error">{error}</p>}</strong>
+    <>
+      {/* HEADER */}
+      <header>
+        <div className="container">
+          <div className="logo-container">
+            <Link to="/" className="logo">
+              <img src="/CineNiche_Logo.png" alt="CineNiche Logo" className="logo-image" />
+            </Link>
+            <Link to="/" className="site-title">CineNiche</Link>
           </div>
         </div>
-      </div>
-    </div>
-  );
-}
+      </header>
 
-export default Register;
+      <div className="login-container">
+        <h1 className="login-title">Create Account</h1>
+        <form className="login-form" onSubmit={handleSubmit}>
+          <div className="form">
+            <input
+              type="email"
+              id="email"
+              name="email"
+              placeholder="Email"
+              value={email}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          
+          <div className="form">
+            <input
+              type="password"
+              id="password"
+              name="password"
+              placeholder="Password"
+              value={password}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="form">
+            <input
+              type="password"
+              id="confirmPassword"
+              name="confirmPassword"
+              placeholder="Confirm Password"
+              value={confirmPassword}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <button type="submit" className="btn-login btn-primary">
+            Create Account
+          </button>
+
+          <div className="login-divider">OR</div>
+
+          <button type="button" className="btn-login btn-google">
+            <FontAwesomeIcon icon={faGoogle} className="me-2" />
+            Continue with Google
+          </button>
+
+          {error && <div className="error">{error}</div>}
+        </form>
+
+        <div className="login-footer">
+          Already have an account?{' '}
+          <a href="/login" onClick={(e) => {
+            e.preventDefault();
+            navigate('/login');
+          }}>
+            Sign in
+          </a>
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default RegisterPage;
