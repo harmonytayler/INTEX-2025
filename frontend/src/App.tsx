@@ -14,6 +14,7 @@ import SearchResultsPage from './pages/SearchResultsPage';
 import { AuthProvider } from './contexts/AuthContext';
 import LandingPage from './pages/LandingPage';
 import PrivacyPage from './pages/PrivacyPage';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
@@ -29,7 +30,14 @@ function App() {
               <Route path="/register/userinfo" element={<NewUserForm/>} />
               <Route path="/home" element={<HomePage />} />
               <Route path="/movie/:movieId" element={<MovieDetailsPage />} />
-              <Route path="/admin" element={<AdminPage />} />
+              <Route 
+                path="/admin" 
+                element={
+                  <ProtectedRoute requiredRole="Administrator">
+                    <AdminPage />
+                  </ProtectedRoute>
+                } 
+              />
               <Route path="/account" element={<AccountsPage />} />
               <Route path="/account/edit" element={<EditingPage />} />
               <Route path="/search" element={<SearchResultsPage />} />

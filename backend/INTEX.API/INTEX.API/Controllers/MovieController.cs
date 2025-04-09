@@ -5,69 +5,60 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 
-
 namespace INTEX.API.Controllers
 {
-[Route("[controller]")]
-[ApiController]
-[Authorize] // Controller requires authentication
-public class MovieController : ControllerBase
-{
-    private MovieDbContext _movieContext;
-
-    // SAS Token (replace with your actual SAS token)
-    private readonly string _sasToken;
-    private readonly string containerName = "images";
-
-    public MovieController(MovieDbContext movieContext, IConfiguration config)
+    [Route("[controller]")]
+    [ApiController]
+    [Authorize] // Controller requires authentication
+    public class MovieController : ControllerBase
     {
-        _movieContext = movieContext;
-        _sasToken = config["Azure:BlobSasToken"];
-    }
+        private MovieDbContext _movieContext;
+        private readonly string _sasToken;
+        private readonly string containerName = "images";
 
-    [HttpGet("PosterUrl/{showId}")]
-    public async Task<IActionResult> GetPosterUrl(string showId)
-    {
-        // Step 1: Look up the movie title from the showId
-        var ShowId = showId;
-        var movie = await _movieContext.movies_titles.FindAsync(ShowId); // Assuming the ShowId is unique in the movies_titles table
-        if (movie == null)
+        public MovieController(MovieDbContext movieContext, IConfiguration config)
         {
-            return NotFound(new { message = "Movie not found" });
+            _movieContext = movieContext;
+            _sasToken = config["Azure:BlobSasToken"];
         }
 
-        // Step 2: Use the movie title to build the URL for the poster
-        string title = movie.Title;
-
-        // Step 3: Remove special characters that do not need to be encoded (e.g., & and :)
-        string sanitizedTitle = RemoveUnwantedCharacters(title);
-
-        // Construct the URL for the image with the SAS token
-        string blobUrl = $"https://intexmovieposters.blob.core.windows.net/{containerName}/{sanitizedTitle}.jpg?{_sasToken}";
-
-        return Ok(blobUrl);
-    }
-
-    // Helper method to remove unwanted characters (like &, :, etc.)
-    private string RemoveUnwantedCharacters(string input)
-    {
-        // Define the unwanted characters that should be removed
-        var unwantedChars = new[] { '&', ':', '?', '=', ';', '#', '%', '.', '$' };
-
-        // Remove unwanted characters from the title string
-        foreach (var ch in unwantedChars)
+        [HttpGet("PosterUrl/{showId}")]
+        public async Task<IActionResult> GetPosterUrl(string showId)
         {
-            input = input.Replace(ch.ToString(), string.Empty);
+            // Step 1: Look up the movie title from the showId
+            var ShowId = showId;
+            var movie = await _movieContext.movies_titles.FindAsync(ShowId); // Assuming the ShowId is unique in the movies_titles table
+            if (movie == null)
+            {
+                return NotFound(new { message = "Movie not found" });
+            }
+
+            // Step 2: Use the movie title to build the URL for the poster
+            string title = movie.Title;
+
+            // Step 3: Remove special characters that do not need to be encoded (e.g., & and :)
+            string sanitizedTitle = RemoveUnwantedCharacters(title);
+
+            // Construct the URL for the image with the SAS token
+            string blobUrl = $"https://intexmovieposters.blob.core.windows.net/{containerName}/{sanitizedTitle}.jpg?{_sasToken}";
+
+            return Ok(blobUrl);
         }
 
-        return input;
-    }
+        // Helper method to remove unwanted characters (like &, :, etc.)
+        private string RemoveUnwantedCharacters(string input)
+        {
+            // Define the unwanted characters that should be removed
+            var unwantedChars = new[] { '&', ':', '?', '=', ';', '#', '%', '.', '$' };
 
+            // Remove unwanted characters from the title string
+            foreach (var ch in unwantedChars)
+            {
+                input = input.Replace(ch.ToString(), string.Empty);
+            }
 
-
-
-
-        // Removed duplicate method
+            return input;
+        }
 
         private string GenerateNextShowId()
         {
@@ -252,7 +243,7 @@ public class MovieController : ControllerBase
         }
 
         [HttpPost("AddMovie")]
-        public IActionResult AddMovie([FromBody] Movie movie)
+        public virtual IActionResult AddMovie([FromBody] Movie movie)
         {
             try
             {
@@ -272,7 +263,7 @@ public class MovieController : ControllerBase
         }
 
         [HttpPut("Update/{id}")]
-        public IActionResult UpdateMovie(string id, [FromBody] Movie movie)
+        public virtual IActionResult UpdateMovie(string id, [FromBody] Movie movie)
         {
             try
             {
@@ -338,7 +329,7 @@ public class MovieController : ControllerBase
         }
 
         [HttpDelete("DeleteMovie/{id}")]
-        public IActionResult DeleteMovie(string id)
+        public virtual IActionResult DeleteMovie(string id)
         {
             try
             {
@@ -389,7 +380,6 @@ public class MovieController : ControllerBase
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
-
 
         [HttpGet("ContentRecommendations/{showId}")]
         public IActionResult GetContentRecommendations(string showId)
@@ -450,7 +440,6 @@ public class MovieController : ControllerBase
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
-
 
         [HttpGet("AverageRating/{showId}")]
         public IActionResult GetAverageRating(string showId)

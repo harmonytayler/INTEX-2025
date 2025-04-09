@@ -14,6 +14,7 @@ const EditMovieForm = ({
     onCancel,
 }: EditMovieFormProps) => {
     const [formData, setFormData] = useState<Movie>({...movie});
+    const [error, setError] = useState<string | null>(null);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value, type } = e.target;
@@ -25,13 +26,32 @@ const EditMovieForm = ({
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        await updateMovie(formData.showId, formData);
-        onSuccess();
+        setError(null);
+        try {
+            const updatedMovie = await updateMovie(movie.showId, formData);
+            onSuccess();
+        } catch (err) {
+            if (err instanceof Error) {
+                if (err.message.includes('403')) {
+                    setError('You do not have permission to update this movie. Please ensure you are logged in as an administrator.');
+                } else {
+                    setError(err.message);
+                }
+            } else {
+                setError('An unexpected error occurred while updating the movie');
+            }
+        }
     };
 
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
             <h2 className="text-2xl font-bold text-gray-800 mb-4">Edit Movie</h2>
+            
+            {error && (
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                    <span className="block sm:inline">{error}</span>
+                </div>
+            )}
             
             <div className="form-group">
                 <label className="block text-sm font-medium text-gray-700 mb-1">Show ID</label>
