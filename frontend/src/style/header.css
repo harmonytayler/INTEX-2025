@@ -37,7 +37,7 @@ header .container {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: white;
+  background: #FFFCF3;
   border-radius: 50%;
   width: 55px;
   height: 55px;
@@ -55,12 +55,16 @@ header .container {
   font-family: 'Pacifico', cursive;
   font-size: 2.25rem;
   font-weight: 400;
-  color: white;
+  color: #FFFCF3;
   text-decoration: none;
   line-height: 1;
   white-space: nowrap;
   letter-spacing: 0.05em;
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+  transition: color 0.2s;
+}
+
+.site-title:hover {
+  color: #C35D24 !important;
 }
 
 /* Right side - Search and user actions */
@@ -74,33 +78,33 @@ header .container {
 .search-form {
   display: flex;
   align-items: center;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 252, 243, 0.1);
   border-radius: 20px;
   padding: 0.25rem 0.5rem;
   transition: all 0.3s ease;
 }
 
 .search-form:focus-within {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 252, 243, 0.2);
 }
 
 .search-input {
   background: transparent;
   border: none;
-  color: white;
+  color: #FFFCF3;
   padding: 0.5rem;
   width: 200px;
   outline: none;
 }
 
 .search-input::placeholder {
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 252, 243, 0.7);
 }
 
 .search-button {
   background: transparent;
   border: none;
-  color: white;
+  color: #FFFCF3;
   padding: 0.5rem;
   cursor: pointer;
   display: flex;
@@ -108,79 +112,78 @@ header .container {
   justify-content: center;
 }
 
-/* User actions */
-.user-actions {
+/* Menu container */
+.menu-container {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
 }
 
-.user-profile, .logout-button {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: white;
-  text-decoration: none;
+/* Hamburger button */
+.hamburger-button {
+  background: transparent;
+  border: none;
+  color: #FFFCF3;
   padding: 0.5rem;
-  border-radius: 4px;
-  transition: background-color 0.3s ease;
-}
-
-.user-profile:hover, .logout-button:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-.user-profile svg, .logout-button svg {
-  width: 20px;
-  height: 20px;
-}
-
-/* User profile button styles */
-header .user-profile {
-  color: white !important;
-  font-size: 1rem;
+  cursor: pointer;
   display: flex;
   align-items: center;
-}
-
-header .user-profile svg {
-  height: 1rem;
-  width: 1rem;
-  margin-right: 0.25rem;
-}
-
-/* Logout button styles */
-header .logout-button {
-  background-color: #193231;
-  color: white;
-  padding: 0.25rem 1rem;
-  border-radius: 0.25rem;
-  font-size: 1rem;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  transition: background-color 0.2s ease;
-  min-width: 100px;
   justify-content: center;
+  transition: background-color 0.2s ease;
+  border-radius: 0.25rem;
 }
 
-header .logout-button:hover {
+.hamburger-button:hover {
+  background-color: rgba(255, 252, 243, 0.1);
+}
+
+.hamburger-button svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+/* Dropdown menu */
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: #193231;
+  border-radius: 0.25rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  min-width: 160px;
+  z-index: 1000;
+  margin-top: 0.5rem;
+  overflow: hidden;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  color: #FFFCF3 !important;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  font-size: 0.875rem;
+}
+
+.dropdown-item:hover {
   background-color: #C35D24;
 }
 
-header .logout-button svg {
-  height: 0.875rem;
-  width: 0.875rem;
+.dropdown-item svg {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
 }
 
-/* Ensure all text in header is white */
+/* Ensure all text in header is #FFFCF3 */
 header a, header button, header span {
-  color: white !important;
-}
-
-/* Override any purple colors */
-header a:hover, header button:hover {
-  color: #10B981 !important; /* Green color for hover */
+  color: #FFFCF3 !important;
 }
 
 /* Responsive adjustments */

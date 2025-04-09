@@ -27,7 +27,7 @@
   padding-left: 8px;
   padding-right: 8px;
   scrollbar-width: thin;
-  scrollbar-color: #224544 #0a1a0a;
+  scrollbar-color: #224544 transparent;
   margin-bottom: 2rem;
 }
 
@@ -59,7 +59,7 @@
 
 .movie-title {
   font-size: 0.75rem; /* Smaller font size */
-  color: white;
+  color: #FFFCF3;
   margin-top: 0.5rem;
   text-align: center;
   overflow: hidden;
@@ -96,7 +96,7 @@
 
 /* Default poster message */
 .default-poster-message {
-  color: white; /* Dark green text to contrast with white background */
+  color: #FFFCF3; /* Dark green text to contrast with white background */
   font-size: 0.75rem; /* Adjust size of message */
   text-align: center;
   width: 100%;
@@ -147,7 +147,7 @@
 
 /* Movie row header */
 .movie-row-header {
-  color: white;
+  color: #FFFCF3;
   font-size: 1.5rem;
   font-weight: 600;
   text-align: left;
