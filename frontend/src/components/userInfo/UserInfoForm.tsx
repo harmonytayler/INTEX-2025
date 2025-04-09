@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import { MovieUser } from '../../types/MovieUser';
 import { addMovieUser } from '../../api/MovieUserAPI';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import '../../style/header.css';
+import '../../style/LandingPage.css';
 
 const NewUserForm = () => {
   const navigate = useNavigate();
@@ -16,6 +19,8 @@ const NewUserForm = () => {
   }, [isAuthenticated, navigate]);
 
   const [userId, setUserId] = useState<number | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchUserId = async () => {
@@ -49,8 +54,8 @@ const NewUserForm = () => {
   const [formData, setFormData] = useState<MovieUser>({
     name: '',
     phone: '',
-    email: email || '', // Use the email passed from the register page
-    age: 0,
+    email: email || '',
+    age: NaN,
     gender: '',
     netflix: 0,
     amazonPrime: 0,
@@ -58,43 +63,32 @@ const NewUserForm = () => {
     paramountPlus: 0,
     max: 0,
     hulu: 0,
-    appleTVPlus: 0,
-    peacock: 0,
     city: '',
     state: '',
-    zip: 0,
+    zip: NaN,
+    appleTVPlus: 0,
+    peacock: 0
   });
 
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<boolean>(false);
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value, type } = e.target as HTMLInputElement;
-    const isCheckbox = (e.target as HTMLInputElement).type === 'checkbox';
-
-    if (isCheckbox) {
-      setFormData({
-        ...formData,
-        [name]: (e.target as HTMLInputElement).checked ? 1 : 0,
-      });
-    } else {
-      setFormData({
-        ...formData,
-        [name]: type === 'number' ? parseInt(value) : value,
-      });
-    }
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value, type } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'number' ? Number(value) : value
+    }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: checked ? 1 : 0
+    }));
+  };
 
-    // Validate required fields
-    if (!formData.name || !formData.email || !formData.age || !formData.gender) {
-      setError('Please fill in all required fields (Name, Email, Age, Gender)');
-      return;
-    }
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError(null);
 
     try {
       const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://localhost:5001';
@@ -125,263 +119,210 @@ const NewUserForm = () => {
   };
 
   if (!isAuthenticated) {
-    return null; // Don't render anything while redirecting
+    return null;
   }
 
   return (
-    <div className="container">
-      <div className="row">
-        <div className="card border-0 shadow rounded-3">
-          <div className="card-body p-4 p-sm-5">
-            <h5 className="card-title text-center mb-5 fw-light fs-5">
-              Complete Your Profile
-            </h5>
-            <form onSubmit={handleSubmit}>
-              <div className="form-floating mb-3">
-                <input
-                  className="form-control"
-                  type="text"
-                  id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                />
-                <label htmlFor="name">Name</label>
-              </div>
-
-              <div className="form-floating mb-3">
-                <input
-                  className="form-control"
-                  type="tel"
-                  id="phone"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                />
-                <label htmlFor="phone">Phone</label>
-              </div>
-
-              <div className="form-floating mb-3">
-                <input
-                  className="form-control"
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                  readOnly
-                />
-                <label htmlFor="email">Email</label>
-              </div>
-
-              <div className="form-floating mb-3">
-                <input
-                  className="form-control"
-                  type="number"
-                  id="age"
-                  name="age"
-                  value={formData.age}
-                  onChange={handleChange}
-                  required
-                  min="0"
-                />
-                <label htmlFor="age">Age</label>
-              </div>
-
-              <div className="form-floating mb-3">
-                <select
-                  className="form-control"
-                  id="gender"
-                  name="gender"
-                  value={formData.gender}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="">Select Gender</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                  <option value="other">Other</option>
-                </select>
-                <label htmlFor="gender">Gender</label>
-              </div>
-
-              <h6 className="mb-3">Streaming Services</h6>
-              <div className="row mb-3">
-                <div className="col-md-6">
-                  <div className="form-check mb-2">
-                    <input
-                      className="form-check-input"
-                      type="checkbox"
-                      id="netflix"
-                      name="netflix"
-                      checked={formData.netflix === 1}
-                      onChange={handleChange}
-                    />
-                    <label className="form-check-label" htmlFor="netflix">
-                      Netflix
-                    </label>
-                  </div>
-
-                  <div className="form-check mb-2">
-                    <input
-                      className="form-check-input"
-                      type="checkbox"
-                      id="amazonPrime"
-                      name="amazonPrime"
-                      checked={formData.amazonPrime === 1}
-                      onChange={handleChange}
-                    />
-                    <label className="form-check-label" htmlFor="amazonPrime">
-                      Amazon Prime
-                    </label>
-                  </div>
-
-                  <div className="form-check mb-2">
-                    <input
-                      className="form-check-input"
-                      type="checkbox"
-                      id="disneyPlus"
-                      name="disneyPlus"
-                      checked={formData.disneyPlus === 1}
-                      onChange={handleChange}
-                    />
-                    <label className="form-check-label" htmlFor="disneyPlus">
-                      Disney+
-                    </label>
-                  </div>
-
-                  <div className="form-check mb-2">
-                    <input
-                      className="form-check-input"
-                      type="checkbox"
-                      id="paramountPlus"
-                      name="paramountPlus"
-                      checked={formData.paramountPlus === 1}
-                      onChange={handleChange}
-                    />
-                    <label className="form-check-label" htmlFor="paramountPlus">
-                      Paramount+
-                    </label>
-                  </div>
-                </div>
-
-                <div className="col-md-6">
-                  <div className="form-check mb-2">
-                    <input
-                      className="form-check-input"
-                      type="checkbox"
-                      id="max"
-                      name="max"
-                      checked={formData.max === 1}
-                      onChange={handleChange}
-                    />
-                    <label className="form-check-label" htmlFor="max">
-                      Max
-                    </label>
-                  </div>
-
-                  <div className="form-check mb-2">
-                    <input
-                      className="form-check-input"
-                      type="checkbox"
-                      id="hulu"
-                      name="hulu"
-                      checked={formData.hulu === 1}
-                      onChange={handleChange}
-                    />
-                    <label className="form-check-label" htmlFor="hulu">
-                      Hulu
-                    </label>
-                  </div>
-
-                  <div className="form-check mb-2">
-                    <input
-                      className="form-check-input"
-                      type="checkbox"
-                      id="appleTVPlus"
-                      name="appleTVPlus"
-                      checked={formData.appleTVPlus === 1}
-                      onChange={handleChange}
-                    />
-                    <label className="form-check-label" htmlFor="appleTVPlus">
-                      Apple TV+
-                    </label>
-                  </div>
-
-                  <div className="form-check mb-2">
-                    <input
-                      className="form-check-input"
-                      type="checkbox"
-                      id="peacock"
-                      name="peacock"
-                      checked={formData.peacock === 1}
-                      onChange={handleChange}
-                    />
-                    <label className="form-check-label" htmlFor="peacock">
-                      Peacock
-                    </label>
-                  </div>
-                </div>
-              </div>
-
-              <div className="form-floating mb-3">
-                <input
-                  className="form-control"
-                  type="text"
-                  id="city"
-                  name="city"
-                  value={formData.city}
-                  onChange={handleChange}
-                />
-                <label htmlFor="city">City</label>
-              </div>
-
-              <div className="form-floating mb-3">
-                <input
-                  className="form-control"
-                  type="text"
-                  id="state"
-                  name="state"
-                  value={formData.state}
-                  onChange={handleChange}
-                />
-                <label htmlFor="state">State</label>
-              </div>
-
-              <div className="form-floating mb-3">
-                <input
-                  className="form-control"
-                  type="number"
-                  id="zip"
-                  name="zip"
-                  value={formData.zip}
-                  onChange={handleChange}
-                  min="0"
-                />
-                <label htmlFor="zip">ZIP Code</label>
-              </div>
-
-              <div className="d-grid mb-2">
-                <button
-                  className="btn btn-primary btn-login text-uppercase fw-bold"
-                  type="submit"
-                >
-                  Complete Registration
-                </button>
-              </div>
-            </form>
-            {error && <div className="alert alert-danger mt-3">{error}</div>}
-            {success && (
-              <div className="alert alert-success mt-3">
-                Registration successful! Redirecting to login...
-              </div>
-            )}
+    <>
+      {/* HEADER */}
+      <header>
+        <div className="container">
+          <div className="logo-container">
+            <Link to="/" className="logo">
+              <img src="/CineNiche_Logo.png" alt="CineNiche Logo" className="logo-image" />
+            </Link>
+            <Link to="/" className="site-title">CineNiche</Link>
           </div>
         </div>
+      </header>
+
+      <div className="login-container">
+        <h1 className="login-title">Complete Your Profile</h1>
+        <form className="login-form" onSubmit={handleSubmit}>
+          <div className="form">
+            <input
+              type="text"
+              id="name"
+              name="name"
+              placeholder="Name"
+              value={formData.name}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="form">
+            <input
+              type="tel"
+              id="phone"
+              name="phone"
+              placeholder="Phone"
+              value={formData.phone}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="form">
+            <input
+              type="email"
+              id="email"
+              name="email"
+              placeholder="Email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+              readOnly
+            />
+          </div>
+
+          <div className="form">
+            <input
+              type="number"
+              id="age"
+              name="age"
+              placeholder="Age"
+              value={formData.age}
+              onChange={handleChange}
+              required
+              min="0"
+            />
+          </div>
+
+          <div className="form">
+            <select
+              id="gender"
+              name="gender"
+              value={formData.gender}
+              onChange={handleChange}
+              required
+              className="form-select"
+            >
+              <option value="">Select Gender</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+
+          <div className="form">
+            <input
+              type="text"
+              id="city"
+              name="city"
+              placeholder="City"
+              value={formData.city}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="form">
+            <input
+              type="text"
+              id="state"
+              name="state"
+              placeholder="State"
+              value={formData.state}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="form">
+            <input
+              type="number"
+              id="zip"
+              name="zip"
+              placeholder="ZIP Code"
+              value={formData.zip}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="form-divider"></div>
+          
+          <p className="streaming-p">Do you have a subscription to any of the following?</p>
+          <div className="streaming-services">
+            <div className="form-check">
+              <input
+                type="checkbox"
+                id="netflix"
+                name="netflix"
+                checked={formData.netflix === 1}
+                onChange={handleCheckboxChange}
+                className="form-check-input"
+              />
+              <label htmlFor="netflix" className="form-check-label">Netflix</label>
+            </div>
+
+            <div className="form-check">
+              <input
+                type="checkbox"
+                id="amazonPrime"
+                name="amazonPrime"
+                checked={formData.amazonPrime === 1}
+                onChange={handleCheckboxChange}
+                className="form-check-input"
+              />
+              <label htmlFor="amazonPrime" className="form-check-label">Amazon Prime</label>
+            </div>
+
+            <div className="form-check">
+              <input
+                type="checkbox"
+                id="disneyPlus"
+                name="disneyPlus"
+                checked={formData.disneyPlus === 1}
+                onChange={handleCheckboxChange}
+                className="form-check-input"
+              />
+              <label htmlFor="disneyPlus" className="form-check-label">Disney+</label>
+            </div>
+
+            <div className="form-check">
+              <input
+                type="checkbox"
+                id="paramountPlus"
+                name="paramountPlus"
+                checked={formData.paramountPlus === 1}
+                onChange={handleCheckboxChange}
+                className="form-check-input"
+              />
+              <label htmlFor="paramountPlus" className="form-check-label">Paramount+</label>
+            </div>
+
+            <div className="form-check">
+              <input
+                type="checkbox"
+                id="max"
+                name="max"
+                checked={formData.max === 1}
+                onChange={handleCheckboxChange}
+                className="form-check-input"
+              />
+              <label htmlFor="max" className="form-check-label">Max</label>
+            </div>
+
+            <div className="form-check">
+              <input
+                type="checkbox"
+                id="hulu"
+                name="hulu"
+                checked={formData.hulu === 1}
+                onChange={handleCheckboxChange}
+                className="form-check-input"
+              />
+              <label htmlFor="hulu" className="form-check-label">Hulu</label>
+            </div>
+          </div>
+
+          <button type="submit" className="btn-login btn-primary">
+            Complete Registration
+          </button>
+
+          {error && <div className="error">{error}</div>}
+          {success && <div className="success">Profile created successfully!</div>}
+        </form>
       </div>
-    </div>
+    </>
   );
 };
 
