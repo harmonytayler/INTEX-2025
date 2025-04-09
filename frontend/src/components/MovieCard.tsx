@@ -10,6 +10,11 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie, onClick }) => {
   const [isImageError, setIsImageError] = useState(false); // State to track if the image has failed to load
   const imageUrl = movie.posterUrl; // Extract the URL from the JSON object
 
+  // Don't render if there's no poster URL or if the image fails to load
+  if (!imageUrl || isImageError) {
+    return null;
+  }
+
   // Handle image loading error
   const handleImageError = () => {
     setIsImageError(true);
@@ -22,18 +27,12 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie, onClick }) => {
       title={`Click to view details for ${movie.title}`}
     >
       <div className="poster-placeholder">
-        {!isImageError && imageUrl ? (
-          <img 
-            src={imageUrl} 
-            alt={movie.title} 
-            className="movie-poster-image"
-            onError={handleImageError} // Trigger the error handler if the image fails to load
-          />
-        ) : (
-          <div className="default-poster-message">
-            <span>This one doesn't have a poster yet! :(</span>
-          </div>
-        )}
+        <img 
+          src={imageUrl} 
+          alt={movie.title} 
+          className="movie-poster-image"
+          onError={handleImageError} // Trigger the error handler if the image fails to load
+        />
       </div>
       <h3 className="movie-title">{movie.title}</h3>
     </div>

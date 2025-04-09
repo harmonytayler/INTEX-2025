@@ -208,9 +208,6 @@ function HomePage() {
                 )
               ))}
 
-              {/* Divider before All Movies A-Z */}
-              <div className="border-t border-white/20 my-8"></div>
-
               {/* All Movies A-Z */}
               <h2 className="movie-row-header">All Movies A-Z</h2>
               <div className="movie-list-container">

@@ -70,7 +70,7 @@
 
 /* Poster placeholder gradient */
 .poster-placeholder {
-  background: linear-gradient(45deg, #1a1a1a, #2a2a2a);
+  background: black;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   display: flex;
   justify-content: center;
@@ -96,7 +96,7 @@
 
 /* Default poster message */
 .default-poster-message {
-  color: white;
+  color: white; /* Dark green text to contrast with white background */
   font-size: 0.75rem; /* Adjust size of message */
   text-align: center;
   width: 100%;
@@ -104,11 +104,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #444; /* Gray background */
+  background-color: black;
   border-radius: 0rem; /* Matches the rounded corners of other images */
 }
 
-/* Responsive adjustments for wrapping */
+/* Responsive adjustmenwhiter wrapping */
 @media (max-width: 640px) {
   .movie-list-container {
     justify-content: center; /* Center items on smaller screens */
