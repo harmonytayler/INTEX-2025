@@ -1,9 +1,9 @@
-/* Hide scrollbar for Chrome, Safari and Opera */
+/* Hide scrollbar for Chrome, Safari, and Opera */
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
 
-/* Hide scrollbar for IE, Edge and Firefox */
+/* Hide scrollbar for IE, Edge, and Firefox */
 .scrollbar-hide {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
@@ -22,18 +22,28 @@
   padding-right: 8px; /* Added padding to ensure space on the right */
 }
 
+/* Movie list container - will wrap cards into the next row when necessary */
+.movie-list-container {
+  display: flex;
+  flex-wrap: wrap; /* Allow items to wrap to the next row */
+  gap: 8px; /* Space between items */
+  padding-bottom: 16px;
+  padding-left: 8px; /* Padding for the left side */
+  padding-right: 8px; /* Padding for the right side */
+}
+
 /* Movie row hover effect */
 .movie-row:hover .movie-card {
   transform: scale(1.05);
   transition: transform 0.3s ease-in-out;
 }
 
-/* Movie card hover effect */
+/* Movie card styling */
 .movie-card {
   position: relative;
   transition: all 0.3s ease-in-out;
   flex-shrink: 0;
-  width: 130px; /* Set default width for movie cards */
+  width: 130px; /* Keep fixed width for movie cards */
   margin: 0 8px; /* Ensure proper spacing between cards */
 }
 
@@ -49,7 +59,7 @@
   justify-content: center;
   align-items: center;
   width: 130px; /* Ensure the placeholder is the same width as the card */
-  height: 195px; /* Set a default height for the poster */
+  height: 195px; /* Set a fixed height for the poster */
   border-radius: 0px;
 }
 
@@ -81,34 +91,26 @@
   border-radius: 0rem; /* Matches the rounded corners of other images */
 }
 
-/* Responsive adjustments */
+/* Responsive adjustments for wrapping */
 @media (max-width: 640px) {
-  .movie-card {
-    width: 100px; /* Smaller width for small screens */
+  .movie-list-container {
+    justify-content: center; /* Center items on smaller screens */
   }
-
-  .poster-placeholder {
-    height: 150px; /* Adjust height for smaller screens */
+  .movie-card {
+    margin-left: auto;
+    margin-right: auto;
   }
 }
 
 @media (min-width: 641px) and (max-width: 1024px) {
-  .movie-card {
-    width: 120px; /* Medium width for tablets */
-  }
-
-  .poster-placeholder {
-    height: 180px; /* Adjust height for tablets */
+  .movie-list-container {
+    justify-content: flex-start;
   }
 }
 
 @media (min-width: 1025px) {
-  .movie-card {
-    width: 130px;
-  }
-  
-.poster-placeholder {
-    height: 195px; /* Default height for larger screens */
+  .movie-list-container {
+    justify-content: flex-start; /* Align movies to the left on larger screens */
   }
 }
 
@@ -124,4 +126,4 @@
 .search-dropdown {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   border: 1px solid rgba(75, 85, 99, 0.3);
-} 
+}

@@ -2,6 +2,7 @@ using INTEX.API.Data;
 using INTEX.API.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 
 
@@ -351,6 +352,37 @@ public class MovieController : ControllerBase
                 _movieContext.SaveChanges();
 
                 return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        [HttpGet("AllMoviesAZ")]
+        public IActionResult GetMoviesAlphabetically([FromQuery] int pageSize, [FromQuery] int pageNum = 1)
+        {
+            try
+            {
+                var query = _movieContext.movies_titles.AsQueryable();
+
+                // Sort movies alphabetically by title
+                query = query.OrderBy(m => m.Title);
+
+                // Calculate the total count of movies
+                var totalCount = query.Count();
+
+                // Get the requested page of movies
+                var movies = query
+                    .Skip((pageNum - 1) * pageSize)  // Skip to the correct page
+                    .Take(pageSize)                  // Take the number of movies for the current page
+                    .ToList();
+
+                return Ok(new 
+                { 
+                    movies = movies, 
+                    totalNumMovies = totalCount 
+                });
             }
             catch (Exception ex)
             {
