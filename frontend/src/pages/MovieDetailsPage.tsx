@@ -1,17 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Movie } from '../types/Movie';
-import { fetchMovies } from '../api/MovieAPI';
+import { fetchMovies, submitRating, getUserRating, getAverageRating } from '../api/MovieAPI';
 import Logout from '../components/security/Logout';
 import AuthorizeView, { AuthorizedUser } from '../components/security/AuthorizeView';
 import SearchBar from '../components/SearchBar';
+import StarRating from '../components/StarRating';
+import { useAuth } from '../contexts/AuthContext';
 
 const MovieDetailsPage: React.FC = () => {
   const { movieId } = useParams<{ movieId: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [movie, setMovie] = useState<Movie | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [userRating, setUserRating] = useState<number>(0);
+  const [userId, setUserId] = useState<number | null>(null);
+  const [submitting, setSubmitting] = useState<boolean>(false);
+  const [ratingSubmitted, setRatingSubmitted] = useState<boolean>(false);
+  const [averageRating, setAverageRating] = useState<number>(0);
+  const [reviewCount, setReviewCount] = useState<number>(0);
 
   useEffect(() => {
     const loadMovieDetails = async () => {
@@ -58,6 +67,45 @@ const MovieDetailsPage: React.FC = () => {
     }
   }, [movieId]);
 
+  // Load user ID and rating when movie is loaded
+  useEffect(() => {
+    const loadUserData = async () => {
+      if (!movieId) return;
+      
+      try {
+        // Get user ID from AuthContext
+        if (user && user.userId) {
+          setUserId(user.userId);
+          
+          // Get user's rating for this movie
+          const rating = await getUserRating(movieId, user.userId);
+          setUserRating(rating);
+        }
+      } catch (error) {
+        console.error('Error loading user data:', error);
+      }
+    };
+    
+    loadUserData();
+  }, [movieId, user]);
+
+  // Load average rating and review count
+  useEffect(() => {
+    const loadAverageRating = async () => {
+      if (!movieId) return;
+      
+      try {
+        const { averageRating, reviewCount } = await getAverageRating(movieId);
+        setAverageRating(averageRating);
+        setReviewCount(reviewCount);
+      } catch (error) {
+        console.error('Error loading average rating:', error);
+      }
+    };
+    
+    loadAverageRating();
+  }, [movieId]);
+
   // Helper function to get all genres for this movie
   const getGenres = () => {
     if (!movie) return '';
@@ -79,6 +127,33 @@ const MovieDetailsPage: React.FC = () => {
 
   const handleBackClick = () => {
     navigate('/home');
+  };
+
+  const handleRatingChange = async (rating: number) => {
+    if (!movieId || !userId) {
+      return;
+    }
+    
+    try {
+      setSubmitting(true);
+      await submitRating(movieId, userId, rating);
+      setUserRating(rating);
+      setRatingSubmitted(true);
+      
+      // Refresh the average rating and review count
+      const { averageRating, reviewCount } = await getAverageRating(movieId);
+      setAverageRating(averageRating);
+      setReviewCount(reviewCount);
+      
+      // Reset the submitted state after 3 seconds
+      setTimeout(() => {
+        setRatingSubmitted(false);
+      }, 3000);
+    } catch (error) {
+      setError('Failed to submit rating. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -131,6 +206,43 @@ const MovieDetailsPage: React.FC = () => {
                 {/* Details Section */}
                 <div className="w-full md:w-2/3">
                   <h1 className="text-3xl font-bold mb-4">{movie.title}</h1>
+                  
+                  {/* Rating Section */}
+                  <div className="mb-6 p-4 bg-gray-800 rounded-lg">
+                    <h3 className="text-lg font-semibold text-gray-300 mb-2">Rate this movie</h3>
+                    <div className="flex items-center gap-4">
+                      <StarRating 
+                        rating={userRating} 
+                        onRatingChange={handleRatingChange} 
+                      />
+                      {submitting && (
+                        <span className="text-gray-400">Submitting...</span>
+                      )}
+                      {ratingSubmitted && (
+                        <span className="text-green-500">Rating submitted!</span>
+                      )}
+                    </div>
+                    {!userId && (
+                      <div className="mt-2 text-yellow-400 text-sm">
+                        Please log in to rate this movie.
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Average Rating Section */}
+                  <div className="mb-6 p-4 bg-gray-800 rounded-lg">
+                    <h3 className="text-lg font-semibold text-gray-300 mb-2">Average Rating</h3>
+                    <div className="flex items-center gap-4">
+                      <StarRating 
+                        rating={averageRating} 
+                        onRatingChange={() => {}} 
+                        readOnly={true}
+                      />
+                      <div className="text-gray-300">
+                        {averageRating.toFixed(1)} out of 5 ({reviewCount} {reviewCount === 1 ? 'review' : 'reviews'})
+                      </div>
+                    </div>
+                  </div>
                   
                   <div className="space-y-4">
                     <div>
