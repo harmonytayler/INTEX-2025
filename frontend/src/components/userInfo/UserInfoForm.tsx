@@ -13,7 +13,14 @@ const NewUserForm = () => {
     const fetchUserId = async () => {
       try {
         const response = await fetch(
-          'http://localhost:5000/MovieUser/GetNextUserId'
+          'https://localhost:5001/MovieUser/GetNextUserId',
+          {
+            credentials: 'include',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            }
+          }
         );
         if (!response.ok) {
           throw new Error('Failed to fetch user ID');
@@ -29,7 +36,6 @@ const NewUserForm = () => {
   }, []);
 
   const [formData, setFormData] = useState<MovieUser>({
-    userId: 0,
     name: '',
     phone: '',
     email: emailFromPreviousPage, // Use the email passed from the register page
@@ -100,7 +106,6 @@ const NewUserForm = () => {
       setSuccess(true);
       setError(null); // Clear any previous errors
       setFormData({
-        userId: 0,
         name: '',
         phone: '',
         email: '',

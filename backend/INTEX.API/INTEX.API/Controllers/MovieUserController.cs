@@ -6,12 +6,12 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Text.Json;
 
 namespace INTEX.API.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    [Authorize] // Ensure the controller requires authentication
     public class MovieUserController : ControllerBase
     {
         private readonly MovieDbContext _context;
@@ -24,6 +24,7 @@ namespace INTEX.API.Controllers
 
         // GET: /MovieUser/{id}
         [HttpGet("{id}")]
+        [Authorize] // Only this endpoint requires authentication
         public async Task<IActionResult> GetMovieUser(int id)
         {
             try
@@ -49,18 +50,35 @@ namespace INTEX.API.Controllers
         {
             try
             {
+                Console.WriteLine("GetNextUserId endpoint called");
+                
+                // Check if the database is accessible
+                var tableExists = await _context.Database.CanConnectAsync();
+                Console.WriteLine($"Database connection status: {tableExists}");
+                
+                if (!tableExists)
+                {
+                    return StatusCode(500, "Database connection failed");
+                }
+
                 // Find the highest user_id
+                Console.WriteLine("Querying for highest user_id");
                 var highestUserId = await _context.movies_users
                     .OrderByDescending(u => u.UserId)
                     .Select(u => u.UserId)
                     .FirstOrDefaultAsync();
+                
+                Console.WriteLine($"Highest user_id found: {highestUserId}");
 
                 // If there are no users, set the initial UserId to 1
                 int newUserId = (highestUserId == 0) ? 1 : highestUserId + 1;
+                Console.WriteLine($"New user_id to be assigned: {newUserId}");
 
                 // Ensure the new userId does not already exist
                 var userExists = await _context.movies_users
                     .AnyAsync(u => u.UserId == newUserId);
+                
+                Console.WriteLine($"User with ID {newUserId} exists: {userExists}");
 
                 // If it exists, increment and check again until a unique ID is found
                 while (userExists)
@@ -68,13 +86,16 @@ namespace INTEX.API.Controllers
                     newUserId++;
                     userExists = await _context.movies_users
                         .AnyAsync(u => u.UserId == newUserId);
+                    Console.WriteLine($"Checking ID {newUserId}, exists: {userExists}");
                 }
 
-                // Return the next available unique userId
+                Console.WriteLine($"Final user_id to be assigned: {newUserId}");
                 return Ok(newUserId);
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"Error in GetNextUserId: {ex}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
@@ -90,6 +111,9 @@ namespace INTEX.API.Controllers
                     return BadRequest("Invalid user data.");
                 }
 
+                // Log the user data for debugging
+                Console.WriteLine($"Adding new user: {JsonSerializer.Serialize(newUser)}");
+
                 // Check if another user with the same email already exists
                 var existingUser = await _context.movies_users
                     .FirstOrDefaultAsync(u => u.Email == newUser.Email);
@@ -99,21 +123,59 @@ namespace INTEX.API.Controllers
                     return Conflict($"A user with the email {newUser.Email} already exists.");
                 }
 
-                // Let the database handle userId auto-generation
+                // Get the next user ID
+                var nextUserId = await GetNextUserIdValue();
+                newUser.UserId = nextUserId;
+
+                // Add the user to the database
                 _context.movies_users.Add(newUser);
                 await _context.SaveChangesAsync();
+
+                // Log the user ID after saving
+                Console.WriteLine($"User added successfully with ID: {newUser.UserId}");
 
                 return CreatedAtAction(nameof(GetMovieUser), new { id = newUser.UserId }, newUser);
             }
             catch (Exception ex)
             {
+                // Log the full exception details
+                Console.WriteLine($"Error adding user: {ex}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
 
+        // Helper method to get the next user ID value
+        private async Task<int> GetNextUserIdValue()
+        {
+            // Find the highest user_id
+            var highestUserId = await _context.movies_users
+                .OrderByDescending(u => u.UserId)
+                .Select(u => u.UserId)
+                .FirstOrDefaultAsync();
+            
+            // If there are no users, set the initial UserId to 1
+            int newUserId = (highestUserId == 0) ? 1 : highestUserId + 1;
+
+            // Ensure the new userId does not already exist
+            var userExists = await _context.movies_users
+                .AnyAsync(u => u.UserId == newUserId);
+            
+            // If it exists, increment and check again until a unique ID is found
+            while (userExists)
+            {
+                newUserId++;
+                userExists = await _context.movies_users
+                    .AnyAsync(u => u.UserId == newUserId);
+            }
+
+            return newUserId;
+        }
 
         // PUT: /MovieUser/Update/{id}
         [HttpPut("Update/{id}")]
+        [Authorize] // This endpoint requires authentication
         public async Task<IActionResult> UpdateMovieUser(int id, [FromBody] MovieUser user)
         {
             try
@@ -146,6 +208,7 @@ namespace INTEX.API.Controllers
 
         // DELETE: /MovieUser/Delete/{id}
         [HttpDelete("DeleteUser/{id}")]
+        [Authorize] // This endpoint requires authentication
         public async Task<IActionResult> DeleteMovieUser(int id)
         {
             try
