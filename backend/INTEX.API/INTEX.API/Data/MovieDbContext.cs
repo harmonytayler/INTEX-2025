@@ -63,7 +63,7 @@ public class MovieDbContext : DbContext
             .HasKey(m => m.SourceShowID);  // Set ShowId as the primary key
 
         modelBuilder.Entity<MovieRating>()
-            .HasKey(m => m.ShowId);  // Set ShowId as the primary key
+            .HasKey(m => new { m.UserId, m.ShowId });  // Set composite key for UserId and ShowId
         
         
     }
