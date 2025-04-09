@@ -31,6 +31,15 @@ function LoginPage() {
     navigate('/register');
   };
 
+    // 🔑  NEW — start Google OAuth by redirecting to the API
+    const handleGoogleLogin = () => {
+      const api = import.meta.env.VITE_API_BASE_URL || 'https://localhost:5001';
+      const redirectUrl = `${api}/auth/google?returnUrl=/home`;
+      console.log("Redirecting to:", redirectUrl); // <-- temporary log
+      window.location.href = redirectUrl;
+    };
+    
+
   // handle submit event for the form
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -154,13 +163,17 @@ function LoginPage() {
               </div>
               <hr className="my-4" />
               <div className="d-grid mb-2">
-                <button
-                  className="btn btn-google btn-login text-uppercase fw-bold"
-                  type="button"
-                >
-                  <i className="fa-brands fa-google me-2"></i> Sign in with
-                  Google
-                </button>
+              <button
+  className="btn btn-google btn-login"
+  onClick={handleGoogleLogin}
+  style={{ pointerEvents: 'auto', zIndex: 10 }}
+>
+  <i className="fa-brands fa-google me-2"></i> Sign in with Google
+</button>
+
+
+
+
               </div>
               <div className="d-grid mb-2">
                 <button

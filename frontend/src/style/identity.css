@@ -12,7 +12,11 @@ body {
   .btn-google {
     color: white !important;
     background-color: #ea4335 !important;
+    pointer-events: auto !important;
+    z-index: 10;
+    position: relative; /* Ensure it's on top if anything was covering it */
   }
+  
   
   .btn-facebook {
     color: white !important;
