@@ -1,6 +1,6 @@
 import { MovieUser } from '../types/MovieUser'; // Adjust the path if necessary
 
-const API_URL = 'https://localhost:5000/MovieUser';
+const API_URL = 'https://localhost:5001/MovieUser';
 
 // Function to add a new movie user
 export const addMovieUser = async (newUser: MovieUser): Promise<MovieUser> => {
