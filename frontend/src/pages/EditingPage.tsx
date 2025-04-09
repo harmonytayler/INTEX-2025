@@ -250,9 +250,6 @@ const EditingPage: React.FC = () => {
               <Link to="/privacy" className="footer-link">
                 Privacy Policy
               </Link>
-              <Link to="/FAQ" className="footer-link">
-                FAQ
-              </Link>
             </div>
           </div>
         </footer>

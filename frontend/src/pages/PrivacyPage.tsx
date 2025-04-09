@@ -87,16 +87,13 @@ const PrivacyPage: React.FC = () => {
           </p>
           <div className="footer-links">
             <Link to="/" className="footer-link">
-              Landing Page
+              Home
             </Link>
             <Link to="/home" className="footer-link">
-              Home
+              Browse
             </Link>
             <Link to="/privacy" className="footer-link">
               Privacy Policy
-            </Link>
-            <Link to="/FAQ" className="footer-link">
-              FAQ
             </Link>
           </div>
         </div>
