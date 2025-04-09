@@ -1,80 +1,144 @@
 /* Header Styles */
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+
 header {
-  background-color: #000000 !important;
+  background-color: #224544;
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 1000;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  height: 150px;
+  height: 80px;
+  padding: 0;
 }
 
-/* Logo styles */
-header .logo {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: white !important;
-  text-decoration: none;
+/* Header layout */
+header .container {
   display: flex;
   align-items: center;
-}
-
-header .logo .green-text {
-  color: #10B981 !important;
-}
-
-/* Search bar styles */
-header .search-container {
-  flex: 0 1 auto;
-  max-width: 600px;
-  margin-left: 2rem;
-}
-
-header .search-form {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-header .search-input {
+  justify-content: space-between;
+  height: 100%;
   width: 100%;
-  background-color: #1F2937;
+  padding: 0 0.75rem;
+  max-width: calc(100% - 1.5rem);
+  margin: 0 auto;
+}
+
+/* Left side - Logo and title */
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-left: 0;
+}
+
+.logo-container .logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border-radius: 50%;
+  width: 55px;
+  height: 55px;
+  flex-shrink: 0;
+  padding: 2px;
+}
+
+.logo-container img {
+  width: 45px;
+  height: 45px;
+  object-fit: contain;
+}
+
+.site-title {
+  font-family: 'Pacifico', cursive;
+  font-size: 2.25rem;
+  font-weight: 400;
   color: white;
-  border-radius: 9999px;
-  padding: 0.75rem 2.5rem 0.75rem 1rem;
+  text-decoration: none;
+  line-height: 1;
+  white-space: nowrap;
+  letter-spacing: 0.05em;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+/* Right side - Search and user actions */
+.search-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-right: 0;
+}
+
+.search-form {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 0.25rem 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.search-form:focus-within {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.search-input {
+  background: transparent;
   border: none;
+  color: white;
+  padding: 0.5rem;
+  width: 200px;
   outline: none;
-  font-size: 1rem;
 }
 
-header .search-input:focus {
-  box-shadow: 0 0 0 2px #10B981;
+.search-input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
 }
 
-header .search-button {
-  position: absolute;
-  right: 0.5rem;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
+.search-button {
+  background: transparent;
   border: none;
-  color: #9CA3AF;
+  color: white;
+  padding: 0.5rem;
   cursor: pointer;
-  padding: 0.25rem;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-header .search-button:hover {
+/* User actions */
+.user-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.user-profile, .logout-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   color: white;
+  text-decoration: none;
+  padding: 0.5rem;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.user-profile:hover, .logout-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.user-profile svg, .logout-button svg {
+  width: 20px;
+  height: 20px;
 }
 
 /* User profile button styles */
 header .user-profile {
   color: white !important;
-  font-size: 0.875rem;
+  font-size: 1rem;
   display: flex;
   align-items: center;
 }
@@ -85,6 +149,30 @@ header .user-profile svg {
   margin-right: 0.25rem;
 }
 
+/* Logout button styles */
+header .logout-button {
+  background-color: #193231;
+  color: white;
+  padding: 0.25rem 1rem;
+  border-radius: 0.25rem;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  transition: background-color 0.2s ease;
+  min-width: 100px;
+  justify-content: center;
+}
+
+header .logout-button:hover {
+  background-color: #C35D24;
+}
+
+header .logout-button svg {
+  height: 0.875rem;
+  width: 0.875rem;
+}
+
 /* Ensure all text in header is white */
 header a, header button, header span {
   color: white !important;
@@ -93,28 +181,6 @@ header a, header button, header span {
 /* Override any purple colors */
 header a:hover, header button:hover {
   color: #10B981 !important; /* Green color for hover */
-}
-
-/* Header layout */
-header .container {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.5rem 1rem;
-  height: 100%;
-}
-
-header .logo-container {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-}
-
-header .user-actions {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex-shrink: 0;
 }
 
 /* Responsive adjustments */

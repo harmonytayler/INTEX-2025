@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React from 'react';
 import { Movie } from '../types/Movie';
 import MovieCard from './MovieCard';
 
@@ -55,8 +55,8 @@ const MovieRow: React.FC<MovieRowProps> = ({ genre, movies, onMovieClick, isTopT
   };
 
   return (
-    <div className="movie-row mb-6 relative group">
-      <h2 className="text-xl font-bold text-white mb-4">{genre}</h2>
+    <div className="movie-row">
+      <h2 className="movie-row-header">{genre}</h2>
       
       {/* Left Arrow */}
       {showLeftArrow && (
@@ -86,7 +86,7 @@ const MovieRow: React.FC<MovieRowProps> = ({ genre, movies, onMovieClick, isTopT
       
       <div 
         ref={rowRef}
-        className="movie-row-container flex overflow-x-auto scrollbar-hide px-4"
+        className="movie-row-container"
       >
         {movies.map((movie, index) => (
           <MovieCard
