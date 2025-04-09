@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 import './style/movies.css';
@@ -16,6 +17,12 @@ import LandingPage from './pages/LandingPage';
 import PrivacyPage from './pages/PrivacyPage';
 
 function App() {
+  useEffect(() => {
+    // Attach the env variables to a global variable for debugging
+    window.env = import.meta.env;
+    console.log("Window env set:", window.env);
+  }, []);
+
   return (
     <AuthProvider>
       <Router>
