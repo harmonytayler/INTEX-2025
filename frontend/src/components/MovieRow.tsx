@@ -6,9 +6,10 @@ interface MovieRowProps {
   genre: string;
   movies: Movie[];
   onMovieClick?: (movie: Movie) => void;
+  isTopTen?: boolean;
 }
 
-const MovieRow: React.FC<MovieRowProps> = ({ genre, movies, onMovieClick }) => {
+const MovieRow: React.FC<MovieRowProps> = ({ genre, movies, onMovieClick, isTopTen }) => {
   const rowRef = useRef<HTMLDivElement>(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(true);
@@ -87,11 +88,12 @@ const MovieRow: React.FC<MovieRowProps> = ({ genre, movies, onMovieClick }) => {
         ref={rowRef}
         className="movie-row-container flex overflow-x-auto scrollbar-hide px-4"
       >
-        {movies.map((movie) => (
+        {movies.map((movie, index) => (
           <MovieCard
             key={movie.showId}
             movie={movie}
             onClick={() => onMovieClick?.(movie)}
+            ranking={isTopTen ? index + 1 : undefined}
           />
         ))}
       </div>

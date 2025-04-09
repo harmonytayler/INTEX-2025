@@ -4,9 +4,10 @@ import { Movie } from '../types/Movie';
 interface MovieCardProps {
   movie: Movie;
   onClick?: () => void;
+  ranking?: number; // Optional ranking number for top movies
 }
 
-const MovieCard: React.FC<MovieCardProps> = ({ movie, onClick }) => {
+const MovieCard: React.FC<MovieCardProps> = ({ movie, onClick, ranking }) => {
   const [isImageError, setIsImageError] = useState(false); // State to track if the image has failed to load
   const imageUrl = movie.posterUrl; // Extract the URL from the JSON object
 
@@ -35,7 +36,9 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie, onClick }) => {
           </div>
         )}
       </div>
-      <h3 className="movie-title">{movie.title}</h3>
+      <h3 className="movie-title">
+        {ranking ? `${ranking}. ${movie.title}` : movie.title}
+      </h3>
     </div>
   );
 };
