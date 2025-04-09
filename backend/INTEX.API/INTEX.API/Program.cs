@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;          // AuthenticationProperties, etc.
+using Microsoft.AspNetCore.Authentication.Google;   // AddGoogle, GoogleDefaults
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,6 +52,16 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 // Authorization
 builder.Services.AddAuthorization();
+
+// ➡️  ADD GOOGLE AS AN EXTERNAL PROVIDER
+builder.Services.AddAuthentication()                // Identity already added cookies; we’re just extending
+    .AddGoogle(o =>
+    {
+        o.ClientId     = builder.Configuration["Auth:Google:Id"];
+        o.ClientSecret = builder.Configuration["Auth:Google:Secret"];
+        o.CallbackPath = "/signin-google";          // must match Google Console
+    });
+
 
 // CORS for frontend connection
 builder.Services.AddCors(options =>
@@ -148,6 +161,8 @@ app.MapGet("/pingauth", (ClaimsPrincipal user) =>
     var email = user.FindFirstValue(ClaimTypes.Email) ?? "unknown@email.com";
     return Results.Json(new { email });
 }).RequireAuthorization();
+
+
 
 // Explicitly set the port to avoid conflicts
 app.Run("https://localhost:5001");
