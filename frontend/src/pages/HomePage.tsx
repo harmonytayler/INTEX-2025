@@ -226,12 +226,6 @@ function HomePage() {
   return (
     <AuthorizeView>
       <div className="min-h-screen bg-black">
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />
         {/* Main content */}
         <div className="px-4 md:px-8 pb-8 pt-2">
           {loading && (
