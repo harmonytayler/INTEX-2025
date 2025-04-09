@@ -5,7 +5,8 @@ interface FetchMoviesResponse {
   totalNumMovies: number;
 }
 
-const API_URL = 'https://localhost:5001/Movie';
+const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://localhost:5001';
+const API_URL = `${baseUrl}/Movie`;
 
 export const fetchMovies = async (
   pageSize: number,
@@ -15,51 +16,56 @@ export const fetchMovies = async (
   selectedGenres?: string[]
 ): Promise<FetchMoviesResponse> => {
   try {
-      const categoryParams = selectedCategories
-          .map((cat) => `movieTypes=${encodeURIComponent(cat)}`)
-          .join('&');
+    const categoryParams = selectedCategories
+      .map((cat) => `movieTypes=${encodeURIComponent(cat)}`)
+      .join("&");
 
-      const searchParam = searchTerm ? `&searchTerm=${encodeURIComponent(searchTerm)}` : '';
-      
-      const genreParams = selectedGenres && selectedGenres.length > 0
-          ? `&genres=${selectedGenres.map(genre => encodeURIComponent(genre)).join(',')}`
-          : '';
-      
-      const url = `${API_URL}/AllMovies?pageSize=${pageSize}&pageNum=${pageNum}${selectedCategories.length ? `&${categoryParams}` : ''}${searchParam}${genreParams}`;
-      console.log("Fetching from URL:", url);
+    const searchParam = searchTerm
+      ? `&searchTerm=${encodeURIComponent(searchTerm)}`
+      : "";
 
-      const response = await fetch(url, {
-          credentials: 'include',
-      });
+    const genreParams =
+      selectedGenres && selectedGenres.length > 0
+        ? `&genres=${selectedGenres.map((genre) => encodeURIComponent(genre)).join(",")}`
+        : "";
 
-      if (!response.ok) {
-          console.error("API error response:", response.status, response.statusText);
-          throw new Error(`Failed to fetch movies: ${response.status} ${response.statusText}`);
-      }
+    const url = `${API_URL}/AllMovies?pageSize=${pageSize}&pageNum=${pageNum}${
+      selectedCategories.length ? `&${categoryParams}` : ""
+    }${searchParam}${genreParams}`;
 
-      const data = await response.json();
-      console.log("API response data:", data);
+    const response = await fetch(url, { credentials: "include" });
+    if (!response.ok) throw new Error(`Failed to fetch movies`);
 
-      // The backend might return the data directly, not wrapped in a movies property
-      if (Array.isArray(data)) {
-          return {
-              movies: data,
-              totalNumMovies: data.length
-          };
-      }
-      
-      // Provide default values if the response structure is unexpected
-      return {
-          movies: Array.isArray(data.movies) ? data.movies : [],
-          totalNumMovies: data.totalNumMovies || 0
-      };
+    const data = await response.json();
+    const movies: Movie[] = Array.isArray(data.movies) ? data.movies : data;
+
+    // Fetch poster URLs in parallel
+    const enrichedMovies = await Promise.all(
+      movies.map(async (movie) => {
+        try {
+          const posterRes = await fetch(`${API_URL}/PosterUrl/${movie.showId}`, {
+            credentials: "include",
+          });
+          if (posterRes.ok) {
+            movie.posterUrl = await posterRes.text();
+          }
+        } catch (err) {
+          console.warn(`Failed to fetch poster for ${movie.title}`);
+        }
+        return movie;
+      })
+    );
+
+    return {
+      movies: enrichedMovies,
+      totalNumMovies: data.totalNumMovies || enrichedMovies.length,
+    };
   } catch (error) {
-      console.error("Error fetching movies:", error);
-      // Return a valid empty response structure instead of throwing
-      return {
-          movies: [],
-          totalNumMovies: 0
-      };
+    console.error("Error fetching movies:", error);
+    return {
+      movies: [],
+      totalNumMovies: 0,
+    };
   }
 };
 

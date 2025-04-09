@@ -39,9 +39,10 @@ function LoginPage() {
       return;
     }
 
+    const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://localhost:5001';
     const loginUrl = rememberme
-    ? 'https://localhost:5001/login?useCookies=true'
-    : 'https://localhost:5001/login?useSessionCookies=true';
+    ? `${baseUrl}/login?useCookies=true`
+    : `${baseUrl}/login?useSessionCookies=true`;
 
     try {
       const response = await fetch(loginUrl, {
