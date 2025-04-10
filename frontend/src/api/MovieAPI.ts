@@ -198,9 +198,7 @@ export const submitRating = async (showId: string, userId: number, rating: numbe
   try {
     const response = await fetch(`${API_URL}/SubmitRating`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getHeaders(),
       credentials: 'include',
       body: JSON.stringify({
         showId,
@@ -214,6 +212,7 @@ export const submitRating = async (showId: string, userId: number, rating: numbe
       throw new Error(errorData.message || 'Failed to submit rating');
     }
   } catch (error) {
+    console.error('Error submitting rating:', error);
     throw error;
   }
 };
