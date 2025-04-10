@@ -1,4 +1,5 @@
 export interface MovieUser {
+    movieUserId: number;
     userId?: number;
     name: string;
     phone: string;

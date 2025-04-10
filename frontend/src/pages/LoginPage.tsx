@@ -87,12 +87,12 @@ function LoginPage() {
         roles: userInfo.roles || []
       };
       console.log('Setting user data:', userData);
+      console.log('User roles:', userData.roles);
       setUser(userData);
 
       navigate('/home');
     } catch (error) {
       setError('Invalid email or password');
-    } finally {
       setLoading(false);
     }
   };
