@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { MovieUser } from '../types/MovieUser';
-import { fetchMovieUserById, deleteMovieUser } from '../api/MovieUserAPI';
+import { getMovieUserByEmail, deleteMovieUser } from '../api/MovieUserAPI';
 import { useAuth } from '../contexts/AuthContext';
 import '../style/account.css';
 
@@ -14,18 +14,23 @@ const AccountsPage: React.FC = () => {
 
   useEffect(() => {
     const loadUserData = async () => {
-      if (!user?.userId) {
-        setError('User ID not found. Please log in again.');
+      if (!user?.email) {
+        setError('Email not found. Please log in again.');
         setLoading(false);
         return;
       }
 
       try {
-        const userData = await fetchMovieUserById(user.userId);
+        const userData = await getMovieUserByEmail(user.email);
         setMovieUser(userData);
         setError(null);
       } catch (err) {
-        setError('Failed to load user data. Please try again later.');
+        // If the user is an admin and doesn't have a movie user record, show a message
+        if (user.roles?.includes('Administrator')) {
+          setError('Admin accounts do not have movie user profiles. Please use the admin page to manage the system.');
+        } else {
+          setError('Failed to load user data. Please try again later.');
+        }
         console.error('Error loading user data:', err);
       } finally {
         setLoading(false);
@@ -40,7 +45,11 @@ const AccountsPage: React.FC = () => {
   };
 
   const handleEditClick = () => {
-    navigate('/account/edit');
+    if (user?.roles?.includes('Administrator')) {
+      navigate('/admin');
+    } else {
+      navigate('/account/edit');
+    }
   };
 
   const handleDeleteClick = async () => {
@@ -48,9 +57,9 @@ const AccountsPage: React.FC = () => {
       'Are you sure you want to delete your account? This action cannot be undone and all your data will be permanently removed.'
     );
 
-    if (confirmed && user?.userId) {
+    if (confirmed && movieUser?.userId) {
       try {
-        await deleteMovieUser(user.userId);
+        await deleteMovieUser(movieUser.userId);
         logout();
         navigate('/login');
       } catch (err) {
@@ -138,17 +147,19 @@ const AccountsPage: React.FC = () => {
             onClick={handleEditClick}
             className="account-button account-button-edit"
           >
-            Edit Account Details
+            {user?.roles?.includes('Administrator') ? 'Go to Admin Page' : 'Edit Account Details'}
           </button>
           <br/>
           <br/>
 
-          <button
-            onClick={handleDeleteClick}
-            className="account-button account-button-delete"
-          >
-            Delete Account
-          </button>
+          {!user?.roles?.includes('Administrator') && (
+            <button
+              onClick={handleDeleteClick}
+              className="account-button account-button-delete"
+            >
+              Delete Account
+            </button>
+          )}
         </div>
       </div>
 

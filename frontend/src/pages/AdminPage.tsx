@@ -3,9 +3,10 @@ import { Movie } from '../types/Movie';
 import { fetchMovies, deleteMovie } from '../api/MovieAPI';
 import './AdminPage.css';
 import Pagination from '../components/Pagination';
-import StarRating from '../components/StarRating';
 import EditMovieForm from '../components/EditMovieForm';
 import NewMovieForm from '../components/NewMovieForm';
+import { useAuth } from "../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const AdminPage: React.FC = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
@@ -65,8 +66,45 @@ const AdminPage: React.FC = () => {
     'Thrillers',
   ];
 
+  const handleSort = (field: string) => {
+    if (field === sortField) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortOrder('asc');
+    }
+    setCurrentPage(1);
+  };
+
+  const handleAddMovie = () => {
+    setIsAddingMovie(true);
+    setEditingMovie(null);
+    setIsEditModalOpen(true);
+  };
+
+  const renderSortIcon = (field: string): string => {
+    if (sortField !== field) return '↕';
+    return sortOrder === 'asc' ? '↑' : '↓';
+  };
+
+// Helper function that detects which genre property equals 1 and returns them as a comma-separated string
+
+    const { isAdmin } = useAuth();
+    const navigate = useNavigate();
+    const [pageSize, setPageSize] = useState<number>(10);
+    const [pageNum, setPageNum] = useState<number>(1);
+    // const [showForm, setShowForm] = useState(false);
+
   useEffect(() => {
-    fetchAllMovies();
+    fetchMovies(itemsPerPage, currentPage, selectedGenres, searchTerm)
+      .then((response) => {
+        setMovies(response.movies);
+        setTotalPages(Math.ceil(response.total / itemsPerPage));
+      })
+      .catch((err) => {
+        setError('Failed to fetch movies. Please try again later.');
+        console.error('Error fetching movies:', err);
+      });
   }, [
     currentPage,
     searchTerm,
@@ -155,16 +193,27 @@ const AdminPage: React.FC = () => {
       setLoading(false);
     }
   };
+    useEffect(() => {
+        if (!isAdmin) {
+            navigate('/');
+            return;
+        }
+      }
+    )
 
-  const handleSort = (field: string) => {
-    if (field === sortField) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortField(field);
-      setSortOrder('asc');
-    }
-    setCurrentPage(1);
-  };
+        const loadMovies = async () => {
+            try {
+                const data = await fetchMovies(pageSize, pageNum, []);
+                setMovies(data.movies);
+                setTotalPages(Math.ceil(data.total / pageSize));
+            } catch (err) {
+                setError((err as Error).message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+
 
   const handleGenreFilter = () => {
     setIsGenreFilterOpen(true);
@@ -180,17 +229,9 @@ const AdminPage: React.FC = () => {
     });
   };
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    setCurrentPage(1);
-    fetchAllMovies();
-  };
+  // Removed duplicate handleSearch function to resolve redeclaration error
 
-  const handleAddMovie = () => {
-    setIsAddingMovie(true);
-    setEditingMovie(null);
-    setIsEditModalOpen(true);
-  };
+
 
   const handleEditMovie = (movie: Movie) => {
     setEditingMovie(movie);
@@ -235,11 +276,6 @@ const AdminPage: React.FC = () => {
     setSelectedMovie(null);
   };
 
-  const formatRating = (rating: number | null | undefined): string => {
-    if (rating === null || rating === undefined) return '-';
-    return `${rating.toFixed(1)} / 5`;
-  };
-
   const formatDuration = (duration: string | null | undefined): string => {
     if (!duration) return '-';
     return duration;
@@ -252,11 +288,6 @@ const AdminPage: React.FC = () => {
     return genres.join(', ') || '-';
   };
 
-  const renderSortIcon = (field: string) => {
-    if (sortField !== field) return '↕';
-    return sortOrder === 'asc' ? '↑' : '↓';
-  };
-
   if (loading) {
     return (
       <div className="loading-container">
@@ -267,19 +298,27 @@ const AdminPage: React.FC = () => {
   }
 
   if (error) {
-    return (
-      <div className="error-container">
-        <p className="error-message">{error}</p>
-      </div>
-    );
-  }
+        loadMovies();
+    };
+    useEffect(() => {
+        loadMovies();
+    }, [pageSize, pageNum, isAdmin, navigate]);
+
+    if (loading) return <div className="flex justify-center items-center h-64"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div></div>;
+    if (error) return <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert"><strong className="font-bold">Error:</strong> <span className="block sm:inline">{error}</span></div>;
+
+
 
   return (
     <div className="admin-container">
       <h1 className="admin-title">MANAGE CONTENT</h1>
       <br />
       <div className="admin-actions">
-        <form onSubmit={handleSearch} className="search-form">
+        <form onSubmit={(e) => {
+          e.preventDefault();
+          setCurrentPage(1);
+          fetchMovies();
+        }} className="search-form">
           <input
             type="text"
             value={searchTerm}
@@ -660,5 +699,4 @@ const AdminPage: React.FC = () => {
     </div>
   );
 };
-
 export default AdminPage;
