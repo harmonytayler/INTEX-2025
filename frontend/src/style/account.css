@@ -109,6 +109,17 @@
   z-index: 1;
 }
 
+.details-footer {
+  background-color: #224544;
+  width: 100vw;
+  padding: 0.75rem 0;
+  margin-left: calc(-50vw + 50%);
+  margin-right: calc(-50vw + 50%);
+  margin-bottom: -32px;
+  position: relative;
+  z-index: 1;
+}
+
 .footer-content {
   max-width: 100%;
   margin: 0 auto;
