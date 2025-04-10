@@ -4,7 +4,6 @@ import { MovieUser } from '../types/MovieUser';
 import { getMovieUserByEmail, deleteMovieUser } from '../api/MovieUserAPI';
 import { useAuth } from '../contexts/AuthContext';
 import '../style/account.css';
-import { FaArrowLeft } from 'react-icons/fa';
 
 const AccountsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -74,11 +73,6 @@ const AccountsPage: React.FC = () => {
 
   return (
     <div>
-        <div className="back-button-container">
-          <button className="back-button" onClick={() => navigate(-1)}>
-            <FaArrowLeft className="back-icon" />
-          </button>
-        </div>
       <div className="account-container flex-grow">
         <h1 className="account-header">Account Information</h1>
 

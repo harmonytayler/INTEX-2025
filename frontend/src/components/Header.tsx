@@ -5,7 +5,6 @@ import '../style/header.css';
 import { fetchMovies } from '../api/MovieAPI';
 import { Movie } from '../types/Movie';
 import SearchDropdown from './SearchDropdown';
-import { FaBookmark } from 'react-icons/fa';
 
 function Header() {
   const location = useLocation();
@@ -22,10 +21,7 @@ function Header() {
 
   // Redirect logged-in users from login/register pages to home
   useEffect(() => {
-    if (
-      user &&
-      (location.pathname === '/login' || location.pathname === '/register')
-    ) {
+    if (user && (location.pathname === '/login' || location.pathname === '/register')) {
       navigate('/home');
     }
   }, [user, location.pathname, navigate]);
@@ -46,10 +42,7 @@ function Header() {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        searchContainerRef.current &&
-        !searchContainerRef.current.contains(event.target as Node)
-      ) {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
         setShowDropdown(false);
       }
     };
@@ -84,13 +77,11 @@ function Header() {
       if (response && Array.isArray(response.movies)) {
         const validMovies = await Promise.all(
           response.movies.map(async (movie) => {
-            if (
-              !movie.posterUrl ||
-              movie.posterUrl.trim() === '' ||
-              movie.posterUrl === 'null' ||
-              movie.posterUrl === 'undefined' ||
-              movie.posterUrl.includes('placeholder')
-            ) {
+            if (!movie.posterUrl || 
+                movie.posterUrl.trim() === '' || 
+                movie.posterUrl === 'null' || 
+                movie.posterUrl === 'undefined' ||
+                movie.posterUrl.includes('placeholder')) {
               return null;
             }
 
@@ -108,9 +99,7 @@ function Header() {
           })
         );
 
-        const filteredMovies = validMovies.filter(
-          (movie): movie is Movie => movie !== null
-        );
+        const filteredMovies = validMovies.filter((movie): movie is Movie => movie !== null);
         setSearchResults(filteredMovies);
         setShowDropdown(filteredMovies.length > 0);
       }
@@ -147,17 +136,11 @@ function Header() {
       <div className="container">
         <div className="logo-container">
           <Link to="/home" className="logo">
-            <img
-              src="/CineNiche_Logo.png"
-              alt="CineNiche Logo"
-              className="logo-image"
-            />
+            <img src="/CineNiche_Logo.png" alt="CineNiche Logo" className="logo-image" />
           </Link>
-          <Link to="/home" className="site-title">
-            CineNiche
-          </Link>
+          <Link to="/home" className="site-title">CineNiche</Link>
         </div>
-
+        
         <div className="search-container" ref={searchContainerRef}>
           <form onSubmit={handleSubmit} className="search-form">
             <input
@@ -199,115 +182,37 @@ function Header() {
 
         <div className="menu-container" ref={menuRef}>
           <button className="hamburger-button" onClick={toggleMenu}>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 6h16M4 12h16M4 18h16"
-              />
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
-
+          
           {isMenuOpen && (
             <div className="dropdown-menu">
               <Link to="/" className="dropdown-item" onClick={toggleMenu}>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-                  />
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                 </svg>
                 <span>Home</span>
               </Link>
               <Link to="/home" className="dropdown-item" onClick={toggleMenu}>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
-                  />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <span>Browse</span>
               </Link>
               {user && (
                 <>
-                  <Link
-                    to="/bookmarks"
-                    className="dropdown-item"
-                    onClick={toggleMenu}
-                  >
-                    <FaBookmark className="h-5 w-5" />
-                    <span>Bookmarks</span>
-                  </Link>
-                  <Link
-                    to="/account"
-                    className="dropdown-item"
-                    onClick={toggleMenu}
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                      />
+                  <Link to="/account" className="dropdown-item" onClick={toggleMenu}>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
                     <span>Account</span>
                   </Link>
-                  <button
-                    className="dropdown-item"
-                    onClick={() => {
-                      handleLogout();
-                      toggleMenu();
-                    }}
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                      />
+                  <button className="dropdown-item" onClick={() => { handleLogout(); toggleMenu(); }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                     </svg>
                     <span>Logout</span>
                   </button>
