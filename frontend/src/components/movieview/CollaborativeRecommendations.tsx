@@ -4,6 +4,7 @@ import { Movie } from '../../types/Movie';
 import { getCollaborativeRecommendations } from '../../api/MovieAPI';
 import MovieRow from '../MovieRow';
 import './Recommendations.css';
+import '../../style/MovieDetails.css';
 
 interface CollaborativeRecommendationsProps {
   showId: string;
@@ -68,7 +69,7 @@ const CollaborativeRecommendations: React.FC<
   }
 
   return (
-    <div className="recommendations-container">
+    <div>
       <MovieRow
         genre="Personalized Recommendations"
         movies={recommendations}
