@@ -1,166 +1,362 @@
-import { useState } from "react";
-import { Movie } from "../types/Movie";
-import { updateMovie } from "../api/MovieAPI";
+import { useState, useEffect, useRef } from 'react';
+import { Movie } from '../types/Movie';
+import { updateMovie } from '../api/MovieAPI';
+import '../pages/AdminPage.css';
 
 interface EditMovieFormProps {
-    movie: Movie;
-    onSuccess: () => void;
-    onCancel: () => void;
+  movie: Movie;
+  onSuccess: () => void;
+  onCancel: () => void;
 }
 
-const EditMovieForm = ({
-    movie,
-    onSuccess,
-    onCancel,
-}: EditMovieFormProps) => {
-    const [formData, setFormData] = useState<Movie>({...movie});
+const EditMovieForm = ({ movie, onSuccess, onCancel }: EditMovieFormProps) => {
+  const [formData, setFormData] = useState<Movie>({ ...movie });
+  const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
+  const [isDragging, setIsDragging] = useState(false);
+  const [posterPreview, setPosterPreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value, type } = e.target;
-        setFormData({
-            ...formData, 
-            [name]: type === 'number' ? parseInt(value) : value
-        });
+  // List of all possible genres
+  const allGenres = [
+    'Action',
+    'Adventure',
+    'Anime Series',
+    'British TV Shows',
+    'Children',
+    'Comedies',
+    'Comedies & Dramas',
+    'International Comedies',
+    'Romantic Comedies',
+    'Crime TV Shows',
+    'Documentaries',
+    'International Documentaries',
+    'Docuseries',
+    'Dramas',
+    'International Dramas',
+    'Romantic Dramas',
+    'Family Movies',
+    'Fantasy',
+    'Horror Movies',
+    'International Thrillers',
+    'International TV Shows',
+    'Kids TV',
+    'Language TV Shows',
+    'Musicals',
+    'Nature TV',
+    'Reality TV',
+    'Spirituality',
+    'TV Action',
+    'TV Comedies',
+    'TV Dramas',
+    'Talk Shows',
+    'Thrillers',
+  ];
+
+  // Initialize selected genres based on the movie data
+  useEffect(() => {
+    const genres = allGenres.filter((genre) => {
+      const genreKey = genre
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, '') as keyof Movie;
+      return formData[genreKey] === 1;
+    });
+    setSelectedGenres(genres);
+  }, [formData]);
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value, type } = e.target;
+    setFormData({
+      ...formData,
+      [name]: type === 'number' ? parseInt(value) : value,
+    });
+  };
+
+  const handleGenreChange = (genre: string) => {
+    const genreKey = genre
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, '') as keyof Movie;
+
+    if (selectedGenres.includes(genre)) {
+      // Remove genre
+      setSelectedGenres(selectedGenres.filter((g) => g !== genre));
+      setFormData({
+        ...formData,
+        [genreKey]: 0,
+      });
+    } else {
+      // Add genre
+      setSelectedGenres([...selectedGenres, genre]);
+      setFormData({
+        ...formData,
+        [genreKey]: 1,
+      });
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(false);
+
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFileUpload(e.dataTransfer.files[0]);
+    }
+  };
+
+  const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      handleFileUpload(e.target.files[0]);
+    }
+  };
+
+  const handleFileUpload = (file: File) => {
+    // Check if file is an image
+    if (!file.type.match('image.*')) {
+      alert('Please upload an image file');
+      return;
+    }
+
+    // Create a preview URL
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setPosterPreview(e.target?.result as string);
+      setFormData({
+        ...formData,
+        posterUrl: e.target?.result as string,
+      });
     };
+    reader.readAsDataURL(file);
+  };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        await updateMovie(formData.showId, formData);
-        onSuccess();
-    };
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await updateMovie(formData.showId, formData);
+    onSuccess();
+  };
 
-    return (
-        <form onSubmit={handleSubmit} className="space-y-4">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">Edit Movie</h2>
-            
-            <div className="form-group">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Show ID</label>
-                <div className="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-700">
-                    {formData.showId}
-                </div>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="form-group">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
-                    <input 
-                        type="text" 
-                        name="type" 
-                        value={formData.type} 
-                        onChange={handleChange} 
-                        required 
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                    />
-                </div>
-                
-                <div className="form-group">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
-                    <input 
-                        type="text" 
-                        name="title" 
-                        value={formData.title} 
-                        onChange={handleChange} 
-                        required 
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                    />
-                </div>
-                
-                <div className="form-group">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Director</label>
-                    <input 
-                        type="text" 
-                        name="director" 
-                        value={formData.director || ""} 
-                        onChange={handleChange} 
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                    />
-                </div>
-                
-                <div className="form-group">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Cast</label>
-                    <input 
-                        type="text" 
-                        name="cast" 
-                        value={formData.cast || ""} 
-                        onChange={handleChange} 
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                    />
-                </div>
-                
-                <div className="form-group">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Country</label>
-                    <input 
-                        type="text" 
-                        name="country" 
-                        value={formData.country || ""} 
-                        onChange={handleChange} 
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                    />
-                </div>
-                
-                <div className="form-group">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Release Year</label>
-                    <input 
-                        type="number" 
-                        name="releaseYear" 
-                        value={formData.releaseYear} 
-                        onChange={handleChange} 
-                        required 
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                    />
-                </div>
-                
-                <div className="form-group">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Rating</label>
-                    <input 
-                        type="text" 
-                        name="rating" 
-                        value={formData.rating || ""} 
-                        onChange={handleChange} 
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                    />
-                </div>
-                
-                <div className="form-group">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Duration</label>
-                    <input 
-                        type="text" 
-                        name="duration" 
-                        value={formData.duration || ""} 
-                        onChange={handleChange} 
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                    />
-                </div>
-            </div>
-            
-            <div className="form-group">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                <input 
-                    type="text" 
-                    name="description" 
-                    value={formData.description || ""} 
-                    onChange={handleChange} 
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                />
-            </div>
-            
-            <div className="flex justify-end space-x-3 pt-4">
-                <button 
-                    type="button" 
-                    onClick={onCancel} 
-                    className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+  return (
+    <div className="modal-overlay">
+      <div className="modal-content">
+        <div className="modal-header">
+          <h2>Edit Movie</h2>
+          <button className="close-button" onClick={onCancel}>
+            <i className="fas fa-times"></i>
+          </button>
+        </div>
+        <div className="modal-body">
+          <form onSubmit={handleSubmit} className="edit-form">
+            <div className="modal-layout">
+              <div className="modal-poster">
+                <div
+                  className={`aspect-ratio ${isDragging ? 'dragging' : ''}`}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                  onClick={() => fileInputRef.current?.click()}
                 >
-                    Cancel
-                </button>
-                <button 
-                    type="submit" 
-                    className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                >
-                    Save Changes
-                </button>
+                  {posterPreview ? (
+                    <img
+                      src={posterPreview}
+                      alt={`${formData.title} poster`}
+                      className="movie-poster"
+                    />
+                  ) : (
+                    <img
+                      src={
+                        formData.posterUrl ||
+                        'https://via.placeholder.com/300x450?text=No+Poster'
+                      }
+                      alt={`${formData.title} poster`}
+                      className="movie-poster"
+                    />
+                  )}
+                  <div className="drag-drop-area">
+                    <i className="fas fa-cloud-upload-alt"></i>
+                    <p>Drag & drop to replace poster</p>
+                    <p>or click to browse</p>
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleFileInput}
+                      accept="image/*"
+                      style={{ display: 'none' }}
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="modal-details">
+                <div className="modal-row">
+                  <div className="modal-label">Title:</div>
+                  <div className="modal-value">
+                    <input
+                      type="text"
+                      name="title"
+                      value={formData.title}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="modal-row">
+                  <div className="modal-label">Rating:</div>
+                  <div className="modal-value">
+                    {formData.averageStarRating === undefined ? (
+                      <span className="no-rating">There are no ratings</span>
+                    ) : formData.averageStarRating === 0 ? (
+                      <span className="no-rating">There are no ratings</span>
+                    ) : (
+                      `${formData.averageStarRating.toFixed(1)}/5`
+                    )}
+                  </div>
+                </div>
+
+                <div className="modal-row">
+                  <div className="modal-label">Duration:</div>
+                  <div className="modal-value">
+                    <input
+                      type="text"
+                      name="duration"
+                      value={formData.duration || ''}
+                      onChange={handleChange}
+                    />
+                  </div>
+                </div>
+
+                <div className="modal-row">
+                  <div className="modal-label">Year:</div>
+                  <div className="modal-value">
+                    <input
+                      type="number"
+                      name="releaseYear"
+                      value={formData.releaseYear}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="modal-row">
+                  <div className="modal-label">Country:</div>
+                  <div className="modal-value">
+                    <input
+                      type="text"
+                      name="country"
+                      value={formData.country || ''}
+                      onChange={handleChange}
+                    />
+                  </div>
+                </div>
+
+                <div className="modal-row">
+                  <div className="modal-label">Genres:</div>
+                  <div className="modal-value">
+                    <div className="genre-dropdown">
+                      <div className="genre-selected">
+                        {selectedGenres.length > 0
+                          ? selectedGenres.join(', ')
+                          : 'Select genres'}
+                      </div>
+                      <div className="genre-options">
+                        {allGenres.map((genre) => (
+                          <div
+                            key={genre}
+                            className={`genre-option ${selectedGenres.includes(genre) ? 'selected' : ''}`}
+                            onClick={() => handleGenreChange(genre)}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={selectedGenres.includes(genre)}
+                              onChange={() => {}}
+                              className="genre-checkbox"
+                            />
+                            <span>{genre}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="modal-row">
+                  <div className="modal-label">Director:</div>
+                  <div className="modal-value">
+                    <input
+                      type="text"
+                      name="director"
+                      value={formData.director || ''}
+                      onChange={handleChange}
+                    />
+                  </div>
+                </div>
+
+                <div className="modal-row">
+                  <div className="modal-label">Cast:</div>
+                  <div className="modal-value">
+                    <input
+                      type="text"
+                      name="cast"
+                      value={formData.cast || ''}
+                      onChange={handleChange}
+                    />
+                  </div>
+                </div>
+
+                <div className="modal-row">
+                  <div className="modal-label">Description:</div>
+                  <div className="modal-value">
+                    <textarea
+                      name="description"
+                      value={formData.description || ''}
+                      onChange={handleChange}
+                      rows={3}
+                    />
+                  </div>
+                </div>
+
+                <div className="modal-row">
+                  <div className="modal-label">Type:</div>
+                  <div className="modal-value">
+                    <input
+                      type="text"
+                      name="type"
+                      value={formData.type}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
-        </form>
-    );
+
+            <div className="modal-footer">
+              <button
+                type="button"
+                onClick={onCancel}
+                className="modal-button cancel-button"
+              >
+                Cancel
+              </button>
+              <button type="submit" className="modal-button edit-button">
+                Save Changes
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default EditMovieForm;

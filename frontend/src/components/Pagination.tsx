@@ -1,109 +1,159 @@
+import React from 'react';
+
 interface PaginationProps {
-    currentPage: number;
-    totalPages: number;
-    pageSize: number;
-    onPageChange: (page: number) => void;
-    onPageSizeChange: (size: number) => void;
+  currentPage: number;
+  totalPages: number;
+  pageSize: number;
+  onPageChange: (page: number) => void;
+  onPageSizeChange: (size: number) => void;
+  totalItems: number;
 }
 
-const Pagination = ({
-    currentPage,
-    totalPages,
-    pageSize,
-    onPageChange,
-    onPageSizeChange,
-}: PaginationProps) => {
-    // Function to generate page numbers to display
-    const getPageNumbers = () => {
-        const pages = [];
-        const maxVisiblePages = 5; // Number of page buttons to show
-        const halfVisible = Math.floor(maxVisiblePages / 2);
+const Pagination: React.FC<PaginationProps> = ({
+  currentPage,
+  totalPages,
+  pageSize,
+  onPageChange,
+  onPageSizeChange,
+  totalItems,
+}) => {
+  const pageSizeOptions = [10, 25, 50, 100];
 
-        let startPage = Math.max(1, currentPage - halfVisible);
-        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+  const renderPageNumbers = () => {
+    const pages = [];
+    const maxVisiblePages = 5;
 
-        // Adjust start page if we're near the end
-        if (endPage - startPage + 1 < maxVisiblePages) {
-            startPage = Math.max(1, endPage - maxVisiblePages + 1);
-        }
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(
+          <button
+            key={i}
+            className={`pagination-button ${currentPage === i ? 'active' : ''}`}
+            onClick={() => onPageChange(i)}
+          >
+            {i}
+          </button>
+        );
+      }
+    } else {
+      // Always show first page
+      pages.push(
+        <button
+          key={1}
+          className={`pagination-button ${currentPage === 1 ? 'active' : ''}`}
+          onClick={() => onPageChange(1)}
+        >
+          1
+        </button>
+      );
 
-        // Always show first page
-        if (startPage > 1) {
-            pages.push(1);
-            if (startPage > 2) {
-                pages.push('...');
-            }
-        }
+      // Calculate range around current page
+      let start = Math.max(2, currentPage - 1);
+      let end = Math.min(totalPages - 1, currentPage + 1);
 
-        // Add pages around current page
-        for (let i = startPage; i <= endPage; i++) {
-            pages.push(i);
-        }
+      // Adjust if at the start or end
+      if (currentPage <= 2) {
+        end = 4;
+      } else if (currentPage >= totalPages - 1) {
+        start = totalPages - 3;
+      }
 
-        // Always show last page
-        if (endPage < totalPages) {
-            if (endPage < totalPages - 1) {
-                pages.push('...');
-            }
-            pages.push(totalPages);
-        }
+      // Add ellipsis after first page if needed
+      if (start > 2) {
+        pages.push(<span key="start-ellipsis">...</span>);
+      }
 
-        return pages;
-    };
+      // Add page numbers
+      for (let i = start; i <= end; i++) {
+        pages.push(
+          <button
+            key={i}
+            className={`pagination-button ${currentPage === i ? 'active' : ''}`}
+            onClick={() => onPageChange(i)}
+          >
+            {i}
+          </button>
+        );
+      }
 
-    return (
-        <div className="flex justify-center items-center mt-4 gap-2">
-            <button 
-                className="px-3 py-1 rounded border disabled:opacity-50"
-                disabled={currentPage === 1}  
-                onClick={() => onPageChange(currentPage - 1)}
-            >
-                Previous
-            </button>
+      // Add ellipsis before last page if needed
+      if (end < totalPages - 1) {
+        pages.push(<span key="end-ellipsis">...</span>);
+      }
 
-            {getPageNumbers().map((page, index) => (
-                page === '...' ? (
-                    <span key={`ellipsis-${index}`} className="px-2">...</span>
-                ) : (
-                    <button
-                        key={page}
-                        className={`px-3 py-1 rounded border ${
-                            currentPage === page ? 'bg-blue-500 text-white' : ''
-                        }`}
-                        onClick={() => onPageChange(page as number)}
-                    >
-                        {page}
-                    </button>
-                )
-            ))}
+      // Always show last page
+      pages.push(
+        <button
+          key={totalPages}
+          className={`pagination-button ${currentPage === totalPages ? 'active' : ''}`}
+          onClick={() => onPageChange(totalPages)}
+        >
+          {totalPages}
+        </button>
+      );
+    }
 
-            <button
-                className="px-3 py-1 rounded border disabled:opacity-50"
-                disabled={currentPage === totalPages}
-                onClick={() => onPageChange(currentPage + 1)}
-            >
-                Next
-            </button>
+    return pages;
+  };
 
-            <div className="ml-4">
-                <label className="flex items-center gap-2">
-                    Results per page:
-                    <select
-                        className="border rounded px-2 py-1"
-                        value={pageSize}
-                        onChange={(e) => {
-                            onPageSizeChange(Number(e.target.value));
-                            onPageChange(1);
-                        }}
-                    >
-                        <option value="5">5</option>
-                        <option value="10">10</option>
-                        <option value="20">20</option>
-                    </select>
-                </label>
-            </div>
-        </div>
-    );
+  return (
+    <div className="pagination-container">
+      <div className="pagination-select">
+        <span>Movies per page:</span>
+        <select
+          value={pageSize}
+          onChange={(e) => onPageSizeChange(Number(e.target.value))}
+        >
+          {pageSizeOptions.map((size) => (
+            <option key={size} value={size}>
+              {size}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="pagination-controls">
+        <button
+          className="pagination-button"
+          onClick={() => onPageChange(1)}
+          disabled={currentPage === 1}
+          title="First Page"
+        >
+          <i className="fas fa-angle-double-left"></i>
+        </button>
+        <button
+          className="pagination-button"
+          onClick={() => onPageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          title="Previous Page"
+        >
+          <i className="fas fa-angle-left"></i>
+        </button>
+        {renderPageNumbers()}
+        <button
+          className="pagination-button"
+          onClick={() => onPageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          title="Next Page"
+        >
+          <i className="fas fa-angle-right"></i>
+        </button>
+        <button
+          className="pagination-button"
+          onClick={() => onPageChange(totalPages)}
+          disabled={currentPage === totalPages}
+          title="Last Page"
+        >
+          <i className="fas fa-angle-double-right"></i>
+        </button>
+      </div>
+
+      <div className="pagination-info">
+        Showing {Math.min((currentPage - 1) * pageSize + 1, totalItems)} to{' '}
+        {Math.min(currentPage * pageSize, totalItems)} of {totalItems} results
+      </div>
+    </div>
+  );
 };
 
 export default Pagination;
