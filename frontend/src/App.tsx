@@ -14,6 +14,7 @@ import SearchResultsPage from './pages/SearchResultsPage';
 import { AuthProvider } from './contexts/AuthContext';
 import LandingPage from './pages/LandingPage';
 import PrivacyPage from './pages/PrivacyPage';
+import BookmarkedMoviesPage from './pages/BookmarkedMoviesPage';
 
 function App() {
   return (
@@ -26,7 +27,7 @@ function App() {
               <Route path="/" element={<LandingPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
-              <Route path="/register/userinfo" element={<NewUserForm/>} />
+              <Route path="/register/userinfo" element={<NewUserForm />} />
               <Route path="/home" element={<HomePage />} />
               <Route path="/movie/:movieId" element={<MovieDetailsPage />} />
               <Route path="/admin" element={<AdminPage />} />
@@ -34,6 +35,7 @@ function App() {
               <Route path="/account/edit" element={<EditingPage />} />
               <Route path="/search" element={<SearchResultsPage />} />
               <Route path="/privacy" element={<PrivacyPage />} />
+              <Route path="/bookmarks" element={<BookmarkedMoviesPage />} />
             </Routes>
           </main>
         </div>

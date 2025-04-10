@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Movie } from '../types/Movie';
 import { submitRating, getUserRating, getAverageRating } from '../api/MovieAPI';
 import AuthorizeView from '../components/security/AuthorizeView';
@@ -9,12 +9,19 @@ import ContentBasedRecommendations from '../components/movieview/ContentBasedRec
 import CollaborativeRecommendations from '../components/movieview/CollaborativeRecommendations';
 import '../style/MovieDetails.css';
 import '../style/account.css';
-import { FaArrowLeft } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
+import {
+  FaArrowLeft,
+  FaBookmark,
+  FaRegBookmark,
+  FaPlay,
+  FaCookieBite,
+} from 'react-icons/fa';
+import Cookies from 'js-cookie';
 
 const MovieDetailsPage: React.FC = () => {
   const { movieId } = useParams<{ movieId: string }>();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [movie, setMovie] = useState<Movie | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -22,7 +29,25 @@ const MovieDetailsPage: React.FC = () => {
   const [userId, setUserId] = useState<number | null>(null);
   const [averageRating, setAverageRating] = useState<number>(0);
   const [reviewCount, setReviewCount] = useState<number>(0);
-  const navigate = useNavigate();
+  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [showWatchModal, setShowWatchModal] = useState(false);
+  const [showCookiesMessage, setShowCookiesMessage] = useState(false);
+
+  // Load bookmarked movies from cookies on component mount
+  useEffect(() => {
+    const cookiesEnabled = navigator.cookieEnabled;
+
+    if (cookiesEnabled) {
+      const bookmarkedMovies = Cookies.get('bookmarkedMovies');
+      if (bookmarkedMovies) {
+        const bookmarkedIds = JSON.parse(bookmarkedMovies);
+        if (movieId && bookmarkedIds.includes(movieId)) {
+          setIsBookmarked(true);
+        }
+      }
+    }
+  }, [movieId]);
+
   useEffect(() => {
     const loadMovieDetails = async () => {
       try {
@@ -182,25 +207,82 @@ const MovieDetailsPage: React.FC = () => {
     }
   };
 
+  const toggleBookmark = () => {
+    if (!movieId) return;
+
+    // Check if cookies are enabled
+    if (!navigator.cookieEnabled) {
+      setShowCookiesMessage(true);
+      return;
+    }
+
+    // Get current bookmarked movies from cookies
+    const bookmarkedMovies = Cookies.get('bookmarkedMovies');
+    let bookmarkedIds: string[] = [];
+
+    if (bookmarkedMovies) {
+      bookmarkedIds = JSON.parse(bookmarkedMovies);
+    }
+
+    if (isBookmarked) {
+      // Remove from bookmarks
+      bookmarkedIds = bookmarkedIds.filter((id) => id !== movieId);
+    } else {
+      // Add to bookmarks
+      bookmarkedIds.push(movieId);
+    }
+
+    // Save updated bookmarks to cookies
+    Cookies.set('bookmarkedMovies', JSON.stringify(bookmarkedIds), {
+      expires: 365,
+    }); // Expires in 1 year
+
+    // Update state
+    setIsBookmarked(!isBookmarked);
+  };
+
+  const handleWatchClick = () => {
+    setShowWatchModal(true);
+  };
+
+  const closeWatchModal = () => {
+    setShowWatchModal(false);
+  };
+
+  const closeCookiesMessage = () => {
+    setShowCookiesMessage(false);
+  };
+
+  const checkCookiesEnabled = () => {
+    if (navigator.cookieEnabled) {
+      setShowCookiesMessage(false);
+      toggleBookmark(); // Try to bookmark again
+    }
+  };
+
   return (
     <AuthorizeView>
-      <div>
-        <div className="back-button-container">
-          <button className="back-button" onClick={() => navigate(-1)}>
-            <FaArrowLeft className="back-icon" />
-          </button>
-        </div>
-        {/* Main content */}
-        {loading && (
-          <div className="text-center py-8">Loading movie details...</div>
-        )}
-
-        {error && (
-          <div className="text-red-500 text-center py-8">Error: {error}</div>
-        )}
-
-        {!loading && !error && movie && (
+      <div className="back-button-container">
+        <button className="back-button" onClick={() => navigate(-1)}>
+          <FaArrowLeft className="back-icon" />
+        </button>
+      </div>
+      <div className="movie-page-container">
+        {loading ? (
+          <div className="loading-container">
+            <div className="loading-spinner"></div>
+          </div>
+        ) : error ? (
+          <div className="error-container">
+            <p className="error-message">{error}</p>
+          </div>
+        ) : movie ? (
           <div className="movie-details-container">
+            <div className="movie-details-header">
+              <h1 className="selected-movie-title">{movie.title}</h1>
+            </div>
+
+            {/* Main content */}
             <div className="movie-details-content">
               {/* Poster Section */}
               <div className="movie-poster-section">
@@ -216,8 +298,6 @@ const MovieDetailsPage: React.FC = () => {
 
               {/* Details Section */}
               <div className="movie-details-section">
-                <h1 className="selected-movie-title">{movie.title}</h1>
-
                 {movie.description && (
                   <div className="mt-6">
                     <p className="detail-description">{movie.description}</p>
@@ -266,6 +346,28 @@ const MovieDetailsPage: React.FC = () => {
                   )}
                 </div>
                 <div className="divider-line"></div>
+
+                {/* Action Buttons */}
+                <div className="movie-action-buttons">
+                  <button className="watch-button" onClick={handleWatchClick}>
+                    <FaPlay className="watch-icon" />
+                    <span>Watch</span>
+                  </button>
+
+                  <button
+                    className={`bookmark-button ${isBookmarked ? 'bookmarked' : ''}`}
+                    onClick={toggleBookmark}
+                    aria-label={
+                      isBookmarked
+                        ? 'Remove from bookmarks'
+                        : 'Add to bookmarks'
+                    }
+                  >
+                    {isBookmarked ? <FaBookmark /> : <FaRegBookmark />}
+                    <span>{isBookmarked ? 'Bookmarked' : 'Bookmark'}</span>
+                  </button>
+                </div>
+
                 <h3 className="rating-label">Rate {movie.title}</h3>
                 <div className="movie-rating-container">
                   <StarRating
@@ -288,8 +390,66 @@ const MovieDetailsPage: React.FC = () => {
               <CollaborativeRecommendations showId={movie.showId} />
             </div>
           </div>
-        )}
+        ) : null}
       </div>
+
+      {/* Watch Modal */}
+      {showWatchModal && movie && (
+        <div className="modal-overlay" onClick={closeWatchModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Watch {movie.title}</h2>
+              <button className="modal-close" onClick={closeWatchModal}>
+                ×
+              </button>
+            </div>
+            <div className="modal-body">
+              <p>This is a placeholder for the video player.</p>
+              <p>
+                In a real application, this would embed a video player or
+                streaming service.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Cookies Disabled Message */}
+      {showCookiesMessage && (
+        <div className="modal-overlay" onClick={closeCookiesMessage}>
+          <div
+            className="modal-content cookies-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-header">
+              <h2>Cookies Disabled</h2>
+              <button className="modal-close" onClick={closeCookiesMessage}>
+                ×
+              </button>
+            </div>
+            <div className="modal-body">
+              <div className="cookies-disabled-content">
+                <FaCookieBite className="cookie-icon" />
+                <p>
+                  Please enable cookies in your browser to use the bookmark
+                  feature.
+                </p>
+                <button
+                  className="check-cookies-button"
+                  onClick={checkCookiesEnabled}
+                >
+                  Check Again
+                </button>
+                <p className="cookie-help">
+                  To enable cookies, please check your browser settings or
+                  privacy settings.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <footer className="details-footer">
         <div className="footer-content">
           <p className="footer-copyright">

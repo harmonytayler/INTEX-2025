@@ -16,12 +16,12 @@
 .movie-details-content {
   display: flex;
   gap: 2rem;
-  margin-bottom: 3rem;
+  margin-top: 0;
 }
 
 .movie-poster-section {
   width: 25%;
-  margin-top: 80px;
+  margin-top: 0;
   margin-left: 0;
   padding: 20px;
   flex-shrink: 0;
@@ -37,7 +37,7 @@
 
 .movie-details-section {
   flex: 1;
-  margin-top: 80px;
+  margin-top: 0;
   padding-left: 20px;
   padding-right: 20px;
   text-align: left;
@@ -46,7 +46,7 @@
 .selected-movie-title {
   font-size: 2.5rem;
   font-weight: 700;
-  margin: 0 0 1.5rem 0;
+  margin: 0 0 0.5rem 0;
   color: #fffcf3;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
   text-align: left;
@@ -223,4 +223,180 @@
   width: 100%;
   min-height: 100vh;
   padding-top: 80px;
+}
+
+.movie-details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.movie-action-buttons {
+  display: flex;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.watch-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #c35d24; /* Changed from Netflix red to #C35D24 */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  gap: 0.5rem;
+}
+
+.watch-button:hover {
+  background-color: #d86a2e; /* Slightly lighter shade of #C35D24 for hover */
+  transform: scale(1.05);
+}
+
+.watch-icon {
+  font-size: 1.2rem;
+}
+
+.bookmark-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #fffcf3;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  gap: 0.5rem;
+}
+
+.bookmark-button:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
+}
+
+.bookmark-button.bookmarked {
+  color: #c35d24; /* Changed from Netflix red to #C35D24 */
+  border-color: #c35d24; /* Changed from Netflix red to #C35D24 */
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: #141414;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-header h2 {
+  margin: 0;
+  color: #fffcf3;
+  font-size: 1.5rem;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: #fffcf3;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+  color: #c35d24; /* Changed from Netflix red to #C35D24 */
+}
+
+.modal-body {
+  padding: 1.5rem;
+  color: #fffcf3;
+}
+
+.cookies-modal {
+  max-width: 500px;
+}
+
+.cookies-disabled-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem 1rem;
+}
+
+.cookie-icon {
+  font-size: 3rem;
+  color: #c35d24;
+  margin-bottom: 1.5rem;
+  opacity: 0.7;
+}
+
+.cookies-disabled-content p {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.check-cookies-button {
+  background-color: #c35d24;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 1.5rem;
+}
+
+.check-cookies-button:hover {
+  background-color: #d86a2e;
+  transform: scale(1.05);
+}
+
+.cookie-help {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.5);
+  max-width: 400px;
+  margin: 0 auto;
 }
