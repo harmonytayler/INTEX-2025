@@ -1,4 +1,5 @@
 import { MovieUser } from '../types/MovieUser'; // Adjust the path if necessary
+import { getHeaders } from './MovieAPI';
 
 const API_URL = 'https://localhost:5001/MovieUser';
 
@@ -11,7 +12,7 @@ export const addMovieUser = async (newUser: MovieUser): Promise<MovieUser> => {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify(newUser),
-            credentials: 'include', // Optional: for handling cookies/sessions if needed
+            credentials: 'include',
         });
 
         if (!response.ok) {
@@ -28,22 +29,34 @@ export const addMovieUser = async (newUser: MovieUser): Promise<MovieUser> => {
     }
 };
 
-// Function to fetch a movie user by ID
-export const fetchMovieUserById = async (userId: number): Promise<MovieUser | null> => {
-    try {
-        const response = await fetch(`${API_URL}/${userId}`, {
-            credentials: 'include',
-        });
+// Function to get a movie user by email
+export const getMovieUserByEmail = async (email: string): Promise<MovieUser> => {
+    const response = await fetch(`${API_URL}/GetUserByEmail?email=${encodeURIComponent(email)}`, {
+        method: 'GET',
+        headers: await getHeaders(),
+        credentials: 'include',
+    });
 
-        if (!response.ok) {
-            throw new Error("Failed to fetch movie user");
-        }
-
-        return await response.json();
-    } catch (error) {
-        console.error("Error fetching movie user:", error);
-        return null;
+    if (!response.ok) {
+        throw new Error(`Failed to fetch user data: ${response.statusText}`);
     }
+
+    return response.json();
+};
+
+// Function to fetch a movie user by ID
+export const fetchMovieUserById = async (userId: number): Promise<MovieUser> => {
+    const response = await fetch(`${API_URL}/${userId}`, {
+        method: 'GET',
+        headers: await getHeaders(),
+        credentials: 'include',
+    });
+
+    if (!response.ok) {
+        throw new Error(`Failed to fetch user data: ${response.statusText}`);
+    }
+
+    return response.json();
 };
 
 // Function to fetch all movie users (with optional filters like search or pagination)
@@ -72,47 +85,33 @@ export const fetchMovieUsers = async (pageSize: number, pageNum: number): Promis
 };
 
 // Function to update movie user data
-export const updateMovieUser = async (userId: number, updatedUser: MovieUser): Promise<MovieUser> => {
-    try {
-        console.log(`Updating user with ID ${userId}:`, updatedUser);
-        
-        const response = await fetch(`${API_URL}/Update/${userId}`, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(updatedUser),
-            credentials: 'include',
-        });
+export const updateMovieUser = async (userId: number, user: MovieUser): Promise<MovieUser> => {
+    const response = await fetch(`${API_URL}/Update/${userId}`, {
+        method: 'PUT',
+        headers: {
+            ...(await getHeaders()),
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ ...user, userId }),
+        credentials: 'include',
+    });
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error(`Server responded with status ${response.status}:`, errorText);
-            throw new Error(`Failed to update movie user: ${response.statusText}. Details: ${errorText}`);
-        }
-
-        return await response.json();
-    } catch (error) {
-        console.error("Error updating movie user:", error);
-        throw error;
+    if (!response.ok) {
+        throw new Error(`Failed to update user: ${response.statusText}`);
     }
+
+    return response.json();
 };
 
 // Function to delete a movie user
 export const deleteMovieUser = async (userId: number): Promise<void> => {
-    try {
-        const response = await fetch(`${API_URL}/DeleteUser/${userId}`, {
-            method: "DELETE",
-            credentials: 'include',
-        });
+    const response = await fetch(`${API_URL}/DeleteUser/${userId}`, {
+        method: 'DELETE',
+        headers: await getHeaders(),
+        credentials: 'include',
+    });
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error(`Server responded with status ${response.status}:`, errorText);
-            throw new Error(`Failed to delete movie user: ${response.statusText}. Details: ${errorText}`);
-        }
-    } catch (error) {
-        console.error('Error deleting movie user:', error);
-        throw error;
+    if (!response.ok) {
+        throw new Error(`Failed to delete user: ${response.statusText}`);
     }
 };

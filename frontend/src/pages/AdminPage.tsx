@@ -4,6 +4,8 @@ import { deleteMovie, fetchMovies } from "../api/MovieAPI";
 import Pagination from "../components/Pagination";
 import NewMovieForm from "../components/NewMovieForm";
 import EditProjectForm from "../components/EditMovieForm.tsx";
+import { useAuth } from "../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 // List of all genre keys in the Movie interface
 const genreKeys: (keyof Movie)[] = [
@@ -47,6 +49,8 @@ const getGenres = (movie: Movie): string => {
 };
 
 const AdminProjectsPage = () => {
+    const { isAdmin } = useAuth();
+    const navigate = useNavigate();
     const [movies, setMovies] = useState<Movie[]>([]);
     const [pageSize, setPageSize] = useState<number>(10);
     const [pageNum, setPageNum] = useState<number>(1);
@@ -57,11 +61,16 @@ const AdminProjectsPage = () => {
     const [editingMovie, setEditingMovie] = useState<Movie | null>(null);
 
     useEffect(() => {
+        if (!isAdmin) {
+            navigate('/');
+            return;
+        }
+
         const loadMovies = async () => {
             try {
                 const data = await fetchMovies(pageSize, pageNum, []);
                 setMovies(data.movies);
-                setTotalPages(Math.ceil(data.totalNumMovies / pageSize));
+                setTotalPages(Math.ceil(data.total / pageSize));
             } catch (err) {
                 setError((err as Error).message);
             } finally {
@@ -70,7 +79,7 @@ const AdminProjectsPage = () => {
         };
 
         loadMovies();
-    }, [pageSize, pageNum]);
+    }, [pageSize, pageNum, isAdmin, navigate]);
 
     const handleDelete = async (showId: string) => {
         const confirmDelete = window.confirm("Are you sure you want to delete this movie?");

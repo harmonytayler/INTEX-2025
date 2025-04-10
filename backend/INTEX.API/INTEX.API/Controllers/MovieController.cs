@@ -252,7 +252,7 @@ public class MovieController : ControllerBase
         }
 
         [HttpPost("AddMovie")]
-        public IActionResult AddMovie([FromBody] Movie movie)
+        public virtual IActionResult AddMovie([FromBody] Movie movie)
         {
             try
             {
@@ -272,7 +272,7 @@ public class MovieController : ControllerBase
         }
 
         [HttpPut("Update/{id}")]
-        public IActionResult UpdateMovie(string id, [FromBody] Movie movie)
+        public virtual IActionResult UpdateMovie(string id, [FromBody] Movie movie)
         {
             try
             {
@@ -338,7 +338,7 @@ public class MovieController : ControllerBase
         }
 
         [HttpDelete("DeleteMovie/{id}")]
-        public IActionResult DeleteMovie(string id)
+        public virtual IActionResult DeleteMovie(string id)
         {
             try
             {

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { MovieUser } from '../types/MovieUser';
-import { fetchMovieUserById, updateMovieUser } from '../api/MovieUserAPI';
+import { getMovieUserByEmail, updateMovieUser } from '../api/MovieUserAPI';
 import { useAuth } from '../contexts/AuthContext';
 import '../style/account.css';
 
@@ -15,14 +15,14 @@ const EditingPage: React.FC = () => {
 
   useEffect(() => {
     const loadUserData = async () => {
-      if (!user?.userId) {
-        setError('User ID not found. Please log in again.');
+      if (!user?.email) {
+        setError('Email not found. Please log in again.');
         setLoading(false);
         return;
       }
 
       try {
-        const userData = await fetchMovieUserById(user.userId);
+        const userData = await getMovieUserByEmail(user.email);
         setMovieUser(userData);
         setFormData(userData);
         setError(null);
@@ -65,11 +65,11 @@ const EditingPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData || !user?.userId) return;
+    if (!formData || !movieUser?.userId) return;
 
     try {
       console.log('Submitting form data:', formData);
-      await updateMovieUser(user.userId, formData);
+      await updateMovieUser(movieUser.userId, formData);
       navigate('/account');
     } catch (err) {
       setError('Failed to update user data. Please try again.');
