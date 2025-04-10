@@ -219,9 +219,6 @@ const MovieDetailsPage: React.FC = () => {
               </svg>
               Back to Home
             </button>
-            <div className="w-64">
-              <SearchBar placeholder="Search movies..." />
-            </div>
           </div>
         </div>
 
@@ -240,7 +237,7 @@ const MovieDetailsPage: React.FC = () => {
               <div className="flex flex-col md:flex-row gap-8">
                 {/* Poster Section */}
                 <div className="w-full md:w-1/3">
-                  <div className="w-full aspect-[2/3] rounded-md overflow-hidden">
+                  <div className="w-full aspect-[2/3] rounded-md overflow-hidden" style={{ maxWidth: '300px' }}>
                     <img
                       src={
                         movie.posterUrl ||
@@ -248,6 +245,7 @@ const MovieDetailsPage: React.FC = () => {
                       }
                       alt={`${movie.title} poster`}
                       className="w-full h-full object-cover"
+                      style={{ width: '300px', height: '450px' }}
                     />
                   </div>
                 </div>

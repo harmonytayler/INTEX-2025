@@ -68,7 +68,17 @@ header .container {
 }
 
 /* Right side - Search and user actions */
+.search-dropdown-container {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  margin-top: 0.25rem;
+}
+
 .search-container {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -76,12 +86,14 @@ header .container {
 }
 
 .search-form {
+  position: relative;
   display: flex;
   align-items: center;
   background: rgba(255, 252, 243, 0.1);
   border-radius: 20px;
   padding: 0.25rem 0.5rem;
   transition: all 0.3s ease;
+  width: 100%;
 }
 
 .search-form:focus-within {
@@ -90,11 +102,18 @@ header .container {
 
 .search-input {
   background: transparent;
-  border: none;
+  border: 2px solid rgba(255, 252, 243, 0.3);
   color: #FFFCF3;
-  padding: 0.5rem;
+  padding: 0.5rem 1rem;
   width: 200px;
   outline: none;
+  border-radius: 9999px;
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  border-color: rgba(255, 252, 243, 0.7);
+  box-shadow: 0 0 0 2px rgba(255, 252, 243, 0.2);
 }
 
 .search-input::placeholder {
