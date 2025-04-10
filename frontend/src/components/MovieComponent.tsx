@@ -47,7 +47,7 @@ function MovieList({selectedCategories}: {selectedCategories: string[]}) {
                 // Check if movies is an array before setting state
                 if (data && Array.isArray(data.movies)) {
                     setMovies(data.movies);
-                    setTotalPages(Math.ceil((data.totalNumMovies || 0) / pageSize));
+                    setTotalPages(Math.ceil((data.total || 0) / pageSize));
                 } else {
                     console.warn("Unexpected data format:", data);
                     setMovies([]);

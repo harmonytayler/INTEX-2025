@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { Movie } from '../types/Movie';
 import { submitRating, getUserRating, getAverageRating } from '../api/MovieAPI';
 import AuthorizeView from '../components/security/AuthorizeView';
-import SearchBar from '../components/SearchBar';
 import StarRating from '../components/StarRating';
 import { useAuth } from '../contexts/AuthContext';
 import ContentBasedRecommendations from '../components/movieview/ContentBasedRecommendations';
@@ -13,15 +12,12 @@ import '../style/account.css';
 
 const MovieDetailsPage: React.FC = () => {
   const { movieId } = useParams<{ movieId: string }>();
-  const navigate = useNavigate();
   const { user } = useAuth();
   const [movie, setMovie] = useState<Movie | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [userRating, setUserRating] = useState<number>(0);
   const [userId, setUserId] = useState<number | null>(null);
-  const [submitting, setSubmitting] = useState<boolean>(false);
-  const [ratingSubmitted, setRatingSubmitted] = useState<boolean>(false);
   const [averageRating, setAverageRating] = useState<number>(0);
   const [reviewCount, setReviewCount] = useState<number>(0);
 
@@ -166,35 +162,22 @@ const MovieDetailsPage: React.FC = () => {
     return genres.join(', ');
   };
 
-  const handleBackClick = () => {
-    navigate('/home');
-  };
-
   const handleRatingChange = async (rating: number) => {
     if (!movieId || !userId) {
       return;
     }
 
     try {
-      setSubmitting(true);
       await submitRating(movieId, userId, rating);
       setUserRating(rating);
-      setRatingSubmitted(true);
 
       // Refresh the average rating and review count
       const { averageRating, reviewCount } = await getAverageRating(movieId);
       setAverageRating(averageRating);
       setReviewCount(reviewCount);
-
-      // Reset the submitted state after 3 seconds
-      setTimeout(() => {
-        setRatingSubmitted(false);
-      }, 3000);
     } catch (error) {
       setError('Failed to submit rating. Please try again.');
-    } finally {
-      setSubmitting(false);
-    }
+    } 
   };
 
   return (

@@ -4,6 +4,7 @@ import '../style/identity.css';
 import '@fortawesome/fontawesome-free/css/all.css';
 import { useAuth } from '../contexts/AuthContext';
 
+
 function LoginPage() {
   // state variables for email and passwords
   const [email, setEmail] = useState<string>('');
@@ -25,10 +26,6 @@ function LoginPage() {
     } else if (name === 'password') {
       setPassword(value);
     }
-  };
-
-  const handleRegisterClick = () => {
-    navigate('/register');
   };
 
   // handle submit event for the form

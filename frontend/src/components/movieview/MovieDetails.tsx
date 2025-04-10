@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { Movie } from '../../types/Movie';
 import {
   fetchMovieById,
@@ -14,7 +14,6 @@ import './MovieDetails.css';
 
 const MovieDetails: React.FC = () => {
   const { showId } = useParams<{ showId: string }>();
-  const navigate = useNavigate();
   const { user } = useAuth();
   const [movie, setMovie] = useState<Movie | null>(null);
   const [userRating, setUserRating] = useState<number>(0);
