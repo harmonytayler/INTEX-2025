@@ -49,38 +49,38 @@ export const fetchMovies = async (
     const data = await response.json();
     const movies: Movie[] = Array.isArray(data.movies) ? data.movies : data;
 
-    // Fetch poster URLs and average ratings in parallel
-    const enrichedMovies = await Promise.all(
-      movies.map(async (movie) => {
-        try {
-          // Fetch poster URL
-          const posterRes = await fetch(`${API_URL}/PosterUrl/${movie.showId}`, {
-            credentials: "include",
-          });
-          if (posterRes.ok) {
-            movie.posterUrl = await posterRes.text();
-          }
+    // Get all movie IDs for batch processing
+    const movieIds = movies.map(movie => movie.showId);
 
-          // Fetch average rating using the correct endpoint
-          const ratingRes = await fetch(`${API_URL}/AverageRating/${movie.showId}`, {
-            credentials: "include",
-          });
-          if (ratingRes.ok) {
-            const ratingData = await ratingRes.json();
-            movie.averageStarRating = ratingData.averageRating;
-          } else if (ratingRes.status === 404) {
-            movie.averageStarRating = 0;
-          }
-        } catch (err) {
-          console.warn(`Failed to fetch additional data for ${movie.title}`);
-          movie.averageStarRating = 0;
+    // Fetch all ratings in bulk
+    const ratings = await getBulkAverageRatings(movieIds);
+
+    // Fetch all poster URLs in parallel
+    const posterPromises = movieIds.map(async (showId) => {
+      try {
+        const posterRes = await fetch(`${API_URL}/PosterUrl/${showId}`, {
+          credentials: "include",
+        });
+        if (posterRes.ok) {
+          return { showId, posterUrl: await posterRes.text() };
         }
-        return movie;
-      })
+        return { showId, posterUrl: null };
+      } catch (err) {
+        return { showId, posterUrl: null };
+      }
+    });
+
+    const posterResults = await Promise.all(posterPromises);
+    const posterUrls = Object.fromEntries(
+      posterResults.map(result => [result.showId, result.posterUrl])
     );
 
-    // Sort movies by average rating
-    enrichedMovies.sort((a, b) => (b.averageStarRating || 0) - (a.averageStarRating || 0));
+    // Enrich movies with ratings and poster URLs
+    const enrichedMovies = movies.map(movie => ({
+      ...movie,
+      averageStarRating: ratings[movie.showId]?.averageRating || 0,
+      posterUrl: posterUrls[movie.showId] || null
+    }));
 
     return {
       movies: enrichedMovies,
@@ -242,20 +242,45 @@ export const getAverageRating = async (showId: string): Promise<{ averageRating:
       credentials: 'include',
     });
 
+    if (response.ok) {
+      const data = await response.json();
+      return { 
+        averageRating: data.averageRating, 
+        reviewCount: data.reviewCount 
+      };
+    } else if (response.status === 404) {
+      return { averageRating: 0, reviewCount: 0 };
+    }
+    throw new Error('Failed to get average rating');
+  } catch (error) {
+    return { averageRating: 0, reviewCount: 0 };
+  }
+};
+
+export const getBulkAverageRatings = async (showIds: string[]): Promise<{ [key: string]: { averageRating: number; reviewCount: number } }> => {
+  try {
+    const response = await fetch(`${API_URL}/BulkAverageRatings?${showIds.map(id => `showIds=${encodeURIComponent(id)}`).join('&')}`, {
+      credentials: 'include',
+    });
+
     if (!response.ok) {
-      if (response.status === 404) {
-        return { averageRating: 0, reviewCount: 0 };
-      }
-      throw new Error('Failed to get average rating');
+      throw new Error('Failed to get bulk average ratings');
     }
 
     const data = await response.json();
-    return { 
-      averageRating: data.averageRating, 
-      reviewCount: data.reviewCount 
-    };
+    const ratings: { [key: string]: { averageRating: number; reviewCount: number } } = {};
+    
+    data.forEach((item: any) => {
+      ratings[item.showId] = {
+        averageRating: item.averageRating,
+        reviewCount: item.reviewCount
+      };
+    });
+
+    return ratings;
   } catch (error) {
-    return { averageRating: 0, reviewCount: 0 };
+    console.error('Error fetching bulk ratings:', error);
+    return {};
   }
 };
 
