@@ -27,7 +27,9 @@ const AccountsPage: React.FC = () => {
       } catch (err) {
         // If the user is an admin and doesn't have a movie user record, show a message
         if (isAdmin) {
-          setError('Admin accounts do not have movie user profiles. Please use the admin page to manage the system.');
+          setError(
+            'Admin accounts do not have movie user profiles. Please use the admin page to manage the system.'
+          );
         } else {
           setError('Failed to load user data. Please try again later.');
         }
@@ -55,7 +57,11 @@ const AccountsPage: React.FC = () => {
   const handleDeleteClick = async () => {
     if (!movieUser) return;
 
-    if (window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+    if (
+      window.confirm(
+        'Are you sure you want to delete your account? This action cannot be undone.'
+      )
+    ) {
       try {
         await deleteMovieUser(movieUser.movieUserId);
         logout();
@@ -73,6 +79,11 @@ const AccountsPage: React.FC = () => {
 
   return (
     <div>
+      <div className="back-button-container">
+        <button className="back-button" onClick={() => window.history.back()}>
+          <span>&larr;</span>
+        </button>
+      </div>
       <div className="account-container flex-grow">
         <h1 className="account-header">Account Information</h1>
 
@@ -110,7 +121,7 @@ const AccountsPage: React.FC = () => {
                 </tr>
               </tbody>
             </table>
-            <br/>
+            <br />
 
             <div className="flex flex-col space-y-4">
               <button
@@ -119,8 +130,8 @@ const AccountsPage: React.FC = () => {
               >
                 {isAdmin ? 'Go to Admin Page' : 'Edit Account Details'}
               </button>
-              <br/>
-              <br/>
+              <br />
+              <br />
 
               {!isAdmin && (
                 <button
@@ -157,4 +168,4 @@ const AccountsPage: React.FC = () => {
   );
 };
 
-export default AccountsPage; 
+export default AccountsPage;
