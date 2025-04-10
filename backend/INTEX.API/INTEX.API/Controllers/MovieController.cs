@@ -485,6 +485,45 @@ public class MovieController : ControllerBase
             }
         }
 
+        [HttpGet("BulkAverageRatings")]
+        public IActionResult GetBulkAverageRatings([FromQuery] string[] showIds)
+        {
+            try
+            {
+                // Query all ratings for the given showIds in a single database call
+                var ratings = _movieContext.movies_ratings
+                    .Where(r => showIds.Contains(r.ShowId))
+                    .GroupBy(r => r.ShowId)
+                    .Select(g => new
+                    {
+                        ShowId = g.Key,
+                        AverageRating = g.Average(r => r.Rating),
+                        ReviewCount = g.Count()
+                    })
+                    .ToList();
+
+                // Create a dictionary for quick lookup
+                var ratingsDict = ratings.ToDictionary(
+                    r => r.ShowId,
+                    r => new { r.AverageRating, r.ReviewCount }
+                );
+
+                // Return ratings for all requested showIds, including those with no ratings
+                var result = showIds.Select(showId => new
+                {
+                    ShowId = showId,
+                    AverageRating = ratingsDict.ContainsKey(showId) ? ratingsDict[showId].AverageRating : 0,
+                    ReviewCount = ratingsDict.ContainsKey(showId) ? ratingsDict[showId].ReviewCount : 0
+                });
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
         [HttpGet("GetMovie/{showId}")]
         public async Task<IActionResult> GetMovie(string showId)
         {

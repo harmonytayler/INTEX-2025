@@ -9,6 +9,8 @@ export interface Movie {
   rating: string | null;
   duration: string | null;
   description: string | null;
+  posterUrl: string | null;
+  averageStarRating?: number;
   action: number;
   adventure: number;
   animeSeriesInternationalTVShows: number;
@@ -41,6 +43,4 @@ export interface Movie {
   tVDramas: number;
   talkShowsTVComedies: number;
   thrillers: number;
-  posterUrl?: string;
-  averageStarRating?: number;
 }

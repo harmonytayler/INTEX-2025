@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Movie } from '../types/Movie';
-import { fetchMovies, fetchMoviesAZ, getAverageRating } from '../api/MovieAPI';
+import { fetchMovies, fetchMoviesAZ, getAverageRating, getBulkAverageRatings } from '../api/MovieAPI';
 import MovieRow from '../components/MovieRow';
 import AuthorizeView from '../components/security/AuthorizeView';
 import MovieCard from '../components/MovieCard';
@@ -35,6 +35,19 @@ const calculateWeightedRating = (averageRating: number, reviewCount: number, glo
   return (reviewCount / (reviewCount + minReviews)) * averageRating + (minReviews / (reviewCount + minReviews)) * globalAverageRating;
 };
 
+// Helper function to fetch ratings in batches
+const fetchRatingsInBatches = async (movieIds: string[], batchSize: number = 20) => {
+  const ratings: { [key: string]: { averageRating: number; reviewCount: number } } = {};
+  
+  for (let i = 0; i < movieIds.length; i += batchSize) {
+    const batch = movieIds.slice(i, i + batchSize);
+    const batchRatings = await getBulkAverageRatings(batch);
+    Object.assign(ratings, batchRatings);
+  }
+  
+  return ratings;
+};
+
 function HomePage() {
   const [moviesByGenre, setMoviesByGenre] = useState<{ [key: string]: Movie[] }>({});
   const [allMoviesAZ, setAllMoviesAZ] = useState<Movie[]>([]);
@@ -61,41 +74,23 @@ function HomePage() {
         const response = await fetchMovies(100, 1, [], '', []);
         if (response && Array.isArray(response.movies)) {
           const allMovies = response.movies;
-
-          // Get all movies' ratings in parallel with a batch size
-          const BATCH_SIZE = 10;
-          const movieRatings = [];
           
-          for (let i = 0; i < allMovies.length; i += BATCH_SIZE) {
-            const batch = allMovies.slice(i, i + BATCH_SIZE);
-            const batchRatings = await Promise.all(
-              batch.map(async (movie) => {
-                // Check cache first
-                if (ratingsCache.current[movie.showId]) {
-                  return {
-                    movie,
-                    ...ratingsCache.current[movie.showId]
-                  };
-                }
-
-                try {
-                  const { averageRating, reviewCount } = await getAverageRating(movie.showId);
-                  // Cache the rating
-                  ratingsCache.current[movie.showId] = { averageRating, reviewCount };
-                  return { movie, averageRating, reviewCount };
-                } catch (error) {
-                  return { movie, averageRating: 0, reviewCount: 0 };
-                }
-              })
-            );
-            movieRatings.push(...batchRatings);
-          }
+          // Fetch all ratings in batches
+          const movieIds = allMovies.map(movie => movie.showId);
+          const ratings = await fetchRatingsInBatches(movieIds);
+          
+          // Update the cache
+          ratingsCache.current = { ...ratingsCache.current, ...ratings };
 
           // Calculate global average rating
-          const globalAverageRating = movieRatings.reduce((sum, { averageRating }) => sum + averageRating, 0) / movieRatings.length;
+          const globalAverageRating = Object.values(ratings).reduce(
+            (sum, { averageRating }) => sum + averageRating, 
+            0
+          ) / Object.keys(ratings).length;
 
           // Calculate weighted ratings for all movies
-          const moviesWithRatings = movieRatings.map(({ movie, averageRating, reviewCount }) => {
+          const moviesWithRatings = allMovies.map(movie => {
+            const { averageRating, reviewCount } = ratings[movie.showId] || { averageRating: 0, reviewCount: 0 };
             const weightedRating = calculateWeightedRating(averageRating, reviewCount, globalAverageRating);
             return { movie, weightedRating };
           });
@@ -117,11 +112,10 @@ function HomePage() {
           });
 
           // Categorize each movie into appropriate genres and calculate weighted ratings
-          movieRatings.forEach(({ movie, averageRating, reviewCount }) => {
+          moviesWithRatings.forEach(({ movie, weightedRating }) => {
             MAIN_GENRES.forEach(displayGenre => {
               const dbField = GENRE_MAPPING[displayGenre];
               if (dbField && movie[dbField as keyof Movie] === 1) {
-                const weightedRating = calculateWeightedRating(averageRating, reviewCount, globalAverageRating);
                 genreMovies[displayGenre].push({ movie, weightedRating });
               }
             });
@@ -162,25 +156,14 @@ function HomePage() {
       // Fetch the first page of movies A-Z
       const response = await fetchMoviesAZ(100, 1);
       if (response && Array.isArray(response.movies)) {
-        // Pre-fetch ratings for the first batch of A-Z movies
-        const moviesWithRatings = await Promise.all(
-          response.movies.map(async (movie) => {
-            // Check cache first
-            if (ratingsCache.current[movie.showId]) {
-              return movie;
-            }
+        // Fetch ratings for the batch in parallel
+        const movieIds = response.movies.map(movie => movie.showId);
+        const ratings = await fetchRatingsInBatches(movieIds);
+        
+        // Update the cache
+        ratingsCache.current = { ...ratingsCache.current, ...ratings };
 
-            try {
-              const { averageRating, reviewCount } = await getAverageRating(movie.showId);
-              ratingsCache.current[movie.showId] = { averageRating, reviewCount };
-            } catch (error) {
-              console.error('Error fetching rating for movie:', movie.showId, error);
-            }
-            return movie;
-          })
-        );
-
-        setAllMoviesAZ(moviesWithRatings);
+        setAllMoviesAZ(response.movies);
         setCurrentPage(1);
       } else {
         console.warn('Unexpected data format:', response);
@@ -209,20 +192,12 @@ function HomePage() {
         const newMovies = response.movies;
   
         if (newMovies.length > 0) {
-          // Pre-fetch ratings for new movies in the background
-          Promise.all(
-            newMovies.map(async (movie) => {
-              if (!ratingsCache.current[movie.showId]) {
-                try {
-                  const { averageRating, reviewCount } = await getAverageRating(movie.showId);
-                  ratingsCache.current[movie.showId] = { averageRating, reviewCount };
-                } catch (error) {
-                  console.error('Error fetching rating for movie:', movie.showId, error);
-                }
-              }
-              return movie;
-            })
-          );
+          // Fetch ratings for the new batch in parallel
+          const movieIds = newMovies.map(movie => movie.showId);
+          const ratings = await fetchRatingsInBatches(movieIds);
+          
+          // Update the cache
+          ratingsCache.current = { ...ratingsCache.current, ...ratings };
 
           setAllMoviesAZ((prevMovies) => [...prevMovies, ...newMovies]);
           setCurrentPage(nextPage);
