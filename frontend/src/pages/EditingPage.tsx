@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { MovieUser } from '../types/MovieUser';
 import { fetchMovieUserById, updateMovieUser } from '../api/MovieUserAPI';
 import { useAuth } from '../contexts/AuthContext';
@@ -8,7 +8,6 @@ import '../style/account.css';
 const EditingPage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [movieUser, setMovieUser] = useState<MovieUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<MovieUser | null>(null);
@@ -23,7 +22,6 @@ const EditingPage: React.FC = () => {
 
       try {
         const userData = await fetchMovieUserById(user.userId);
-        setMovieUser(userData);
         setFormData(userData);
         setError(null);
       } catch (err) {
@@ -46,19 +44,6 @@ const EditingPage: React.FC = () => {
       return {
         ...prev,
         [name]: type === 'number' ? Number(value) : value
-      };
-    });
-  };
-
-  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!formData) return;
-
-    const { name, checked } = e.target;
-    setFormData(prev => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        [name]: checked ? 1 : 0
       };
     });
   };
