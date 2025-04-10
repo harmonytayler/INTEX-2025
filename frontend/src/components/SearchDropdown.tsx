@@ -26,14 +26,14 @@ const SearchDropdown: React.FC<SearchDropdownProps> = ({ results, onClose }) => 
   return (
     <div style={{
       position: 'absolute',
-      width: '120%',
-      minWidth: '400px',
-      left: '-10%',
+      top: '100%',
+      width: '100%',
       backgroundColor: 'rgba(17, 24, 39, 0.95)',
       border: '1px solid rgba(55, 65, 81, 1)',
       borderRadius: '0 0 0.5rem 0.5rem',
       boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-      zIndex: 1001
+      zIndex: 1001,
+      marginTop: '0.25rem'
     }}>
       <div style={{
         height: `${height}px`,
@@ -73,7 +73,7 @@ const SearchDropdown: React.FC<SearchDropdownProps> = ({ results, onClose }) => 
                 className="rounded"
               />
             </div>
-            <div style={{ marginLeft: '1rem', flex: 1, minWidth: 0 }}>
+            <div style={{ marginLeft: '1rem', flex: 1 }}>
               <div style={{
                 color: 'white',
                 fontSize: '1rem',
