@@ -140,7 +140,8 @@ function Header() {
           </Link>
           <Link to="/home" className="site-title">CineNiche</Link>
         </div>
-        
+
+        <div className="menu-container" ref={menuRef}>
         <div className="search-container" ref={searchContainerRef}>
           <form onSubmit={handleSubmit} className="search-form">
             <input
@@ -179,8 +180,7 @@ function Header() {
             />
           )}
         </div>
-
-        <div className="menu-container" ref={menuRef}>
+        
           <button className="hamburger-button" onClick={toggleMenu}>
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
