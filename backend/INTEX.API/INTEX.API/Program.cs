@@ -56,8 +56,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("ConnectFrontend", policy =>
     {
         policy.WithOrigins(
-                "http://localhost:3000",
-                "https://kind-ground-08eb7501e.6.azurestaticapps.net", "http://localhost:5000", "http://localhost:5001", "https://localhost:5001", "https://intex-2025.azurewebsites.net")
+                "http://localhost:3000", "http://localhost:5000", "http://localhost:5001", "https://localhost:5001", "https://intex-2025.azurewebsites.net")
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials();
@@ -73,11 +72,16 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+        options.RoutePrefix = "swagger";
+    });
 }
 
 app.UseCors("ConnectFrontend");
-app.UseHttpsRedirection();
+// Remove HTTPS redirection for local development
+// app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
@@ -149,5 +153,7 @@ app.MapGet("/pingauth", (ClaimsPrincipal user) =>
     return Results.Json(new { email });
 }).RequireAuthorization();
 
-// Explicitly set the port to avoid conflicts
-app.Run("https://localhost:5001");
+// Explicitly set the ports to avoid conflicts
+app.Urls.Add("http://localhost:5000");
+app.Urls.Add("https://localhost:5001");
+app.Run();

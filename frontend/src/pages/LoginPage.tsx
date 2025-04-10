@@ -6,7 +6,7 @@ import '../style/header.css';
 import '../style/LandingPage.css';
 import { useAuth } from '../contexts/AuthContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGoogle, faFacebook } from '@fortawesome/free-brands-svg-icons';
+import { faGoogle } from '@fortawesome/free-brands-svg-icons';
 
 const LoginPage: React.FC = () => {
   // state variables for email and passwords
@@ -29,10 +29,6 @@ const LoginPage: React.FC = () => {
     } else if (name === 'password') {
       setPassword(value);
     }
-  };
-
-  const handleRegisterClick = () => {
-    navigate('/register');
   };
 
   // handle submit event for the form

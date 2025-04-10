@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import SearchBar from './SearchBar';
 import '../style/header.css';
 import { fetchMovies } from '../api/MovieAPI';
 import { Movie } from '../types/Movie';
@@ -143,39 +142,42 @@ function Header() {
         </div>
         
         <div className="search-container" ref={searchContainerRef}>
-          <form onSubmit={handleSubmit} className="relative">
-            <div className="relative flex-1 max-w-2xl">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={handleInputChange}
-                onFocus={() => setIsFocused(true)}
-                onBlur={() => {
-                  // Add a small delay to allow clicking on search results
-                  setTimeout(() => setIsFocused(false), 200);
-                }}
-                placeholder="Search for movies..."
-                className="search-input border-2 border-gray-700 rounded-full focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 transition-all duration-200"
-              />
-              {isFocused && searchResults.length > 0 && (
-                <SearchDropdown results={searchResults} onClose={() => setIsFocused(false)} />
-              )}
-            </div>
+          <form onSubmit={handleSubmit} className="search-form">
+            <input
+              type="text"
+              placeholder="Search movies..."
+              value={searchQuery}
+              onChange={handleInputChange}
+              onFocus={() => {
+                setIsFocused(true);
+                if (searchQuery.trim() !== '') {
+                  setShowDropdown(true);
+                }
+              }}
+              onBlur={() => {
+                setIsFocused(false);
+                // Don't hide dropdown immediately to allow clicking on results
+                setTimeout(() => {
+                  if (!isFocused) {
+                    setShowDropdown(false);
+                  }
+                }, 200);
+              }}
+              className="search-input"
+            />
             <button type="submit" className="search-button">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                  clipRule="evenodd"
-                />
-              </svg>
+              <i className="fas fa-search"></i>
             </button>
           </form>
+          {showDropdown && searchResults.length > 0 && (
+            <SearchDropdown
+              results={searchResults}
+              onClose={() => {
+                setShowDropdown(false);
+                setSearchQuery('');
+              }}
+            />
+          )}
         </div>
 
         <div className="menu-container" ref={menuRef}>

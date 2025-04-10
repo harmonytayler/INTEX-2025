@@ -115,7 +115,7 @@ const AdminPage: React.FC = () => {
               movie.description.toLowerCase().includes(searchLower))
         );
       }
-
+      
       // Sort movies based on the current sort field and order
       allMovies.sort((a, b) => {
         let compareA = a[sortField as keyof Movie];

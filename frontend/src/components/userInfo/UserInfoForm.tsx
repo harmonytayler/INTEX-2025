@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { MovieUser } from '../../types/MovieUser';
-import { addMovieUser } from '../../api/MovieUserAPI';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import '../../style/header.css';
@@ -52,6 +51,7 @@ const NewUserForm = () => {
   }, [isAuthenticated]);
 
   const [formData, setFormData] = useState<MovieUser>({
+    userId: userId || 0,
     name: '',
     phone: '',
     email: email || '',
