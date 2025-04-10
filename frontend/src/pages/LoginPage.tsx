@@ -1,16 +1,19 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import '../style/identity.css';
 import '@fortawesome/fontawesome-free/css/all.css';
+import '../style/header.css';
+import '../style/LandingPage.css';
 import { useAuth } from '../contexts/AuthContext';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faGoogle, faFacebook } from '@fortawesome/free-brands-svg-icons';
 
-
-function LoginPage() {
+const LoginPage: React.FC = () => {
   // state variables for email and passwords
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const [rememberme, setRememberme] = useState<boolean>(false);
-  const { setUser, setLoading } = useAuth();
+  const [rememberMe, setRememberMe] = useState<boolean>(false);
+  const { setUser } = useAuth();
 
   // state variable for error messages
   const [error, setError] = useState<string>('');
@@ -20,13 +23,14 @@ function LoginPage() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, type, checked, value } = e.target;
     if (type === 'checkbox') {
-      setRememberme(checked);
+      setRememberMe(checked);
     } else if (name === 'email') {
       setEmail(value);
     } else if (name === 'password') {
       setPassword(value);
     }
   };
+
   const handleRegisterClick = () => {
     navigate('/register');
   };
@@ -35,156 +39,141 @@ function LoginPage() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(''); // Clear any previous errors
-    setLoading(true);
 
     if (!email || !password) {
       setError('Please fill in all fields.');
-      setLoading(false);
       return;
     }
 
     const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://localhost:5001';
-    const loginUrl = rememberme
+    const loginUrl = rememberMe
       ? `${baseUrl}/login?useCookies=true`
       : `${baseUrl}/login?useSessionCookies=true`;
 
     try {
       const response = await fetch(loginUrl, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
         credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
       });
+
+      // Ensure we only parse JSON if there is content
+      let data = null;
+      const contentLength = response.headers.get('content-length');
+      if (contentLength && parseInt(contentLength, 10) > 0) {
+        data = await response.json();
+      }
 
       if (!response.ok) {
-        throw new Error('Login failed');
+        throw new Error(data?.message || 'Invalid email or password.');
       }
 
-      // Get the JWT token from the response
-      const token = response.headers.get('Authorization')?.replace('Bearer ', '');
-      if (token) {
-        localStorage.setItem('token', token);
-      }
-
-      // Fetch user info including roles
-      const userInfoResponse = await fetch(`${baseUrl}/userinfo`, {
+      // Fetch user data to get the user ID
+      const userResponse = await fetch(`${baseUrl}/MovieUser/GetUserByEmail?email=${encodeURIComponent(email)}`, {
         credentials: 'include',
+        headers: { 'Content-Type': 'application/json' }
       });
 
-      if (!userInfoResponse.ok) {
-        throw new Error('Failed to fetch user info');
+      if (!userResponse.ok) {
+        throw new Error('Failed to fetch user data');
       }
 
-      const userInfo = await userInfoResponse.json();
-      console.log('User info from server:', userInfo);
+      const userData = await userResponse.json();
       
-      // Set user with roles
-      const userData = {
-        email: userInfo.email,
-        userId: userInfo.userId,
-        roles: userInfo.roles || []
-      };
-      console.log('Setting user data:', userData);
-      setUser(userData);
-
+      // Set the user data in the AuthContext with both email and userId
+      setUser({ 
+        email,
+        userId: userData.userId
+      });
+      
       navigate('/home');
-    } catch (error) {
-      setError('Invalid email or password');
-    } finally {
-      setLoading(false);
+    } catch (error: any) {
+      setError(error.message || 'Error logging in.');
+      console.error('Fetch attempt failed:', error);
     }
   };
 
   return (
-    <div className="container">
-      <div className="row">
-        <div className="card border-0 shadow rounded-3 ">
-          <div className="card-body p-4 p-sm-5">
-            <h5 className="card-title text-center mb-5 fw-light fs-5">
-              Sign In
-            </h5>
-            <form onSubmit={handleSubmit}>
-              <div className="form-floating mb-3">
-                <input
-                  className="form-control"
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={email}
-                  onChange={handleChange}
-                />
-                <label htmlFor="email">Email address</label>
-              </div>
-              <div className="form-floating mb-3">
-                <input
-                  className="form-control"
-                  type="password"
-                  id="password"
-                  name="password"
-                  value={password}
-                  onChange={handleChange}
-                />
-                <label htmlFor="password">Password</label>
-              </div>
-
-              <div className="form-check mb-3">
-                <input
-                  className="form-check-input"
-                  type="checkbox"
-                  value=""
-                  id="rememberme"
-                  name="rememberme"
-                  checked={rememberme}
-                  onChange={handleChange}
-                />
-                <label className="form-check-label" htmlFor="rememberme">
-                  Remember password
-                </label>
-              </div>
-              <div className="d-grid mb-2">
-                <button
-                  className="btn btn-primary btn-login text-uppercase fw-bold"
-                  type="submit"
-                >
-                  Sign in
-                </button>
-              </div>
-              <div className="d-grid mb-2">
-                <button
-                  className="btn btn-primary btn-login text-uppercase fw-bold"
-                  onClick={handleRegisterClick}
-                >
-                  Register
-                </button>
-              </div>
-              <hr className="my-4" />
-              <div className="d-grid mb-2">
-                <button
-                  className="btn btn-google btn-login text-uppercase fw-bold"
-                  type="button"
-                >
-                  <i className="fa-brands fa-google me-2"></i> Sign in with
-                  Google
-                </button>
-              </div>
-              <div className="d-grid mb-2">
-                <button
-                  className="btn btn-facebook btn-login text-uppercase fw-bold"
-                  type="button"
-                >
-                  <i className="fa-brands fa-facebook-f me-2"></i> Sign in with
-                  Facebook
-                </button>
-              </div>
-            </form>
-            {error && <p className="error">{error}</p>}
+    <>
+      {/* HEADER */}
+      <header>
+        <div className="container">
+          <div className="logo-container">
+            <Link to="/" className="logo">
+              <img src="/CineNiche_Logo.png" alt="CineNiche Logo" className="logo-image" />
+            </Link>
+            <Link to="/" className="site-title">CineNiche</Link>
           </div>
         </div>
+      </header>
+
+    <div className="login-container">
+      <h1 className="login-title">Sign In</h1>
+      <form className="login-form" onSubmit={handleSubmit}>
+        <div className="form">
+          <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="Email"
+            value={email}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        
+        <div className="form">
+          <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Password"
+            value={password}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <div className="form-check">
+          <input
+            type="checkbox"
+            id="rememberMe"
+            className="form-check-input"
+            checked={rememberMe}
+            onChange={handleChange}
+          />
+          <label htmlFor="rememberMe" className="form-check-label">
+            Remember me
+          </label>
+        </div>
+
+        <button type="submit" className="btn-login btn-primary">
+          Sign In
+        </button>
+
+        <div className="login-divider">OR</div>
+
+        <button type="button" className="btn-login btn-google">
+          <FontAwesomeIcon icon={faGoogle} className="me-2" />
+          Continue with Google
+        </button>
+
+        {error && <div className="error">{error}</div>}
+      </form>
+
+      <div className="login-footer">
+        Don't have an account?{' '}
+        <a href="/register" onClick={(e) => {
+          e.preventDefault();
+          navigate('/register');
+        }}>
+          Sign up
+        </a>
       </div>
     </div>
+    </>
   );
-}
+};
 
 export default LoginPage;
