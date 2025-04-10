@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Movie } from '../types/Movie';
-import { fetchMovies, fetchMoviesAZ, getAverageRating } from '../api/MovieAPI';
+import { fetchMovies, fetchMoviesAZ, getAverageRatingsBatch } from '../api/MovieAPI';
 import MovieRow from '../components/MovieRow';
 import AuthorizeView from '../components/security/AuthorizeView';
 import MovieCard from '../components/MovieCard';
@@ -62,80 +62,65 @@ function HomePage() {
         if (response && Array.isArray(response.movies)) {
           const allMovies = response.movies;
 
-          // Get all movies' ratings in parallel with a batch size
-          const BATCH_SIZE = 10;
-          const movieRatings = [];
-          
-          for (let i = 0; i < allMovies.length; i += BATCH_SIZE) {
-            const batch = allMovies.slice(i, i + BATCH_SIZE);
-            const batchRatings = await Promise.all(
-              batch.map(async (movie) => {
-                // Check cache first
-                if (ratingsCache.current[movie.showId]) {
-                  return {
-                    movie,
-                    ...ratingsCache.current[movie.showId]
-                  };
-                }
-
-                try {
-                  const { averageRating, reviewCount } = await getAverageRating(movie.showId);
-                  // Cache the rating
-                  ratingsCache.current[movie.showId] = { averageRating, reviewCount };
-                  return { movie, averageRating, reviewCount };
-                } catch (error) {
-                  return { movie, averageRating: 0, reviewCount: 0 };
-                }
-              })
-            );
-            movieRatings.push(...batchRatings);
-          }
-
-          // Calculate global average rating
-          const globalAverageRating = movieRatings.reduce((sum, { averageRating }) => sum + averageRating, 0) / movieRatings.length;
-
-          // Calculate weighted ratings for all movies
-          const moviesWithRatings = movieRatings.map(({ movie, averageRating, reviewCount }) => {
-            const weightedRating = calculateWeightedRating(averageRating, reviewCount, globalAverageRating);
-            return { movie, weightedRating };
-          });
-
-          // Sort all movies by weighted rating to get top 10
-          const sortedAllMovies = moviesWithRatings
-            .sort((a, b) => b.weightedRating - a.weightedRating)
-            .slice(0, 10)
-            .map(item => item.movie);
-          
-          setTopMovies(sortedAllMovies);
-
-          // Categorize movies by genre and calculate weighted ratings
+          // Initialize genre movies object
           const genreMovies: { [key: string]: { movie: Movie; weightedRating: number }[] } = {};
-
-          // Initialize empty arrays for each genre
           MAIN_GENRES.forEach(genre => {
             genreMovies[genre] = [];
           });
 
-          // Categorize each movie into appropriate genres and calculate weighted ratings
-          movieRatings.forEach(({ movie, averageRating, reviewCount }) => {
-            MAIN_GENRES.forEach(displayGenre => {
-              const dbField = GENRE_MAPPING[displayGenre];
-              if (dbField && movie[dbField as keyof Movie] === 1) {
-                const weightedRating = calculateWeightedRating(averageRating, reviewCount, globalAverageRating);
-                genreMovies[displayGenre].push({ movie, weightedRating });
-              }
+          // Get all showIds for batch rating request
+          const showIds = allMovies.map(movie => movie.showId);
+          
+          // Fetch all ratings in one batch request
+          const ratings = await getAverageRatingsBatch(showIds);
+          
+          // Process movies in batches to avoid overwhelming the browser
+          const BATCH_SIZE = 20;
+          for (let i = 0; i < allMovies.length; i += BATCH_SIZE) {
+            const batch = allMovies.slice(i, i + BATCH_SIZE);
+            
+            // Process each movie in the batch
+            const processedBatch = batch.map(movie => {
+              const { averageRating = 0, reviewCount = 0 } = ratings[movie.showId] || {};
+              return { movie, averageRating, reviewCount };
             });
-          });
 
-          // Sort movies within each genre by weighted rating
+            // Calculate global average rating for this batch
+            const batchAverageRating = processedBatch.reduce((sum, { averageRating }) => sum + averageRating, 0) / processedBatch.length;
+
+            // Process each movie in the batch
+            processedBatch.forEach(({ movie, averageRating, reviewCount }) => {
+              const weightedRating = calculateWeightedRating(averageRating, reviewCount, batchAverageRating);
+              
+              // Categorize movie into appropriate genres
+              MAIN_GENRES.forEach(displayGenre => {
+                const dbField = GENRE_MAPPING[displayGenre];
+                if (dbField && movie[dbField as keyof Movie] === 1) {
+                  genreMovies[displayGenre].push({ movie, weightedRating });
+                }
+              });
+            });
+          }
+
+          // Sort movies within each genre by weighted rating and take top 10
           const sortedMoviesByGenre: { [key: string]: Movie[] } = {};
           MAIN_GENRES.forEach(genre => {
             sortedMoviesByGenre[genre] = genreMovies[genre]
               .sort((a, b) => b.weightedRating - a.weightedRating)
+              .slice(0, 10)
               .map(item => item.movie);
           });
 
           setMoviesByGenre(sortedMoviesByGenre);
+
+          // Get top 10 movies across all genres
+          const allMoviesWithRatings = Object.values(genreMovies).flat();
+          const topMovies = allMoviesWithRatings
+            .sort((a, b) => b.weightedRating - a.weightedRating)
+            .slice(0, 10)
+            .map(item => item.movie);
+          
+          setTopMovies(topMovies);
         } else {
           console.warn('Unexpected data format:', response);
           setMoviesByGenre({});
@@ -162,25 +147,17 @@ function HomePage() {
       // Fetch the first page of movies A-Z
       const response = await fetchMoviesAZ(100, 1);
       if (response && Array.isArray(response.movies)) {
-        // Pre-fetch ratings for the first batch of A-Z movies
-        const moviesWithRatings = await Promise.all(
-          response.movies.map(async (movie) => {
-            // Check cache first
-            if (ratingsCache.current[movie.showId]) {
-              return movie;
-            }
+        const showIds = response.movies.map(movie => movie.showId);
+        
+        // Fetch all ratings in one batch request
+        const ratings = await getAverageRatingsBatch(showIds);
+        
+        // Cache the ratings
+        Object.entries(ratings).forEach(([showId, rating]) => {
+          ratingsCache.current[showId] = rating;
+        });
 
-            try {
-              const { averageRating, reviewCount } = await getAverageRating(movie.showId);
-              ratingsCache.current[movie.showId] = { averageRating, reviewCount };
-            } catch (error) {
-              console.error('Error fetching rating for movie:', movie.showId, error);
-            }
-            return movie;
-          })
-        );
-
-        setAllMoviesAZ(moviesWithRatings);
+        setAllMoviesAZ(response.movies);
         setCurrentPage(1);
       } else {
         console.warn('Unexpected data format:', response);
@@ -209,20 +186,15 @@ function HomePage() {
         const newMovies = response.movies;
   
         if (newMovies.length > 0) {
-          // Pre-fetch ratings for new movies in the background
-          Promise.all(
-            newMovies.map(async (movie) => {
-              if (!ratingsCache.current[movie.showId]) {
-                try {
-                  const { averageRating, reviewCount } = await getAverageRating(movie.showId);
-                  ratingsCache.current[movie.showId] = { averageRating, reviewCount };
-                } catch (error) {
-                  console.error('Error fetching rating for movie:', movie.showId, error);
-                }
-              }
-              return movie;
-            })
-          );
+          const showIds = newMovies.map(movie => movie.showId);
+          
+          // Fetch all ratings in one batch request
+          const ratings = await getAverageRatingsBatch(showIds);
+          
+          // Cache the ratings
+          Object.entries(ratings).forEach(([showId, rating]) => {
+            ratingsCache.current[showId] = rating;
+          });
 
           setAllMoviesAZ((prevMovies) => [...prevMovies, ...newMovies]);
           setCurrentPage(nextPage);
