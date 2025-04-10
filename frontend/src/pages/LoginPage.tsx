@@ -166,15 +166,6 @@ function LoginPage() {
                   Register
                 </button>
 
-                <div className="login-divider">OR</div>
-
-                <div className="d-grid mb-2">
-                  <button
-                    className="btn-login btn-google">
-                    <FontAwesomeIcon icon={faGoogle} className="me-2" />
-                    Continue with Google
-                  </button>
-                </div>
             </form>
             {error && <p className="error">{error}</p>}
 
