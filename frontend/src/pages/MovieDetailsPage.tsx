@@ -9,6 +9,8 @@ import ContentBasedRecommendations from '../components/movieview/ContentBasedRec
 import CollaborativeRecommendations from '../components/movieview/CollaborativeRecommendations';
 import '../style/MovieDetails.css';
 import '../style/account.css';
+import { FaArrowLeft } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 
 const MovieDetailsPage: React.FC = () => {
   const { movieId } = useParams<{ movieId: string }>();
@@ -20,7 +22,7 @@ const MovieDetailsPage: React.FC = () => {
   const [userId, setUserId] = useState<number | null>(null);
   const [averageRating, setAverageRating] = useState<number>(0);
   const [reviewCount, setReviewCount] = useState<number>(0);
-
+  const navigate = useNavigate();
   useEffect(() => {
     const loadMovieDetails = async () => {
       try {
@@ -177,107 +179,118 @@ const MovieDetailsPage: React.FC = () => {
       setReviewCount(reviewCount);
     } catch (error) {
       setError('Failed to submit rating. Please try again.');
-    } 
+    }
   };
 
   return (
     <AuthorizeView>
       <div>
+        <div className="back-button-container">
+          <button className="back-button" onClick={() => navigate(-1)}>
+            <FaArrowLeft className="back-icon" />
+          </button>
+        </div>
         {/* Main content */}
-          {loading && (
-            <div className="text-center py-8">Loading movie details...</div>
-          )}
+        {loading && (
+          <div className="text-center py-8">Loading movie details...</div>
+        )}
 
-          {error && (
-            <div className="text-red-500 text-center py-8">Error: {error}</div>
-          )}
+        {error && (
+          <div className="text-red-500 text-center py-8">Error: {error}</div>
+        )}
 
-          {!loading && !error && movie && (
-            <div className="movie-details-container">
-              <div className="movie-details-content">
-                {/* Poster Section */}
-                <div className="movie-poster-section">
-                  <img
-                    src={
-                      movie.posterUrl ||
-                      'https://via.placeholder.com/300x450?text=No+Poster'
-                    }
-                    alt={`${movie.title} poster`}
-                    className="movie-poster"
-                  />
-                </div>
+        {!loading && !error && movie && (
+          <div className="movie-details-container">
+            <div className="movie-details-content">
+              {/* Poster Section */}
+              <div className="movie-poster-section">
+                <img
+                  src={
+                    movie.posterUrl ||
+                    'https://via.placeholder.com/300x450?text=No+Poster'
+                  }
+                  alt={`${movie.title} poster`}
+                  className="movie-poster"
+                />
+              </div>
 
-                {/* Details Section */}
-                <div className="movie-details-section">
-                  <h1 className="selected-movie-title">{movie.title}</h1>
+              {/* Details Section */}
+              <div className="movie-details-section">
+                <h1 className="selected-movie-title">{movie.title}</h1>
 
-                  {movie.description && (
-                    <div className="mt-6">
-                      <p className="detail-description">
-                        {movie.description}
+                {movie.description && (
+                  <div className="mt-6">
+                    <p className="detail-description">{movie.description}</p>
+                  </div>
+                )}
+
+                <p className="detail-item">
+                  {movie.releaseYear} | {movie.duration} | {movie.rating} |{' '}
+                  {getGenres()}
+                </p>
+
+                <div className="movie-details-grid">
+                  {movie.director && (
+                    <div>
+                      <h3 className="detail-label">Directed by</h3>
+                      <p className="detail-item">
+                        {movie.director.split(' ').map((word, index, array) => (
+                          <span key={index}>
+                            {word}
+                            {index % 2 === 1 && index < array.length - 1
+                              ? ', '
+                              : ' '}
+                          </span>
+                        ))}
                       </p>
                     </div>
                   )}
 
-                  <p className="detail-item">
-                    {movie.releaseYear} | {movie.duration} | {movie.rating} | {getGenres()}
-                  </p>
-                  
-                  <div className="movie-details-grid">
-                    {movie.director && (
-                      <div>
-                        <h3 className="detail-label">Directed by</h3>
-                        <p className="detail-item">
-                          {movie.director.split(' ').map((word, index, array) => (
-                            <span key={index}>
-                              {word}
-                              {index % 2 === 1 && index < array.length - 1 ? ', ' : ' '}
-                            </span>
-                          ))}
-                        </p>
-                      </div>
-                    )}
-                  
                   {movie.cast && (
-                      <div>
-                        <h3 className="detail-label">Starring</h3>
-                        <p className="detail-item">
-                          {movie.cast.split(' ').slice(0, 6).map((word, index, array) => (
+                    <div>
+                      <h3 className="detail-label">Starring</h3>
+                      <p className="detail-item">
+                        {movie.cast
+                          .split(' ')
+                          .slice(0, 6)
+                          .map((word, index, array) => (
                             <span key={index}>
                               {word}
-                              {index % 2 === 1 && index < array.length - 1 ? ', ' : ' '}
+                              {index % 2 === 1 && index < array.length - 1
+                                ? ', '
+                                : ' '}
                             </span>
                           ))}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                  <div className="divider-line"></div>
-                  <h3 className="rating-label">Rate {movie.title}</h3>
-                  <div className="movie-rating-container">
-                    <StarRating
-                      rating={userRating}
-                      onRatingChange={handleRatingChange}
-                    />
-                    <div className="detail-item">
-                      Average Rating: {averageRating.toFixed(1)} out of 5 ({reviewCount}{' '}
-                      {reviewCount === 1 ? 'review' : 'reviews'})
+                      </p>
                     </div>
+                  )}
+                </div>
+                <div className="divider-line"></div>
+                <h3 className="rating-label">Rate {movie.title}</h3>
+                <div className="movie-rating-container">
+                  <StarRating
+                    rating={userRating}
+                    onRatingChange={handleRatingChange}
+                  />
+                  <div className="detail-item">
+                    Average Rating: {averageRating.toFixed(1)} out of 5 (
+                    {reviewCount} {reviewCount === 1 ? 'review' : 'reviews'})
                   </div>
                 </div>
               </div>
-              {/* Recommendations Section */}
-              <div className="recommendations-section">
-                <ContentBasedRecommendations showId={movie.showId} />
-              </div>
-
-              <div className="recommendations-section">
-                <CollaborativeRecommendations showId={movie.showId} />
-              </div>
             </div>
-          )}
-        </div>
-        <footer className="details-footer">
+            {/* Recommendations Section */}
+            <div className="recommendations-section">
+              <ContentBasedRecommendations showId={movie.showId} />
+            </div>
+
+            <div className="recommendations-section">
+              <CollaborativeRecommendations showId={movie.showId} />
+            </div>
+          </div>
+        )}
+      </div>
+      <footer className="details-footer">
         <div className="footer-content">
           <p className="footer-copyright">
             © {new Date().getFullYear()} CineNiche. All rights reserved.

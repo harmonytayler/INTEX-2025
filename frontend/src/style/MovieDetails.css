@@ -1,8 +1,16 @@
 .movie-details-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 2rem;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem;
-  color: #FFFCF3;
+  background-color: #141414;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  color: #fffcf3;
+  position: relative;
+  margin-top: 0;
 }
 
 .movie-details-content {
@@ -39,7 +47,7 @@
   font-size: 2.5rem;
   font-weight: 700;
   margin: 0 0 1.5rem 0;
-  color: #FFFCF3;
+  color: #fffcf3;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
   text-align: left;
 }
@@ -54,7 +62,7 @@
 
 .rating-label {
   font-size: 1.1rem;
-  color: #FFFCF3;
+  color: #fffcf3;
   margin-bottom: 0.5rem;
   text-align: left;
 }
@@ -119,7 +127,7 @@
 
 .detail-label {
   font-size: 0.9rem;
-  color: #FFFCF3;
+  color: #fffcf3;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 0.5rem;
@@ -127,14 +135,14 @@
 }
 
 .detail-item {
-  color: #FFFCF3;
-  opacity: 0.7; 
+  color: #fffcf3;
+  opacity: 0.7;
   line-height: 1.4;
   text-align: left;
 }
 
 .detail-description {
-  color: #FFFCF3;
+  color: #fffcf3;
   font-size: 1.5rem;
   line-height: 1.5;
   text-align: left;
@@ -151,6 +159,42 @@
   background-color: rgba(255, 255, 255, 0.2);
   margin: 2rem 0;
   width: 100%;
+}
+
+/* Back Button Styles */
+.back-button-container {
+  position: absolute;
+  top: 100px;
+  left: 20px;
+  z-index: 100;
+}
+
+.back-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #193231;
+  color: #fffcf3;
+  border: none;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.back-button:hover {
+  background-color: #2a4a4a;
+  transform: scale(1.05);
+}
+
+.back-icon {
+  font-size: 20px;
+  margin: 0;
 }
 
 @media (max-width: 768px) {
@@ -172,4 +216,11 @@
   .movie-details-grid {
     grid-template-columns: 1fr;
   }
+}
+
+.movie-page-container {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  padding-top: 80px;
 }
