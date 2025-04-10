@@ -67,90 +67,25 @@ const AdminPage: React.FC = () => {
 
   useEffect(() => {
     fetchAllMovies();
-  }, [
-    currentPage,
-    searchTerm,
-    sortField,
-    sortOrder,
-    selectedGenres,
-    itemsPerPage,
-  ]);
+  }, [currentPage, itemsPerPage, selectedGenres, searchTerm]);
 
   const fetchAllMovies = async () => {
     try {
       setLoading(true);
-      // Fetch all movies with a large page size to get the complete dataset
+      // Use pagination with a reasonable page size
       const response = await fetchMovies(
-        10000, // Fetch all movies (increased from 1000 to accommodate all ~5000+ movies)
-        1, // Start from page 1
-        [], // No genre filter initially
-        '' // No search term initially
+        itemsPerPage,
+        currentPage,
+        selectedGenres,
+        searchTerm
       );
 
-      let allMovies = [...response.movies];
-
-      // Apply genre filter if selected
-      if (selectedGenres.length > 0) {
-        allMovies = allMovies.filter((movie) =>
-          selectedGenres.some(
-            (genre) => movie[genre.toLowerCase() as keyof Movie] === 1
-          )
-        );
-      }
-
-      // Apply search filter if there's a search term
-      if (searchTerm) {
-        const searchLower = searchTerm.toLowerCase();
-        allMovies = allMovies.filter(
-          (movie) =>
-            movie.title.toLowerCase().includes(searchLower) ||
-            (movie.director &&
-              movie.director.toLowerCase().includes(searchLower)) ||
-            (movie.cast &&
-              Array.isArray(movie.cast) &&
-              movie.cast.some((actor: string) =>
-                actor.toLowerCase().includes(searchLower)
-              )) ||
-            (movie.description &&
-              movie.description.toLowerCase().includes(searchLower))
-        );
-      }
-      
-      // Sort movies based on the current sort field and order
-      allMovies.sort((a, b) => {
-        let compareA = a[sortField as keyof Movie];
-        let compareB = b[sortField as keyof Movie];
-
-        // Handle null/undefined values
-        if (compareA === null || compareA === undefined) compareA = '';
-        if (compareB === null || compareB === undefined) compareB = '';
-
-        // Convert to strings for comparison
-        const strA = String(compareA).toLowerCase();
-        const strB = String(compareB).toLowerCase();
-
-        if (sortOrder === 'asc') {
-          return strA.localeCompare(strB);
-        } else {
-          return strB.localeCompare(strA);
-        }
-      });
-
-      // Update total results based on filtered dataset
-      setTotalResults(allMovies.length);
-
-      // Apply pagination to the filtered and sorted dataset
-      const startIndex = (currentPage - 1) * itemsPerPage;
-      const endIndex = startIndex + itemsPerPage;
-      const paginatedMovies = allMovies.slice(startIndex, endIndex);
-
-      // Update state with paginated results
-      setMovies(paginatedMovies);
-      setTotalPages(Math.ceil(allMovies.length / itemsPerPage));
-      setError(null);
-    } catch (err) {
-      setError('Failed to fetch movies. Please try again later.');
-      console.error('Error fetching movies:', err);
+      setMovies(response.movies);
+      setTotalPages(Math.ceil(response.total / itemsPerPage));
+      setTotalResults(response.total);
+    } catch (error) {
+      console.error('Error fetching movies:', error);
+      setError('Failed to load movies');
     } finally {
       setLoading(false);
     }

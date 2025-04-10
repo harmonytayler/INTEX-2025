@@ -41,7 +41,13 @@ export const fetchMovies = async (
     const data = await response.json();
     const movies: Movie[] = Array.isArray(data.movies) ? data.movies : data;
 
-    // Fetch poster URLs and average ratings in parallel
+    // Get all showIds for batch rating request
+    const showIds = movies.map(movie => movie.showId);
+    
+    // Fetch all ratings in one batch request
+    const ratings = await getAverageRatingsBatch(showIds);
+
+    // Fetch poster URLs and enrich movies with ratings in parallel
     const enrichedMovies = await Promise.all(
       movies.map(async (movie) => {
         try {
@@ -56,19 +62,9 @@ export const fetchMovies = async (
             movie.posterUrl = await posterRes.text();
           }
 
-          // Fetch average rating using the correct endpoint
-          const ratingRes = await fetch(
-            `${API_URL}/AverageRating/${movie.showId}`,
-            {
-              credentials: 'include',
-            }
-          );
-          if (ratingRes.ok) {
-            const ratingData = await ratingRes.json();
-            movie.averageStarRating = ratingData.averageRating;
-          } else if (ratingRes.status === 404) {
-            movie.averageStarRating = 0;
-          }
+          // Set average rating from batch response
+          const movieRating = ratings[movie.showId];
+          movie.averageStarRating = movieRating ? movieRating.averageRating : 0;
         } catch (err) {
           console.warn(`Failed to fetch additional data for ${movie.title}`);
           movie.averageStarRating = 0;
@@ -250,27 +246,34 @@ export const getUserRating = async (
   }
 };
 
-export const getAverageRating = async (
-  showId: string
-): Promise<{ averageRating: number; reviewCount: number }> => {
+export const getAverageRatingsBatch = async (showIds: string[]): Promise<{ [key: string]: { averageRating: number; reviewCount: number } }> => {
   try {
-    const response = await fetch(`${API_URL}/AverageRating/${showId}`, {
+    const response = await fetch(`${API_URL}/AverageRatings`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(showIds),
       credentials: 'include',
     });
 
     if (!response.ok) {
-      if (response.status === 404) {
-        return { averageRating: 0, reviewCount: 0 };
-      }
-      throw new Error('Failed to get average rating');
+      throw new Error('Failed to fetch batch ratings');
     }
 
-    const data = await response.json();
-    return {
-      averageRating: data.averageRating,
-      reviewCount: data.reviewCount,
-    };
+    return await response.json();
   } catch (error) {
+    console.error('Error fetching batch ratings:', error);
+    return {};
+  }
+};
+
+export const getAverageRating = async (showId: string): Promise<{ averageRating: number; reviewCount: number }> => {
+  try {
+    const ratings = await getAverageRatingsBatch([showId]);
+    return ratings[showId] || { averageRating: 0, reviewCount: 0 };
+  } catch (error) {
+    console.error('Error fetching rating:', error);
     return { averageRating: 0, reviewCount: 0 };
   }
 };

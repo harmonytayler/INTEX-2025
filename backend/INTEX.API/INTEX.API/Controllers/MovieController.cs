@@ -485,6 +485,41 @@ public class MovieController : ControllerBase
             }
         }
 
+        [HttpPost("AverageRatings")]
+        public IActionResult GetAverageRatingsBatch([FromBody] string[] showIds)
+        {
+            try
+            {
+                if (showIds == null || showIds.Length == 0)
+                {
+                    return BadRequest(new { message = "No show IDs provided." });
+                }
+
+                // Query all ratings for the provided showIds in one go
+                var ratings = _movieContext.movies_ratings
+                    .Where(r => showIds.Contains(r.ShowId))
+                    .ToList();
+
+                // Group ratings by showId and calculate averages
+                var result = showIds.ToDictionary(
+                    showId => showId,
+                    showId => {
+                        var movieRatings = ratings.Where(r => r.ShowId == showId).ToList();
+                        return new {
+                            averageRating = movieRatings.Count > 0 ? movieRatings.Average(r => r.Rating) : 0,
+                            reviewCount = movieRatings.Count
+                        };
+                    }
+                );
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
         [HttpGet("GetMovie/{showId}")]
         public async Task<IActionResult> GetMovie(string showId)
         {
