@@ -14,38 +14,48 @@ namespace INTEX.API.Controllers
 public class MovieController : ControllerBase
 {
     private MovieDbContext _movieContext;
-
-    // SAS Token (replace with your actual SAS token)
-    private readonly string _sasToken;
-    private readonly string containerName = "images";
+    private readonly IConfiguration _config;
 
     public MovieController(MovieDbContext movieContext, IConfiguration config)
     {
         _movieContext = movieContext;
-        _sasToken = config["Azure:BlobSasToken"];
+        _config = config;
     }
 
     [HttpGet("PosterUrl/{showId}")]
     public async Task<IActionResult> GetPosterUrl(string showId)
     {
-        // Step 1: Look up the movie title from the showId
-        var ShowId = showId;
-        var movie = await _movieContext.movies_titles.FindAsync(ShowId); // Assuming the ShowId is unique in the movies_titles table
-        if (movie == null)
+        try
         {
-            return NotFound(new { message = "Movie not found" });
+            // Step 1: Look up the movie title from the showId
+            var movie = await _movieContext.movies_titles.FindAsync(showId);
+            if (movie == null)
+            {
+                return NotFound(new { message = "Movie not found" });
+            }
+
+            // Step 2: Get Azure storage configuration
+            var storageAccountName = _config["Azure:StorageAccountName"];
+            var containerName = _config["Azure:BlobContainerName"];
+            var sasToken = _config["Azure:BlobSasToken"];
+
+            if (string.IsNullOrEmpty(storageAccountName) || string.IsNullOrEmpty(containerName) || string.IsNullOrEmpty(sasToken))
+            {
+                return StatusCode(500, new { message = "Azure storage configuration is missing" });
+            }
+
+            // Step 3: Remove special characters that do not need to be encoded
+            string sanitizedTitle = RemoveUnwantedCharacters(movie.Title);
+
+            // Construct the URL for the image with the SAS token
+            string blobUrl = $"https://{storageAccountName}.blob.core.windows.net/{containerName}/{sanitizedTitle}.jpg?{sasToken}";
+
+            return Ok(blobUrl);
         }
-
-        // Step 2: Use the movie title to build the URL for the poster
-        string title = movie.Title;
-
-        // Step 3: Remove special characters that do not need to be encoded (e.g., & and :)
-        string sanitizedTitle = RemoveUnwantedCharacters(title);
-
-        // Construct the URL for the image with the SAS token
-        string blobUrl = $"https://intexmovieposters.blob.core.windows.net/{containerName}/{sanitizedTitle}.jpg?{_sasToken}";
-
-        return Ok(blobUrl);
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = $"Error generating poster URL: {ex.Message}" });
+        }
     }
 
     // Helper method to remove unwanted characters (like &, :, etc.)
@@ -62,13 +72,8 @@ public class MovieController : ControllerBase
 
         return input;
     }
-
-
-
-
-
+    
         // Removed duplicate method
-
         private string GenerateNextShowId()
         {
             // Get all existing show IDs

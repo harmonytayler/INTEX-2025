@@ -61,7 +61,7 @@ const AdminProjectsPage = () => {
             try {
                 const data = await fetchMovies(pageSize, pageNum, []);
                 setMovies(data.movies);
-                setTotalPages(Math.ceil(data.totalNumMovies / pageSize));
+                setTotalPages(Math.ceil(data.total / pageSize));
             } catch (err) {
                 setError((err as Error).message);
             } finally {
