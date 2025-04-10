@@ -8,8 +8,8 @@ on:
 env:
   AZURE_STATIC_WEB_APPS_API_TOKEN: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
   AZURE_WEBAPP_PUBLISH_PROFILE: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-  AZURE_WEBAPP_NAME: 'your-backend-app-name'  # Replace with your backend app name
-  AZURE_STATIC_WEB_APP_NAME: 'your-static-web-app-name'  # Replace with your static web app name
+  AZURE_WEBAPP_NAME: 'intex-deployment'  # Your backend app name
+  AZURE_STATIC_WEB_APP_NAME: 'intex-static-web-app'  # Your static web app name
 
 jobs:
   build_and_deploy:
@@ -29,8 +29,8 @@ jobs:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: 'upload'
-          app_location: 'frontend'
-          output_location: 'dist'
+          app_location: 'frontend'  # Changed from /dist to frontend
+          output_location: 'dist'    # This is where Vite outputs the build
           app_build_command: 'npm run build'
 
       # Deploy Backend
