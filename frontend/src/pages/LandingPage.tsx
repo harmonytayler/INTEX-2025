@@ -42,6 +42,7 @@ export default function LandingPage() {
             </Link>
             <Link to="/" className="site-title">CineNiche</Link>
           </div>
+          
         </div>
       </header>
 
@@ -51,6 +52,10 @@ export default function LandingPage() {
           <h1 className="landing-title">
             CineNiche
           </h1>
+          
+          <h3><i>Experience Distinguished Cinema</i></h3>
+          
+          <br/>
           
           <div className="landing-buttons">
             <Link to="/login">
