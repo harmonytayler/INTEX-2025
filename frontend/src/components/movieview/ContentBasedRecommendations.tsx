@@ -4,6 +4,7 @@ import { Movie } from '../../types/Movie';
 import { getContentBasedRecommendations } from '../../api/MovieAPI';
 import MovieRow from '../MovieRow';
 import './Recommendations.css';
+import '../../style/MovieDetails.css';
 
 interface ContentBasedRecommendationsProps {
   showId: string;
@@ -68,7 +69,7 @@ const ContentBasedRecommendations: React.FC<
   }
 
   return (
-    <div className="recommendations-container">
+    <div>
       <MovieRow
         genre="Similar Movies"
         movies={recommendations}
