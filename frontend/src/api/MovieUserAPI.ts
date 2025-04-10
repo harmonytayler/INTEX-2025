@@ -1,7 +1,8 @@
 import { MovieUser } from '../types/MovieUser'; // Adjust the path if necessary
 import { getHeaders } from './MovieAPI';
 
-const API_URL = 'https://localhost:5001/MovieUser';
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://intex-backend.azurewebsites.net';
+const API_URL = `${BASE_URL}/MovieUser`; 
 
 // Function to add a new movie user
 export const addMovieUser = async (newUser: MovieUser): Promise<MovieUser> => {

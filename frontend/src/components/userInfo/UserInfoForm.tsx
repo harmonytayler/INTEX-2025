@@ -25,7 +25,7 @@ const NewUserForm = () => {
     const fetchUserId = async () => {
       try {
         const response = await fetch(
-          'https://localhost:5001/MovieUser/GetNextUserId',
+          'https://intex-backend.azurewebsites.net/MovieUser/GetNextUserId',
           {
             credentials: 'include',
             headers: {
@@ -91,7 +91,7 @@ const NewUserForm = () => {
     setError(null);
 
     try {
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://localhost:5001';
+      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://intex-backend.azurewebsites.net';
       const response = await fetch(`${baseUrl}/MovieUser/AddUser`, {
         method: 'POST',
         credentials: 'include',
