@@ -19,10 +19,21 @@ export default defineConfig({
         "base-uri 'self'; " +
         "form-action 'self'; " +
         "frame-src 'self' https://accounts.google.com https://oauth2.googleapis.com;",
+      'Content-Type': 'application/javascript; charset=utf-8',
     },
     cors: {
       origin: 'https://localhost:3000',
       credentials: true,
+    },
+  },
+  build: {
+    outDir: 'dist',
+    assetsDir: 'assets',
+    rollupOptions: {
+      output: {
+        manualChunks: undefined,
+        inlineDynamicImports: false,
+      },
     },
   },
 });
