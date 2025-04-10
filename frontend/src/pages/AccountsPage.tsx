@@ -85,6 +85,7 @@ const AccountsPage: React.FC = () => {
         </button>
       </div>
       <div className="account-container flex-grow">
+        <br/>
         <h1 className="account-header">Account Information</h1>
 
         {error ? (

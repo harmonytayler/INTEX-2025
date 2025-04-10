@@ -205,6 +205,18 @@ export const submitRating = async (
   rating: number
 ): Promise<void> => {
   try {
+    console.log('Submitting rating:', { showId, userId, rating });
+
+    // Ensure rating is a number between 1 and 5
+    if (typeof rating !== 'number' || rating < 1 || rating > 5) {
+      throw new Error('Rating must be a number between 1 and 5');
+    }
+
+    // Ensure userId is a number
+    if (typeof userId !== 'number') {
+      throw new Error('User ID must be a number');
+    }
+
     const response = await fetch(`${API_URL}/SubmitRating`, {
       method: 'POST',
       headers: {
@@ -213,16 +225,25 @@ export const submitRating = async (
       credentials: 'include',
       body: JSON.stringify({
         showId,
-        userId,
-        rating,
+        userId: Number(userId), // Explicitly convert to number
+        rating: Number(rating), // Explicitly convert to number
       }),
     });
 
+    console.log('Rating submission response status:', response.status);
+
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to submit rating');
+      const errorText = await response.text();
+      console.error('Rating submission error response:', errorText);
+      throw new Error(
+        `Failed to submit rating: ${response.status} ${response.statusText} - ${errorText}`
+      );
     }
+
+    const responseData = await response.json();
+    console.log('Rating submission success:', responseData);
   } catch (error) {
+    console.error('Error in submitRating:', error);
     throw error;
   }
 };
@@ -513,5 +534,90 @@ export const fetchMovieById = async (showId: string): Promise<Movie> => {
   } catch (error) {
     console.error('Error fetching movie by ID:', error);
     throw error;
+  }
+};
+
+export const getMovieUserId = async (): Promise<number> => {
+  try {
+    console.log('Fetching movie user ID from API...');
+    const response = await fetch(`${API_URL}/MovieUser/GetUserIdByEmail`, {
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Error response from GetUserIdByEmail:', errorText);
+      throw new Error('Failed to get movie user ID');
+    }
+
+    const data = await response.json();
+    console.log('Movie User ID API Response:', data);
+    return data.userId;
+  } catch (error) {
+    console.error('Error getting movie user ID:', error);
+    throw error;
+  }
+};
+
+export const saveWatchedMovie = (movieId: string) => {
+  try {
+    const cookies = document.cookie.split(';');
+    const watchedCookie = cookies.find((cookie) =>
+      cookie.trim().startsWith('watched_movies=')
+    );
+
+    let watchedMovies: string[] = [];
+    if (watchedCookie) {
+      watchedMovies = JSON.parse(
+        decodeURIComponent(watchedCookie.split('=')[1])
+      );
+    }
+
+    // Remove the movie if it already exists (to avoid duplicates)
+    watchedMovies = watchedMovies.filter((id) => id !== movieId);
+
+    // Add the movie to the beginning of the array (most recent)
+    watchedMovies.unshift(movieId);
+
+    // Keep only the last 20 watched movies
+    if (watchedMovies.length > 20) {
+      watchedMovies = watchedMovies.slice(0, 20);
+    }
+
+    document.cookie = `watched_movies=${encodeURIComponent(
+      JSON.stringify(watchedMovies)
+    )}; path=/; max-age=31536000`; // 1 year expiration
+  } catch (error) {
+    console.error('Error saving watched movie:', error);
+  }
+};
+
+export const getWatchedMovies = (): string[] => {
+  try {
+    const cookies = document.cookie.split(';');
+    const watchedCookie = cookies.find((cookie) =>
+      cookie.trim().startsWith('watched_movies=')
+    );
+
+    if (watchedCookie) {
+      return JSON.parse(decodeURIComponent(watchedCookie.split('=')[1]));
+    }
+  } catch (error) {
+    console.error('Error getting watched movies:', error);
+  }
+  return [];
+};
+
+export const areCookiesEnabled = (): boolean => {
+  try {
+    // Try to set a test cookie
+    document.cookie = 'test_cookie=test; path=/';
+    const cookiesEnabled = document.cookie.indexOf('test_cookie=') !== -1;
+    // Clean up the test cookie
+    document.cookie =
+      'test_cookie=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+    return cookiesEnabled;
+  } catch (e) {
+    return false;
   }
 };

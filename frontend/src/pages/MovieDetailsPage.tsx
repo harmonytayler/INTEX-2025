@@ -1,7 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Movie } from '../types/Movie';
-import { submitRating, getUserRating, getAverageRating } from '../api/MovieAPI';
+import {
+  submitRating,
+  getUserRating,
+  getAverageRating,
+  getMovieUserId,
+  fetchMovieById,
+  getContentBasedRecommendations,
+  saveWatchedMovie,
+  areCookiesEnabled,
+} from '../api/MovieAPI';
 import AuthorizeView from '../components/security/AuthorizeView';
 import StarRating from '../components/StarRating';
 import { useAuth } from '../contexts/AuthContext';
@@ -20,6 +29,12 @@ const MovieDetailsPage: React.FC = () => {
   const [userId, setUserId] = useState<number | null>(null);
   const [averageRating, setAverageRating] = useState<number>(0);
   const [reviewCount, setReviewCount] = useState<number>(0);
+  const [showWatchPopup, setShowWatchPopup] = useState(false);
+  const [showRatingPopup, setShowRatingPopup] = useState(false);
+  const [tempRating, setTempRating] = useState<number>(0);
+  const [watchedMovie, setWatchedMovie] = useState<boolean>(false);
+  const [isBookmarked, setIsBookmarked] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const loadMovieDetails = async () => {
@@ -79,21 +94,28 @@ const MovieDetailsPage: React.FC = () => {
       if (!movieId) return;
 
       try {
-        // Get user ID from AuthContext
-        if (user && user.userId) {
-          setUserId(user.userId);
+        // Get user ID from movies_users table
+        const movieUserId = await getMovieUserId();
+        console.log('Movie User ID from movies_users table:', movieUserId);
 
-          // Get user's rating for this movie
-          const rating = await getUserRating(movieId, user.userId);
-          setUserRating(rating);
+        if (!movieUserId) {
+          console.error('No movie user ID found for the current user');
+          return;
         }
+
+        setUserId(movieUserId);
+
+        // Get user's rating for this movie
+        const rating = await getUserRating(movieId, movieUserId);
+        console.log('User rating for movie:', rating);
+        setUserRating(rating);
       } catch (error) {
         console.error('Error loading user data:', error);
       }
     };
 
     loadUserData();
-  }, [movieId, user]);
+  }, [movieId]);
 
   // Load average rating and review count
   useEffect(() => {
@@ -110,6 +132,23 @@ const MovieDetailsPage: React.FC = () => {
     };
 
     loadAverageRating();
+  }, [movieId]);
+
+  // Load bookmark status when movie is loaded
+  useEffect(() => {
+    if (movieId) {
+      const cookies = document.cookie.split(';');
+      const bookmarkCookie = cookies.find((cookie) =>
+        cookie.trim().startsWith('bookmarked_movies=')
+      );
+
+      if (bookmarkCookie) {
+        const movieIds = JSON.parse(
+          decodeURIComponent(bookmarkCookie.split('=')[1])
+        );
+        setIsBookmarked(movieIds.includes(movieId));
+      }
+    }
   }, [movieId]);
 
   // Helper function to get all genres for this movie
@@ -162,22 +201,105 @@ const MovieDetailsPage: React.FC = () => {
     return genres.join(', ');
   };
 
-  const handleRatingChange = async (rating: number) => {
+  const handleWatchNow = () => {
+    setShowWatchPopup(true);
+  };
+
+  const handleLeaveMovie = () => {
+    setShowWatchPopup(false);
+  };
+
+  const handleStartWatching = () => {
+    if (movie) {
+      saveWatchedMovie(movie.showId);
+      setShowWatchPopup(false);
+      setShowRatingPopup(true);
+    }
+  };
+
+  const handleMarkAsWatched = () => {
+    setShowWatchPopup(false);
+    setWatchedMovie(true);
+    setShowRatingPopup(true);
+    // Store in cookies that the movie was watched
+    document.cookie = `watched_${movieId}=true; path=/; max-age=31536000`; // Expires in 1 year
+  };
+
+  const handleRatingSubmit = async () => {
     if (!movieId || !userId) {
+      console.error('Missing movieId or userId:', { movieId, userId });
       return;
     }
 
     try {
-      await submitRating(movieId, userId, rating);
-      setUserRating(rating);
+      // Ensure tempRating is a valid number
+      if (typeof tempRating !== 'number' || tempRating < 1 || tempRating > 5) {
+        setError('Please select a valid rating between 1 and 5 stars');
+        return;
+      }
+
+      console.log('Submitting rating with values:', {
+        movieId,
+        userId,
+        rating: tempRating,
+      });
+
+      // Submit the rating
+      await submitRating(movieId, userId, tempRating);
+
+      // Update the user's rating in state
+      setUserRating(tempRating);
+
+      // Close the rating popup
+      setShowRatingPopup(false);
 
       // Refresh the average rating and review count
       const { averageRating, reviewCount } = await getAverageRating(movieId);
       setAverageRating(averageRating);
       setReviewCount(reviewCount);
+
+      // Show success message
+      setError(null);
     } catch (error) {
+      console.error('Error submitting rating:', error);
       setError('Failed to submit rating. Please try again.');
     }
+  };
+
+  const handleBookmarkClick = () => {
+    if (!movieId) return;
+
+    if (!areCookiesEnabled()) {
+      navigate('/bookmarks');
+      return;
+    }
+
+    const cookies = document.cookie.split(';');
+    const bookmarkCookie = cookies.find((cookie) =>
+      cookie.trim().startsWith('bookmarked_movies=')
+    );
+
+    let movieIds: string[] = [];
+    if (bookmarkCookie) {
+      movieIds = JSON.parse(decodeURIComponent(bookmarkCookie.split('=')[1]));
+    }
+
+    if (isBookmarked) {
+      // Remove from bookmarks
+      movieIds = movieIds.filter((id) => id !== movieId);
+    } else {
+      // Add to bookmarks
+      if (!movieIds.includes(movieId)) {
+        movieIds.push(movieId);
+      }
+    }
+
+    // Update cookie
+    const expiryDate = new Date();
+    expiryDate.setFullYear(expiryDate.getFullYear() + 1); // Cookie expires in 1 year
+    document.cookie = `bookmarked_movies=${encodeURIComponent(JSON.stringify(movieIds))}; expires=${expiryDate.toUTCString()}; path=/`;
+
+    setIsBookmarked(!isBookmarked);
   };
 
   return (
@@ -264,11 +386,122 @@ const MovieDetailsPage: React.FC = () => {
                   )}
                 </div>
                 <div className="divider-line"></div>
+                {/* Action Buttons */}
+                <div className="action-buttons">
+                  <button className="watch-button" onClick={handleWatchNow}>
+                    <i className="fas fa-play"></i> Watch Now
+                  </button>
+                  <button
+                    className={`bookmark-button ${isBookmarked ? 'bookmarked' : ''}`}
+                    onClick={handleBookmarkClick}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                    >
+                      <path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                    </svg>
+                    <span>{isBookmarked ? 'Bookmarked' : 'Bookmark'}</span>
+                  </button>
+                </div>
+
+                {/* Watch Popup */}
+                {showWatchPopup && (
+                  <div className="popup-overlay">
+                    <div className="popup-content">
+                      <div className="popup-header">
+                        <h3>Watch {movie.title}</h3>
+                        <button
+                          className="close-button"
+                          onClick={handleLeaveMovie}
+                        >
+                          ×
+                        </button>
+                      </div>
+                      <div className="popup-body">
+                        <div className="movie-poster-container">
+                          <img
+                            src={
+                              movie.posterUrl ||
+                              'https://via.placeholder.com/300x450?text=No+Poster'
+                            }
+                            alt={`${movie.title} poster`}
+                            className="popup-poster"
+                          />
+                        </div>
+                        <div className="popup-actions">
+                          <p className="popup-description">
+                            In a production environment, this would open the
+                            movie in a streaming player. For now, this
+                            simulation will track your watch history. Click
+                            "Start Watching" to mark this movie as watched, or
+                            "Leave Movie" to exit and provide feedback.
+                          </p>
+                          <div className="popup-buttons">
+                            <button
+                              className="popup-button leave-button"
+                              onClick={handleLeaveMovie}
+                            >
+                              Leave Movie
+                            </button>
+                            <button
+                              className="popup-button watch-button"
+                              onClick={handleStartWatching}
+                            >
+                              Start Watching
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Rating Popup */}
+                {showRatingPopup && (
+                  <div className="popup-overlay">
+                    <div className="popup-content">
+                      <div className="popup-header">
+                        <h3>Rate {movie.title}</h3>
+                        <button
+                          className="close-button"
+                          onClick={() => setShowRatingPopup(false)}
+                        >
+                          ×
+                        </button>
+                      </div>
+                      <div className="popup-body">
+                        <div className="popup-actions">
+                          <p className="popup-description">
+                            {watchedMovie
+                              ? "We'd love to know how much you enjoyed this movie! Give it a star rating to help us find more movies you'll absolutely love."
+                              : "We noticed you didn't watch this movie. That's okay! Could you give it a star rating anyway? This helps us understand what kinds of movies you prefer."}
+                          </p>
+                          <StarRating
+                            rating={tempRating}
+                            onRatingChange={setTempRating}
+                          />
+                          <div className="popup-buttons">
+                            <button
+                              className="popup-button submit-button"
+                              onClick={handleRatingSubmit}
+                            >
+                              Submit Rating
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 <h3 className="rating-label">Rate {movie.title}</h3>
                 <div className="movie-rating-container">
                   <StarRating
                     rating={userRating}
-                    onRatingChange={handleRatingChange}
+                    onRatingChange={setUserRating}
                   />
                   <div className="detail-item">
                     Average Rating: {averageRating.toFixed(1)} out of 5 (
