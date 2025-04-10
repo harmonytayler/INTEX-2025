@@ -6,14 +6,11 @@ import {
   getUserRating,
   getAverageRating,
   getMovieUserId,
-  fetchMovieById,
-  getContentBasedRecommendations,
   saveWatchedMovie,
   areCookiesEnabled,
 } from '../api/MovieAPI';
 import AuthorizeView from '../components/security/AuthorizeView';
 import StarRating from '../components/StarRating';
-import { useAuth } from '../contexts/AuthContext';
 import ContentBasedRecommendations from '../components/movieview/ContentBasedRecommendations';
 import CollaborativeRecommendations from '../components/movieview/CollaborativeRecommendations';
 import '../style/MovieDetails.css';
@@ -21,7 +18,6 @@ import '../style/account.css';
 
 const MovieDetailsPage: React.FC = () => {
   const { movieId } = useParams<{ movieId: string }>();
-  const { user } = useAuth();
   const [movie, setMovie] = useState<Movie | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -32,7 +28,6 @@ const MovieDetailsPage: React.FC = () => {
   const [showWatchPopup, setShowWatchPopup] = useState(false);
   const [showRatingPopup, setShowRatingPopup] = useState(false);
   const [tempRating, setTempRating] = useState<number>(0);
-  const [watchedMovie, setWatchedMovie] = useState<boolean>(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
   const navigate = useNavigate();
 
@@ -215,14 +210,6 @@ const MovieDetailsPage: React.FC = () => {
       setShowWatchPopup(false);
       setShowRatingPopup(true);
     }
-  };
-
-  const handleMarkAsWatched = () => {
-    setShowWatchPopup(false);
-    setWatchedMovie(true);
-    setShowRatingPopup(true);
-    // Store in cookies that the movie was watched
-    document.cookie = `watched_${movieId}=true; path=/; max-age=31536000`; // Expires in 1 year
   };
 
   const handleRatingSubmit = async () => {
@@ -474,11 +461,6 @@ const MovieDetailsPage: React.FC = () => {
                       </div>
                       <div className="popup-body">
                         <div className="popup-actions">
-                          <p className="popup-description">
-                            {watchedMovie
-                              ? "We'd love to know how much you enjoyed this movie! Give it a star rating to help us find more movies you'll absolutely love."
-                              : "We noticed you didn't watch this movie. That's okay! Could you give it a star rating anyway? This helps us understand what kinds of movies you prefer."}
-                          </p>
                           <StarRating
                             rating={tempRating}
                             onRatingChange={setTempRating}

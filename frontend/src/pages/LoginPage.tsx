@@ -5,8 +5,6 @@ import '../style/header.css';
 import '../style/LandingPage.css';
 import '@fortawesome/fontawesome-free/css/all.css';
 import { useAuth } from '../contexts/AuthContext';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGoogle, faFacebook } from '@fortawesome/free-brands-svg-icons';
 
 
 function LoginPage() {

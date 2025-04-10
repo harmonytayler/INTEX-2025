@@ -67,7 +67,7 @@ const SearchDropdown: React.FC<SearchDropdownProps> = ({ results, onClose }) => 
           >
             <div style={{ width: '56px', height: '80px', flexShrink: 0 }}>
               <img
-                src={movie.posterUrl}
+                src={movie.posterUrl ?? undefined}
                 alt={movie.title}
                 style={{ width: '56px', height: '80px', objectFit: 'cover' }}
                 className="rounded"

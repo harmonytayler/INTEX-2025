@@ -131,6 +131,7 @@ function MovieList({selectedCategories}: {selectedCategories: string[]}) {
                     {totalPages > 0 && (
                         <Pagination
                             currentPage={pageNum}
+                            totalItems={totalPages}
                             totalPages={totalPages}
                             pageSize={pageSize}
                             onPageChange={setPageNum}

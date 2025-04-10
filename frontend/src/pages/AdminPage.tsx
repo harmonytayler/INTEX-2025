@@ -15,7 +15,6 @@ const AdminPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [isAddingMovie, setIsAddingMovie] = useState(false);
   const [editingMovie, setEditingMovie] = useState<Movie | null>(null);
   const [totalResults, setTotalResults] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -75,7 +74,6 @@ const AdminPage: React.FC = () => {
   };
 
   const handleAddMovie = () => {
-    setIsAddingMovie(true);
     setEditingMovie(null);
     setIsEditModalOpen(true);
   };
@@ -491,7 +489,6 @@ const AdminPage: React.FC = () => {
                 className="close-button"
                 onClick={() => {
                   setIsEditModalOpen(false);
-                  setIsAddingMovie(false);
                 }}
               >
                 <i className="fas fa-times"></i>
@@ -507,19 +504,16 @@ const AdminPage: React.FC = () => {
                   }}
                   onCancel={() => {
                     setIsEditModalOpen(false);
-                    setIsAddingMovie(false);
                   }}
                 />
               ) : (
                 <NewMovieForm
                   onSuccess={() => {
                     setIsEditModalOpen(false);
-                    setIsAddingMovie(false);
                     loadMovies();
                   }}
                   onCancel={() => {
                     setIsEditModalOpen(false);
-                    setIsAddingMovie(false);
                   }}
                 />
               )}

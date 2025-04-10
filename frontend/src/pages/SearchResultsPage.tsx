@@ -169,7 +169,7 @@ const SearchResultsPage: React.FC = () => {
                         <div className="flex justify-center">
                           <div style={{ width: '48px', height: '72px' }}>
                             <img
-                              src={movie.posterUrl}
+                              src={movie.posterUrl ?? undefined}
                               alt={movie.title}
                               style={{ width: '48px', height: '72px', objectFit: 'contain' }}
                               className="rounded"

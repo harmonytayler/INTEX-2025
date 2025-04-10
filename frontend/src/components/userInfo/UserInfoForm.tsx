@@ -17,7 +17,7 @@ const NewUserForm = () => {
     }
   }, [isAuthenticated, navigate]);
 
-  const [userId, setUserId] = useState<number | null>(null);
+  const [movieUserId, setMovieUserId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean>(false);
 
@@ -38,7 +38,7 @@ const NewUserForm = () => {
           throw new Error('Failed to fetch user ID');
         }
         const data = await response.json();
-        setUserId(data);
+        setMovieUserId(data);
       } catch (error) {
         console.error('Error fetching user ID:', error);
         setError('Error fetching user ID. Please try again.');
@@ -51,7 +51,7 @@ const NewUserForm = () => {
   }, [isAuthenticated]);
 
   const [formData, setFormData] = useState<MovieUser>({
-    userId: userId || 0,
+    movieUserId: movieUserId || 0,
     name: '',
     phone: '',
     email: email || '',

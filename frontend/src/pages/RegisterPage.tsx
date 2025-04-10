@@ -4,8 +4,6 @@ import '../style/identity.css';
 import '@fortawesome/fontawesome-free/css/all.css';
 import '../style/header.css';
 import '../style/LandingPage.css';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGoogle } from '@fortawesome/free-brands-svg-icons';
 
 const RegisterPage: React.FC = () => {
   // state variables for email and passwords
