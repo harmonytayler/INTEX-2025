@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Movie } from "../types/Movie";
-import { updateMovie } from "../api/MovieAPI";
+import { Movie } from "../../types//Movie";
+import { updateMovie } from "../../api/MovieAPI";
 
 interface EditMovieFormProps {
     movie: Movie;

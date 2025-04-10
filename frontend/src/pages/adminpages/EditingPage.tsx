@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { MovieUser } from '../types/MovieUser';
-import { fetchMovieUserById, updateMovieUser } from '../api/MovieUserAPI';
-import { useAuth } from '../contexts/AuthContext';
-import '../style/account.css';
+import { MovieUser } from '../../types/MovieUser';
+import { fetchMovieUserById, updateMovieUser } from '../../api/MovieUserAPI';
+import { useAuth } from '../../contexts/AuthContext';
+import '../../style/account.css';
 
 const EditingPage: React.FC = () => {
   const navigate = useNavigate();

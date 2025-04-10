@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../style/identity.css';
+import '../../style/identity.css';
 
 function Register() {
   // state variables for email and passwords
@@ -33,9 +33,10 @@ function Register() {
     } else {
       // clear error message
       setError('');
-      
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://localhost:5001';
-      
+
+      const baseUrl =
+        import.meta.env.VITE_API_BASE_URL || 'https://localhost:5001';
+
       try {
         // First create the authentication account
         const authResponse = await fetch(`${baseUrl}/register`, {
@@ -48,15 +49,17 @@ function Register() {
 
         if (!authResponse.ok) {
           const errorData = await authResponse.json();
-          throw new Error(errorData.message || 'Failed to create authentication account');
+          throw new Error(
+            errorData.message || 'Failed to create authentication account'
+          );
         }
 
         // If authentication account was created successfully, navigate to user info form
-        navigate('/register/userinfo', { 
-          state: { 
+        navigate('/register/userinfo', {
+          state: {
             email,
-            isAuthenticated: true // Add this flag to ensure the user came from the registration page
-          } 
+            isAuthenticated: true, // Add this flag to ensure the user came from the registration page
+          },
         });
       } catch (error: any) {
         console.error('Registration error:', error);

@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Movie } from '../types/Movie';
-import { submitRating, getUserRating, getAverageRating } from '../api/MovieAPI';
-import AuthorizeView from '../components/security/AuthorizeView';
-import SearchBar from '../components/SearchBar';
-import StarRating from '../components/StarRating';
-import { useAuth } from '../contexts/AuthContext';
-import ContentBasedRecommendations from '../components/movieview/ContentBasedRecommendations';
-import CollaborativeRecommendations from '../components/movieview/CollaborativeRecommendations';
+import { Movie } from '../../types/Movie';
+import {
+  submitRating,
+  getUserRating,
+  getAverageRating,
+} from '../../api/MovieAPI';
+import AuthorizeView from '../../components/security/AuthorizeView';
+import SearchBar from '../../components/SearchBar';
+import StarRating from '../../components/movieview/StarRating';
+import { useAuth } from '../../contexts/AuthContext';
+import ContentBasedRecommendations from '../../components/movieview/ContentBasedRecommendations';
+import CollaborativeRecommendations from '../../components/movieview/CollaborativeRecommendations';
 
 const MovieDetailsPage: React.FC = () => {
   const { movieId } = useParams<{ movieId: string }>();

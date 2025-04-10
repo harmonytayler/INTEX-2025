@@ -1,13 +1,13 @@
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { Movie } from '../types/Movie';
-import { fetchMovies } from '../api/MovieAPI';
-import '../style/identity.css';
+import { Movie } from '../../types/Movie';
+import { fetchMovies } from '../../api/MovieAPI';
+import '../../style/identity.css';
 import '@fortawesome/fontawesome-free/css/all.css';
 import CookieConsent from "react-cookie-consent";
-import '../style/header.css';
-import '../style/LandingPage.css';
-import MovieCard from '../components/MovieCard';
+import '../../style/header.css';
+import '../../style/LandingPage.css';
+import MovieCard from '../../components/MovieCard';
 
 export default function LandingPage() {
   const [topMovies, setTopMovies] = useState<Movie[]>([]);

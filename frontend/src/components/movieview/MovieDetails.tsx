@@ -7,7 +7,7 @@ import {
   getUserRating,
 } from '../../api/MovieAPI';
 import { useAuth } from '../../contexts/AuthContext';
-import StarRating from '../StarRating';
+import StarRating from './StarRating';
 import ContentBasedRecommendations from './ContentBasedRecommendations';
 import CollaborativeRecommendations from './CollaborativeRecommendations';
 import './MovieDetails.css';

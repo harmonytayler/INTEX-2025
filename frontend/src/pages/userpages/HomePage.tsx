@@ -1,11 +1,10 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Movie } from '../types/Movie';
-import { fetchMovies, fetchMoviesAZ, getAverageRating } from '../api/MovieAPI';
-import MovieRow from '../components/MovieRow';
-import Logout from '../components/security/Logout';
-import AuthorizeView, { AuthorizedUser } from '../components/security/AuthorizeView';
-import MovieCard from '../components/MovieCard';
+import { Movie } from '../../types/Movie';
+import { fetchMovies, fetchMoviesAZ, getAverageRating } from '../../api/MovieAPI';
+import MovieRow from '../../components/MovieRow';
+import AuthorizeView, { AuthorizedUser } from '../../components/security/AuthorizeView';
+import MovieCard from '../../components/MovieCard';
 
 // Define main genres for the rows
 const MAIN_GENRES = [

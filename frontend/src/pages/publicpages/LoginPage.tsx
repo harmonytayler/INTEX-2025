@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../style/identity.css';
+import '../../style/identity.css';
 import '@fortawesome/fontawesome-free/css/all.css';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
 
 function LoginPage() {
   // state variables for email and passwords

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Movie } from '../types/Movie';
+import { Movie } from '../../types/Movie';
 
 const SearchResultsPage: React.FC = () => {
   const location = useLocation();
@@ -13,7 +13,7 @@ const SearchResultsPage: React.FC = () => {
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const query = queryParams.get('q');
-    
+
     if (query) {
       setSearchQuery(query);
       fetchSearchResults(query);
@@ -25,12 +25,16 @@ const SearchResultsPage: React.FC = () => {
   const fetchSearchResults = async (query: string) => {
     setLoading(true);
     setError(null);
-    
+
     try {
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://localhost:5001';
-      const response = await fetch(`${baseUrl}/Movie/Search?query=${encodeURIComponent(query)}`, {
-        credentials: 'include',
-      });
+      const baseUrl =
+        import.meta.env.VITE_API_BASE_URL || 'https://localhost:5001';
+      const response = await fetch(
+        `${baseUrl}/Movie/Search?query=${encodeURIComponent(query)}`,
+        {
+          credentials: 'include',
+        }
+      );
 
       if (!response.ok) {
         throw new Error('Failed to fetch search results');
@@ -91,8 +95,12 @@ const SearchResultsPage: React.FC = () => {
           </div>
         ) : movies.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-xl text-gray-400">No movies found matching your search.</p>
-            <p className="text-gray-500 mt-2">Try different keywords or browse our collection.</p>
+            <p className="text-xl text-gray-400">
+              No movies found matching your search.
+            </p>
+            <p className="text-gray-500 mt-2">
+              Try different keywords or browse our collection.
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -104,14 +112,21 @@ const SearchResultsPage: React.FC = () => {
               >
                 <div className="aspect-w-16 aspect-h-9">
                   <img
-                    src={movie.posterUrl || 'https://via.placeholder.com/300x450?text=No+Poster'}
+                    src={
+                      movie.posterUrl ||
+                      'https://via.placeholder.com/300x450?text=No+Poster'
+                    }
                     alt={movie.title}
                     className="w-full h-full object-cover"
                   />
                 </div>
                 <div className="p-4">
-                  <h2 className="text-lg font-semibold mb-1 truncate">{movie.title}</h2>
-                  <p className="text-gray-400 text-sm mb-2">{movie.releaseYear}</p>
+                  <h2 className="text-lg font-semibold mb-1 truncate">
+                    {movie.title}
+                  </h2>
+                  <p className="text-gray-400 text-sm mb-2">
+                    {movie.releaseYear}
+                  </p>
                   <div className="flex items-center">
                     <span className="text-yellow-500 mr-1">★</span>
                     <span>{movie.rating || 'N/A'}</span>
@@ -126,4 +141,4 @@ const SearchResultsPage: React.FC = () => {
   );
 };
 
-export default SearchResultsPage; 
+export default SearchResultsPage;
