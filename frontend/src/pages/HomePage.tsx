@@ -11,11 +11,11 @@ const MAIN_GENRES = [
   'Action',
   'Comedy',
   'Drama',
-  'Horror',
+  'Thrillers',
   'Documentary',
   'Thriller',
   'Family',
-  'Romance'
+  'Musicals'
 ];
 
 // Map display genres to database field names
@@ -23,16 +23,29 @@ const GENRE_MAPPING: Record<string, string> = {
   'Action': 'action',
   'Comedy': 'comedies',
   'Drama': 'dramas',
-  'Horror': 'horrorMovies',
+  'Thrillers': 'thrillers',
   'Documentary': 'documentaries',
   'Thriller': 'thrillers',
   'Family': 'familyMovies',
-  'Romance': 'comediesRomanticMovies'
+  'Musicals': 'musicals'
 };
 
 // Helper function to calculate weighted rating using IMDb formula
-const calculateWeightedRating = (averageRating: number, reviewCount: number, globalAverageRating: number, minReviews: number = 3): number => {
-  return (reviewCount / (reviewCount + minReviews)) * averageRating + (minReviews / (reviewCount + minReviews)) * globalAverageRating;
+const calculateWeightedRating = (averageRating: number, reviewCount: number, globalAverageRating: number): number => {
+  // If there are no reviews, use a very low weight to push these movies to the end
+  if (reviewCount === 0) return 0;
+  // For movies with reviews, use their actual average rating
+  return averageRating;
+};
+
+// Helper function to shuffle array (Fisher-Yates algorithm)
+const shuffleArray = <T,>(array: T[]): T[] => {
+  const newArray = [...array];
+  for (let i = newArray.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+  }
+  return newArray;
 };
 
 // Helper function to fetch ratings in batches
@@ -92,16 +105,35 @@ function HomePage() {
           const moviesWithRatings = allMovies.map(movie => {
             const { averageRating, reviewCount } = ratings[movie.showId] || { averageRating: 0, reviewCount: 0 };
             const weightedRating = calculateWeightedRating(averageRating, reviewCount, globalAverageRating);
-            return { movie, weightedRating };
+            return { movie, weightedRating, reviewCount };
           });
 
-          // Sort all movies by weighted rating to get top 10
+          // Sort movies by weighted rating and review count
           const sortedAllMovies = moviesWithRatings
-            .sort((a, b) => b.weightedRating - a.weightedRating)
-            .slice(0, 10)
+            .sort((a, b) => {
+              // First sort by review count (movies with reviews come first)
+              if (a.reviewCount === 0 && b.reviewCount > 0) return 1;
+              if (a.reviewCount > 0 && b.reviewCount === 0) return -1;
+              // Then sort by weighted rating
+              return b.weightedRating - a.weightedRating;
+            })
             .map(item => item.movie);
-          
-          setTopMovies(sortedAllMovies);
+
+          // Split movies into reviewed and unreviewed
+          const reviewedMovies = sortedAllMovies.filter(movie => 
+            ratings[movie.showId]?.reviewCount > 0
+          );
+          const unreviewedMovies = sortedAllMovies.filter(movie => 
+            !ratings[movie.showId]?.reviewCount
+          );
+
+          // Shuffle unreviewed movies
+          const shuffledUnreviewedMovies = shuffleArray(unreviewedMovies);
+
+          // Combine reviewed and shuffled unreviewed movies
+          const finalMovieList = [...reviewedMovies, ...shuffledUnreviewedMovies];
+
+          setTopMovies(finalMovieList.slice(0, 10));
 
           // Categorize movies by genre and calculate weighted ratings
           const genreMovies: { [key: string]: { movie: Movie; weightedRating: number }[] } = {};
