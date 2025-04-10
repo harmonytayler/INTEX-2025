@@ -80,7 +80,7 @@ header .container {
 .search-container {
   position: relative;
   display: flex;
-  align-items: center;
+  align-items: right;
   gap: 1rem;
   margin-right: 0;
 }
@@ -111,10 +111,6 @@ header .container {
   transition: all 0.3s ease;
 }
 
-.search-input:focus {
-  border-color: rgba(255, 252, 243, 0.7);
-  box-shadow: 0 0 0 2px rgba(255, 252, 243, 0.2);
-}
 
 .search-input::placeholder {
   color: rgba(255, 252, 243, 0.7);

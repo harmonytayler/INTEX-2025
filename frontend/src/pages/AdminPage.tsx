@@ -309,9 +309,9 @@ const AdminPage: React.FC = () => {
                   <td className="movie-title">{movie.title}</td>
                   <td>
                     {movie.averageStarRating === undefined ? (
-                      <span className="no-rating">There are no ratings</span>
+                      <span className="no-rating">No ratings</span>
                     ) : movie.averageStarRating === 0 ? (
-                      <span className="no-rating">There are no ratings</span>
+                      <span className="no-rating">No ratings</span>
                     ) : (
                       `${movie.averageStarRating.toFixed(1)}/5`
                     )}
