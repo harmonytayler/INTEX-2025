@@ -127,12 +127,6 @@ const RegisterPage: React.FC = () => {
             Create Account
           </button>
 
-          <div className="login-divider">OR</div>
-
-          <button type="button" className="btn-login btn-google">
-            <FontAwesomeIcon icon={faGoogle} className="me-2" />
-            Continue with Google
-          </button>
 
           {error && <div className="error">{error}</div>}
         </form>

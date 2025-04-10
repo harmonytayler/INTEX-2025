@@ -1,0 +1,94 @@
+.bookmarked-movies-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  color: #fffcf3;
+  position: relative;
+}
+
+.back-button-container {
+  position: fixed;
+  left: 2rem;
+  top: 100px;
+  z-index: 100;
+}
+
+.back-button {
+  background-color: #224544;
+  color: #fffcf3;
+  border: none;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.back-button:hover {
+  background-color: #c35d24;
+  transform: scale(1.1);
+}
+
+.back-button span {
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.bookmarked-movies-content {
+  margin-top: 80px;
+  padding: 0 20px;
+}
+
+.bookmarked-movies-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0 0 1.5rem 0;
+  color: #fffcf3;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  text-align: center;
+}
+
+.no-bookmarks {
+  text-align: center;
+  padding: 40px;
+  color: #fffcf3;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  margin-top: 2rem;
+}
+
+.no-bookmarks p {
+  margin: 10px 0;
+  font-size: 1.1rem;
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: #fffcf3;
+  font-size: 1.2rem;
+}
+
+.bookmarked-movies-container {
+  margin-top: 2rem;
+}
+
+@media (max-width: 768px) {
+  .back-button-container {
+    left: 1rem;
+    top: 90px;
+  }
+
+  .bookmarked-movies-content {
+    margin-top: 60px;
+    padding: 0 10px;
+  }
+
+  .bookmarked-movies-title {
+    font-size: 2rem;
+  }
+}

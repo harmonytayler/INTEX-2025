@@ -1,0 +1,143 @@
+.bookmarked-movies-container {
+  padding: 20px;
+  min-height: 100vh;
+}
+
+.back-button-container {
+  margin-bottom: 20px;
+}
+
+.back-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.back-button-circle {
+  width: 40px;
+  height: 40px;
+  background-color: #224544;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.back-button-circle span {
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.movie-details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.account-header {
+  text-align: center;
+  margin: 40px 0;
+}
+
+.account-header h1 {
+  color: white;
+  font-size: 48px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.bookmarked-movies-content {
+  margin-top: 20px;
+}
+
+.loading,
+.no-bookmarks {
+  color: white;
+  text-align: center;
+  padding: 20px;
+}
+
+.cookies-disabled-message {
+  background-color: #1f1f1f;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 20px auto;
+  max-width: 600px;
+  color: white;
+}
+
+.cookies-disabled-message h2 {
+  color: #e50914;
+  margin-bottom: 15px;
+}
+
+.cookies-disabled-message p {
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+
+.cookies-disabled-message ol {
+  margin-left: 20px;
+  line-height: 1.8;
+}
+
+.cookies-disabled-message li {
+  margin-bottom: 10px;
+}
+
+.no-bookmarks-message {
+  background-color: #1f1f1f;
+  border-radius: 8px;
+  padding: 30px;
+  margin: 20px auto;
+  max-width: 600px;
+  text-align: center;
+  color: white;
+}
+
+.no-bookmarks-message h2 {
+  color: #c35d24;
+  margin-bottom: 20px;
+  font-size: 24px;
+}
+
+.no-bookmarks-message p {
+  margin-bottom: 15px;
+  line-height: 1.5;
+  font-size: 16px;
+}
+
+.browse-button {
+  background-color: #c35d24;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: background-color 0.3s;
+}
+
+.browse-button:hover {
+  background-color: #d46a31;
+}
+
+.page-title {
+  color: white;
+  font-size: 36px;
+  font-weight: bold;
+  text-align: center;
+  margin: 0 auto;
+  width: 100%;
+  padding: 20px 0;
+}
