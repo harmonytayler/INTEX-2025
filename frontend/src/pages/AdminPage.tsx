@@ -3,9 +3,10 @@ import { Movie } from '../types/Movie';
 import { fetchMovies, deleteMovie } from '../api/MovieAPI';
 import './AdminPage.css';
 import Pagination from '../components/Pagination';
-import StarRating from '../components/StarRating';
 import EditMovieForm from '../components/EditMovieForm';
 import NewMovieForm from '../components/NewMovieForm';
+import { useAuth } from "../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const AdminPage: React.FC = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
@@ -25,9 +26,7 @@ const AdminPage: React.FC = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isGenreFilterOpen, setIsGenreFilterOpen] = useState(false);
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
-  const [deleteConfirmMovie, setDeleteConfirmMovie] = useState<Movie | null>(
-    null
-  );
+  const [deleteConfirmMovie, setDeleteConfirmMovie] = useState<Movie | null>(null);
 
   // List of all possible genres
   const allGenres = [
@@ -65,97 +64,6 @@ const AdminPage: React.FC = () => {
     'Thrillers',
   ];
 
-  useEffect(() => {
-    fetchAllMovies();
-  }, [
-    currentPage,
-    searchTerm,
-    sortField,
-    sortOrder,
-    selectedGenres,
-    itemsPerPage,
-  ]);
-
-  const fetchAllMovies = async () => {
-    try {
-      setLoading(true);
-      // Fetch all movies with a large page size to get the complete dataset
-      const response = await fetchMovies(
-        10000, // Fetch all movies (increased from 1000 to accommodate all ~5000+ movies)
-        1, // Start from page 1
-        [], // No genre filter initially
-        '' // No search term initially
-      );
-
-      let allMovies = [...response.movies];
-
-      // Apply genre filter if selected
-      if (selectedGenres.length > 0) {
-        allMovies = allMovies.filter((movie) =>
-          selectedGenres.some(
-            (genre) => movie[genre.toLowerCase() as keyof Movie] === 1
-          )
-        );
-      }
-
-      // Apply search filter if there's a search term
-      if (searchTerm) {
-        const searchLower = searchTerm.toLowerCase();
-        allMovies = allMovies.filter(
-          (movie) =>
-            movie.title.toLowerCase().includes(searchLower) ||
-            (movie.director &&
-              movie.director.toLowerCase().includes(searchLower)) ||
-            (movie.cast &&
-              Array.isArray(movie.cast) &&
-              movie.cast.some((actor: string) =>
-                actor.toLowerCase().includes(searchLower)
-              )) ||
-            (movie.description &&
-              movie.description.toLowerCase().includes(searchLower))
-        );
-      }
-      
-      // Sort movies based on the current sort field and order
-      allMovies.sort((a, b) => {
-        let compareA = a[sortField as keyof Movie];
-        let compareB = b[sortField as keyof Movie];
-
-        // Handle null/undefined values
-        if (compareA === null || compareA === undefined) compareA = '';
-        if (compareB === null || compareB === undefined) compareB = '';
-
-        // Convert to strings for comparison
-        const strA = String(compareA).toLowerCase();
-        const strB = String(compareB).toLowerCase();
-
-        if (sortOrder === 'asc') {
-          return strA.localeCompare(strB);
-        } else {
-          return strB.localeCompare(strA);
-        }
-      });
-
-      // Update total results based on filtered dataset
-      setTotalResults(allMovies.length);
-
-      // Apply pagination to the filtered and sorted dataset
-      const startIndex = (currentPage - 1) * itemsPerPage;
-      const endIndex = startIndex + itemsPerPage;
-      const paginatedMovies = allMovies.slice(startIndex, endIndex);
-
-      // Update state with paginated results
-      setMovies(paginatedMovies);
-      setTotalPages(Math.ceil(allMovies.length / itemsPerPage));
-      setError(null);
-    } catch (err) {
-      setError('Failed to fetch movies. Please try again later.');
-      console.error('Error fetching movies:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleSort = (field: string) => {
     if (field === sortField) {
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
@@ -164,6 +72,57 @@ const AdminPage: React.FC = () => {
       setSortOrder('asc');
     }
     setCurrentPage(1);
+  };
+
+  const handleAddMovie = () => {
+    setIsAddingMovie(true);
+    setEditingMovie(null);
+    setIsEditModalOpen(true);
+  };
+
+  const renderSortIcon = (field: string): string => {
+    if (sortField !== field) return '↕';
+    return sortOrder === 'asc' ? '↑' : '↓';
+  };
+
+  const { isAdmin } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    console.log('AdminPage mounted');
+    console.log('isAdmin:', isAdmin);
+    if (!isAdmin) {
+      console.log('Not admin, redirecting...');
+      navigate('/');
+      return;
+    }
+    loadMovies();
+  }, [isAdmin, navigate]);
+
+  // Load movies with pagination and filters
+  const loadMovies = async () => {
+    try {
+      setLoading(true);
+      console.log('Loading movies...');
+      const response = await fetchMovies(
+        itemsPerPage,
+        currentPage,
+        selectedGenres,
+        searchTerm,
+        [sortField, sortOrder]
+      );
+      
+      console.log('Movies loaded:', response);
+      setMovies(response.movies);
+      setTotalResults(response.total);
+      setTotalPages(Math.ceil(response.total / itemsPerPage));
+      setError(null);
+    } catch (err) {
+      console.error('Error loading movies:', err);
+      setError('Failed to fetch movies. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleGenreFilter = () => {
@@ -180,18 +139,6 @@ const AdminPage: React.FC = () => {
     });
   };
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    setCurrentPage(1);
-    fetchAllMovies();
-  };
-
-  const handleAddMovie = () => {
-    setIsAddingMovie(true);
-    setEditingMovie(null);
-    setIsEditModalOpen(true);
-  };
-
   const handleEditMovie = (movie: Movie) => {
     setEditingMovie(movie);
     setIsEditModalOpen(true);
@@ -206,7 +153,7 @@ const AdminPage: React.FC = () => {
     if (deleteConfirmMovie) {
       try {
         await deleteMovie(deleteConfirmMovie.showId);
-        fetchAllMovies();
+        loadMovies(); // Reload current page after deletion
         setDeleteConfirmMovie(null);
         setIsModalOpen(false);
       } catch (err) {
@@ -235,11 +182,6 @@ const AdminPage: React.FC = () => {
     setSelectedMovie(null);
   };
 
-  const formatRating = (rating: number | null | undefined): string => {
-    if (rating === null || rating === undefined) return '-';
-    return `${rating.toFixed(1)} / 5`;
-  };
-
   const formatDuration = (duration: string | null | undefined): string => {
     if (!duration) return '-';
     return duration;
@@ -252,24 +194,24 @@ const AdminPage: React.FC = () => {
     return genres.join(', ') || '-';
   };
 
-  const renderSortIcon = (field: string) => {
-    if (sortField !== field) return '↕';
-    return sortOrder === 'asc' ? '↑' : '↓';
-  };
-
   if (loading) {
     return (
-      <div className="loading-container">
-        <div className="loading-spinner" />
-        <p>Loading movies...</p>
+      <div className="admin-container">
+        <div className="loading-container">
+          <div className="loading-spinner" />
+          <p>Loading movies...</p>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="error-container">
-        <p className="error-message">{error}</p>
+      <div className="admin-container">
+        <div className="error-message">{error}</div>
+        <button onClick={loadMovies} className="retry-button">
+          Retry
+        </button>
       </div>
     );
   }
@@ -279,7 +221,11 @@ const AdminPage: React.FC = () => {
       <h1 className="admin-title">MANAGE CONTENT</h1>
       <br />
       <div className="admin-actions">
-        <form onSubmit={handleSearch} className="search-form">
+        <form onSubmit={(e) => {
+          e.preventDefault();
+          setCurrentPage(1);
+          loadMovies();
+        }} className="search-form">
           <input
             type="text"
             value={searchTerm}
@@ -557,7 +503,7 @@ const AdminPage: React.FC = () => {
                   movie={editingMovie}
                   onSuccess={() => {
                     setIsEditModalOpen(false);
-                    fetchAllMovies();
+                    loadMovies();
                   }}
                   onCancel={() => {
                     setIsEditModalOpen(false);
@@ -569,7 +515,7 @@ const AdminPage: React.FC = () => {
                   onSuccess={() => {
                     setIsEditModalOpen(false);
                     setIsAddingMovie(false);
-                    fetchAllMovies();
+                    loadMovies();
                   }}
                   onCancel={() => {
                     setIsEditModalOpen(false);

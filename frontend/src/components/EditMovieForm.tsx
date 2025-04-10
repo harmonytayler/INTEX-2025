@@ -138,11 +138,16 @@ const EditMovieForm = ({ movie, onSuccess, onCancel }: EditMovieFormProps) => {
     };
     reader.readAsDataURL(file);
   };
-
-  const handleSubmit = async (e: React.FormEvent) => {
+// Removed duplicate EditMovieForm definition to resolve conflicts and errors.
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    await updateMovie(formData.showId, formData);
-    onSuccess();
+    try {
+      await updateMovie(formData.showId, formData);
+      onSuccess();
+    } catch (error) {
+      console.error('Failed to update movie:', error);
+      alert('An error occurred while updating the movie.');
+    }
   };
 
   return (

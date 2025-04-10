@@ -49,6 +49,19 @@ const calculateWeightedRating = (
   );
 };
 
+// Helper function to fetch ratings in batches
+const fetchRatingsInBatches = async (movieIds: string[], batchSize: number = 20) => {
+  const ratings: { [key: string]: { averageRating: number; reviewCount: number } } = {};
+  
+  for (let i = 0; i < movieIds.length; i += batchSize) {
+    const batch = movieIds.slice(i, i + batchSize);
+    const batchRatings = await getBulkAverageRatings(batch);
+    Object.assign(ratings, batchRatings);
+  }
+  
+  return ratings;
+};
+
 function HomePage() {
   const [moviesByGenre, setMoviesByGenre] = useState<{
     [key: string]: Movie[];
