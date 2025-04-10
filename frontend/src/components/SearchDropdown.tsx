@@ -95,4 +95,4 @@ const SearchDropdown: React.FC<SearchDropdownProps> = ({ results, onClose }) => 
   );
 };
 
-export default SearchDropdown; 
+export default SearchDropdown;

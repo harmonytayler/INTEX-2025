@@ -88,10 +88,22 @@ const AdminPage: React.FC = () => {
   const { isAdmin } = useAuth();
   const navigate = useNavigate();
 
+  useEffect(() => {
+    console.log('AdminPage mounted');
+    console.log('isAdmin:', isAdmin);
+    if (!isAdmin) {
+      console.log('Not admin, redirecting...');
+      navigate('/');
+      return;
+    }
+    loadMovies();
+  }, [isAdmin, navigate]);
+
   // Load movies with pagination and filters
   const loadMovies = async () => {
     try {
       setLoading(true);
+      console.log('Loading movies...');
       const response = await fetchMovies(
         itemsPerPage,
         currentPage,
@@ -100,26 +112,18 @@ const AdminPage: React.FC = () => {
         [sortField, sortOrder]
       );
       
+      console.log('Movies loaded:', response);
       setMovies(response.movies);
       setTotalResults(response.total);
       setTotalPages(Math.ceil(response.total / itemsPerPage));
       setError(null);
     } catch (err) {
+      console.error('Error loading movies:', err);
       setError('Failed to fetch movies. Please try again later.');
-      console.error('Error fetching movies:', err);
     } finally {
       setLoading(false);
     }
   };
-
-  // Load movies when dependencies change
-  useEffect(() => {
-    if (!isAdmin) {
-      navigate('/');
-      return;
-    }
-    loadMovies();
-  }, [currentPage, searchTerm, sortField, sortOrder, selectedGenres, itemsPerPage, isAdmin, navigate]);
 
   const handleGenreFilter = () => {
     setIsGenreFilterOpen(true);
@@ -192,15 +196,24 @@ const AdminPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="loading-container">
-        <div className="loading-spinner" />
-        <p>Loading movies...</p>
+      <div className="admin-container">
+        <div className="loading-container">
+          <div className="loading-spinner" />
+          <p>Loading movies...</p>
+        </div>
       </div>
     );
   }
 
   if (error) {
-    loadMovies();
+    return (
+      <div className="admin-container">
+        <div className="error-message">{error}</div>
+        <button onClick={loadMovies} className="retry-button">
+          Retry
+        </button>
+      </div>
+    );
   }
 
   return (
@@ -593,4 +606,5 @@ const AdminPage: React.FC = () => {
     </div>
   );
 };
+
 export default AdminPage;

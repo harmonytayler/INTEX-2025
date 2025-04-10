@@ -22,10 +22,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const savedUser = localStorage.getItem('user');
     if (savedUser) {
       const parsedUser = JSON.parse(savedUser);
-      // Ensure userId is a number
+      // Ensure userId is a number and roles are properly set
       return {
         ...parsedUser,
-        userId: typeof parsedUser.userId === 'string' ? parseInt(parsedUser.userId, 10) : parsedUser.userId
+        userId: typeof parsedUser.userId === 'string' ? parseInt(parsedUser.userId, 10) : parsedUser.userId,
+        roles: parsedUser.roles || []
       };
     }
     return null;
@@ -37,6 +38,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (user) {
       console.log('Current user:', user);
+      console.log('User roles:', user.roles);
       console.log('Is admin:', isAdmin);
       localStorage.setItem('user', JSON.stringify(user));
     } else {
