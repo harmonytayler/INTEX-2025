@@ -109,6 +109,24 @@ app.UseCors("ConnectFrontend");
 // Remove HTTPS redirection for local development
 app.UseHttpsRedirection();
 
+// Add CSP header middleware
+app.Use(async (context, next) =>
+{
+    context.Response.Headers.Add(
+        "Content-Security-Policy",
+        "default-src 'self'; " +
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
+        "font-src 'self' https://fonts.gstatic.com; " +
+        "img-src 'self' data: https://intexmovieposters.blob.core.windows.net; " +
+        "connect-src 'self' https://intex-bougier.azurewebsites.net; " +
+        "frame-ancestors 'none'; " +
+        "base-uri 'self'; " +
+        "form-action 'self'"
+    );
+    await next();
+});
+
 app.UseAuthentication();
 app.UseAuthorization();
 
