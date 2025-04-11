@@ -67,22 +67,18 @@ header .container {
   color: #C35D24 !important;
 }
 
-/* Right side - Search and user actions */
-.search-dropdown-container {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  z-index: 1000;
-  margin-top: 0.25rem;
+/* Right side container */
+.right-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
+/* Search container */
 .search-container {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 1rem;
-  margin-right: 0;
 }
 
 .search-form {
@@ -215,9 +211,13 @@ header a, header button, header span {
     font-size: 1.25rem;
   }
   
-  header .search-container {
-    margin-left: 1rem;
-    max-width: 400px;
+  .right-container {
+    flex-direction: column;
+    align-items: flex-end;
+  }
+  
+  .search-container {
+    margin-bottom: 0.5rem;
   }
 }
 
@@ -226,11 +226,11 @@ header a, header button, header span {
     height: 100px;
   }
   
-  header .search-container {
-    max-width: 300px;
+  .search-input {
+    width: 150px;
   }
   
-  header .user-actions {
+  .right-container {
     gap: 0.5rem;
   }
 } 

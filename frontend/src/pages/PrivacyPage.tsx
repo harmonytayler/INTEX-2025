@@ -86,12 +86,6 @@ const PrivacyPage: React.FC = () => {
             © {new Date().getFullYear()} CineNiche. All rights reserved.
           </p>
           <div className="footer-links">
-            <Link to="/" className="footer-link">
-              Home
-            </Link>
-            <Link to="/home" className="footer-link">
-              Browse
-            </Link>
             <Link to="/privacy" className="footer-link">
               Privacy Policy
             </Link>
