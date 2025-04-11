@@ -204,16 +204,18 @@ const AdminPage: React.FC = () => {
     setSearchInput(e.target.value);
   };
 
-  const handleSearch = () => {
-    // If the search input is empty, set searchTerm to an empty string to show all movies
-    setSearchTerm(searchInput.trim() || '');
-    setCurrentPage(1); // Reset to first page when searching
+  const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      // If search input is empty, set searchTerm to empty string to show all movies
+      setSearchTerm(searchInput.trim());
+      setCurrentPage(1); // Reset to first page when searching
+    }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      handleSearch();
-    }
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSearchTerm(searchInput.trim());
+    setCurrentPage(1); // Reset to first page when searching
   };
 
   if (loading) {
@@ -243,17 +245,14 @@ const AdminPage: React.FC = () => {
       <h1 className="admin-title">MANAGE CONTENT</h1>
       <br />
       <div className="admin-actions">
-        <form onSubmit={(e) => {
-          e.preventDefault();
-          handleSearch();
-        }} className="search-form">
+        <form onSubmit={handleSearchSubmit} className="search-form">
           <input
             type="text"
-            value={searchInput}
-            onChange={handleSearchInput}
             placeholder="Search movies..."
             className="search-input"
-            onKeyDown={handleKeyDown}
+            value={searchInput}
+            onChange={handleSearchInput}
+            onKeyDown={handleSearch}
           />
           <button type="submit" className="search-button">
             <i className="fas fa-search"></i>
