@@ -29,9 +29,6 @@ function LoginPage() {
       setPassword(value);
     }
   };
-  const handleRegisterClick = () => {
-    navigate('/register');
-  };
 
   // handle submit event for the form
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -156,12 +153,6 @@ function LoginPage() {
                   type="submit"
                 >
                   Sign in
-                </button>
-                <button
-                  className="btn-primary btn-login"
-                  onClick={handleRegisterClick}
-                >
-                  Register
                 </button>
 
             </form>

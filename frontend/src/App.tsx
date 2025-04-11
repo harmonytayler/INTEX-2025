@@ -17,10 +17,12 @@ import PrivacyPage from './pages/PrivacyPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import BookmarkedMoviesPage from './pages/BookmarkedMoviesPage';
 import CookieConsent from "react-cookie-consent";
+import ScrollToTop from './components/ScrollToTop';
 
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <AuthProvider>
         <div className="flex flex-col min-h-screen bg-[#0a1a0a] w-full">
           <Header />
