@@ -4,7 +4,6 @@ import { Movie } from '../types/Movie';
 import {
   fetchMovies,
   fetchMoviesAZ,
-  getAverageRating,
   getBulkAverageRatings,
   fetchMovieById,
   getWatchedMovies,
@@ -45,7 +44,6 @@ const GENRE_MAPPING: Record<string, string> = {
 const calculateWeightedRating = (
   averageRating: number,
   reviewCount: number,
-  globalAverageRating: number
 ): number => {
   // If there are no reviews, use a very low weight to push these movies to the end
   if (reviewCount === 0) return 0;
@@ -95,7 +93,6 @@ function HomePage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [bookmarkedMovies, setBookmarkedMovies] = useState<Movie[]>([]);
   const [watchedMovies, setWatchedMovies] = useState<Movie[]>([]);
-  const [ratedMovies, setRatedMovies] = useState<Movie[]>([]);
   const [selectedRatedMovie, setSelectedRatedMovie] = useState<Movie | null>(null);
   const [movieUserId, setMovieUserId] = useState<number | null>(null);
   const navigate = useNavigate();
@@ -125,13 +122,6 @@ function HomePage() {
           // Update the cache
           ratingsCache.current = { ...ratingsCache.current, ...ratings };
 
-          // Calculate global average rating
-          const globalAverageRating =
-            Object.values(ratings).reduce(
-              (sum, { averageRating }) => sum + averageRating,
-              0
-            ) / Object.keys(ratings).length;
-
           // Calculate weighted ratings for all movies
           const moviesWithRatings = allMovies.map((movie) => {
             const { averageRating, reviewCount } = ratings[movie.showId] || {
@@ -140,8 +130,7 @@ function HomePage() {
             };
             const weightedRating = calculateWeightedRating(
               averageRating,
-              reviewCount,
-              globalAverageRating
+              reviewCount
             );
             return { movie, weightedRating, reviewCount };
           });
@@ -438,7 +427,6 @@ function HomePage() {
           const validRatedMovies = ratedMoviesResults.filter((movie): movie is Movie => movie !== null);
           
           console.log('Total rated movies found:', validRatedMovies.length);
-          setRatedMovies(validRatedMovies);
           
           // Select a random rated movie for recommendations
           if (validRatedMovies.length > 0) {

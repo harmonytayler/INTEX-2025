@@ -51,6 +51,7 @@ const NewUserForm = () => {
   }, [isAuthenticated]);
 
   const [formData, setFormData] = useState<MovieUser>({
+    movieUserId: userId || 0,
     userId: userId || 0,
     name: '',
     phone: '',

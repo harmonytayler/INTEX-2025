@@ -6,8 +6,6 @@ import {
   getUserRating,
   getAverageRating,
   getMovieUserId,
-  fetchMovieById,
-  getContentBasedRecommendations,
   saveWatchedMovie,
   areCookiesEnabled,
 } from '../api/MovieAPI';
@@ -32,7 +30,6 @@ const MovieDetailsPage: React.FC = () => {
   const [showWatchPopup, setShowWatchPopup] = useState(false);
   const [showRatingPopup, setShowRatingPopup] = useState(false);
   const [tempRating, setTempRating] = useState<number>(0);
-  const [watchedMovie, setWatchedMovie] = useState<boolean>(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
   const navigate = useNavigate();
 
@@ -43,7 +40,7 @@ const MovieDetailsPage: React.FC = () => {
         setError(null);
 
         const baseUrl =
-          import.meta.env.VITE_API_BASE_URL || 'https://localhost:5001';
+          import.meta.env.VITE_API_BASE_URL || 'https://intex-bougier.azurewebsites.net';
         const response = await fetch(`${baseUrl}/Movie/GetMovie/${movieId}`, {
           credentials: 'include',
           headers: {
@@ -221,7 +218,6 @@ const MovieDetailsPage: React.FC = () => {
 
   const handleMarkAsWatched = () => {
     setShowWatchPopup(false);
-    setWatchedMovie(true);
     setShowRatingPopup(true);
     // Store in cookies that the movie was watched
     document.cookie = `watched_${movieId}=true; path=/; max-age=31536000`; // Expires in 1 year
@@ -480,6 +476,12 @@ const MovieDetailsPage: React.FC = () => {
                               onClick={handleStartWatching}
                             >
                               Start Watching
+                            </button>
+                            <button
+                              className="popup-button watch-button"
+                              onClick={handleMarkAsWatched}
+                            >
+                              Mark as Watched
                             </button>
                           </div>
                         </div>

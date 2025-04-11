@@ -58,9 +58,7 @@ const SearchResultsPage: React.FC = () => {
   const [isGenreFilterOpen, setIsGenreFilterOpen] = useState(false);
   const [searchResults, setSearchResults] = useState<Movie[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
-  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const searchContainerRef = useRef<HTMLDivElement>(null);
-  const [isFocused, setIsFocused] = useState(false);
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
@@ -134,9 +132,6 @@ const SearchResultsPage: React.FC = () => {
     navigate(`/movie/${movie.showId}`);
   };
 
-  const handleBackClick = () => {
-    navigate('/home');
-  };
 
   const handleGenreFilter = () => {
     setTempSelectedGenres(selectedGenres);
@@ -216,27 +211,6 @@ const SearchResultsPage: React.FC = () => {
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const query = e.target.value;
-    setSearchQuery(query);
-
-    if (searchTimeoutRef.current) {
-      clearTimeout(searchTimeoutRef.current);
-    }
-
-    searchTimeoutRef.current = setTimeout(() => {
-      handleSearch(query);
-    }, 300);
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
-      setShowDropdown(false);
-    }
-  };
-
   // Handle click outside to close search dropdown
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -267,7 +241,7 @@ const SearchResultsPage: React.FC = () => {
           <div className="w-full md:w-2/3">
             <div className="search-page-container">
               <div className="search-container" ref={searchContainerRef}>
-                <SearchBar />
+                <SearchBar onSearch={handleSearch} />
                 {showDropdown && searchResults.length > 0 && (
                   <SearchDropdown
                     results={searchResults}

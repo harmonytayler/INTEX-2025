@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { Movie } from '../types/Movie';
 import { addMovie } from '../api/MovieAPI';
 import '../pages/AdminPage.css';

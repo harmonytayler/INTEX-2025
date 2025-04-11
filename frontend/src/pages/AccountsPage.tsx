@@ -42,10 +42,6 @@ const AccountsPage: React.FC = () => {
     loadUserData();
   }, [user, isAdmin]);
 
-  const handleBackClick = () => {
-    navigate('/home');
-  };
-
   const handleEditClick = () => {
     if (isAdmin) {
       navigate('/admin');

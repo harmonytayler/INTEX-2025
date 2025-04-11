@@ -5,8 +5,6 @@ import '../style/header.css';
 import '../style/LandingPage.css';
 import '@fortawesome/fontawesome-free/css/all.css';
 import { useAuth } from '../contexts/AuthContext';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGoogle, faFacebook } from '@fortawesome/free-brands-svg-icons';
 
 
 function LoginPage() {
@@ -47,7 +45,7 @@ function LoginPage() {
       return;
     }
 
-    const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://localhost:5001';
+    const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://intex-bougier.azurewebsites.net';
     const loginUrl = rememberme
       ? `${baseUrl}/login?useCookies=true`
       : `${baseUrl}/login?useSessionCookies=true`;

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Movie, EssentialMovie } from '../types/Movie';
-import { fetchMovies, deleteMovie, fetchMovieById, fetchAdminMovies } from '../api/MovieAPI';
+import { deleteMovie, fetchMovieById, fetchAdminMovies } from '../api/MovieAPI';
 import './AdminPage.css';
 import Pagination from '../components/Pagination';
 import EditMovieForm from '../components/EditMovieForm';
@@ -16,7 +16,6 @@ const AdminPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [isAddingMovie, setIsAddingMovie] = useState(false);
   const [editingMovie, setEditingMovie] = useState<Movie | null>(null);
   const [totalResults, setTotalResults] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -42,7 +41,6 @@ const AdminPage: React.FC = () => {
   };
 
   const handleAddMovie = () => {
-    setIsAddingMovie(true);
     setEditingMovie(null);
     setIsEditModalOpen(true);
   };
@@ -75,18 +73,13 @@ const AdminPage: React.FC = () => {
 
         // Convert to EssentialMovie type for the table view
         const essentialMovies: EssentialMovie[] = response.movies.map(movie => ({
-          showId: movie.showId,
-          title: movie.title,
-          averageStarRating: movie.averageStarRating,
-          duration: movie.duration,
-          releaseYear: movie.releaseYear,
-          country: movie.country,
-          director: movie.director,
+          ...movie,
           // Include all genre fields as they're needed for filtering
           ...Object.keys(GENRE_MAPPING).reduce((acc, genre) => {
-            acc[GENRE_MAPPING[genre]] = movie[GENRE_MAPPING[genre]];
+            const genreKey = GENRE_MAPPING[genre] as keyof Movie;
+            acc[genreKey] = movie[genreKey];
             return acc;
-          }, {} as Record<string, any>)
+          }, {} as Record<keyof Movie, any>)
         }));
 
         setMovies(essentialMovies);
@@ -512,7 +505,6 @@ const AdminPage: React.FC = () => {
                 className="close-button"
                 onClick={() => {
                   setIsEditModalOpen(false);
-                  setIsAddingMovie(false);
                 }}
               >
                 <i className="fas fa-times"></i>
@@ -528,19 +520,16 @@ const AdminPage: React.FC = () => {
                   }}
                   onCancel={() => {
                     setIsEditModalOpen(false);
-                    setIsAddingMovie(false);
                   }}
                 />
               ) : (
                 <NewMovieForm
                   onSuccess={() => {
                     setIsEditModalOpen(false);
-                    setIsAddingMovie(false);
                     applyGenreFilters();
                   }}
                   onCancel={() => {
                     setIsEditModalOpen(false);
-                    setIsAddingMovie(false);
                   }}
                 />
               )}

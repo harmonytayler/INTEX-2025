@@ -9,6 +9,7 @@ function MovieList({selectedCategories}: {selectedCategories: string[]}) {
     const [pageSize, setPageSize] = useState<number>(10);
     const [pageNum, setPageNum] = useState<number>(1);
     const [totalPages, setTotalPages] = useState<number>(0);
+    const [totalItems, setTotalItems] = useState<number>(0);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [searchTerm, setSearchTerm] = useState<string>("");
@@ -48,6 +49,7 @@ function MovieList({selectedCategories}: {selectedCategories: string[]}) {
                 if (data && Array.isArray(data.movies)) {
                     setMovies(data.movies);
                     setTotalPages(Math.ceil((data.total || 0) / pageSize));
+                    setTotalItems(data.total || 0);
                 } else {
                     console.warn("Unexpected data format:", data);
                     setMovies([]);
@@ -138,6 +140,7 @@ function MovieList({selectedCategories}: {selectedCategories: string[]}) {
                                 setPageSize(newSize);
                                 setPageNum(1);
                             }}
+                            totalItems={totalItems}
                         />
                     )}
                 </div>

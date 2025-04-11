@@ -5,15 +5,20 @@ import '../style/header.css';
 
 interface SearchBarProps {
   placeholder?: string;
+  onSearch?: (query: string) => void;
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ placeholder = "Search movies..." }) => {
+const SearchBar: React.FC<SearchBarProps> = ({ placeholder = "Search movies...", onSearch }) => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const searchRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
+    const query = e.target.value;
+    setSearchTerm(query);
+    if (onSearch) {
+      onSearch(query);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {

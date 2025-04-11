@@ -6,7 +6,7 @@ interface FetchMoviesResponse {
   totalNumMovies: number;
 }
 
-const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://localhost:5001';
+const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://intex-bougier.azurewebsites.net';
 const API_URL = `${baseUrl}/Movie`;
 
 export const getHeaders = () => {

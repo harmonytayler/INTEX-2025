@@ -4,8 +4,6 @@ import '../style/identity.css';
 import '@fortawesome/fontawesome-free/css/all.css';
 import '../style/header.css';
 import '../style/LandingPage.css';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGoogle } from '@fortawesome/free-brands-svg-icons';
 
 const RegisterPage: React.FC = () => {
   // state variables for email and passwords
@@ -41,7 +39,7 @@ const RegisterPage: React.FC = () => {
       // clear error message
       setError('');
       
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://localhost:5001';
+      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://intex-bougier.azurewebsites.net';
       
       try {
         // First create the authentication account
