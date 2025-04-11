@@ -454,7 +454,7 @@ function HomePage() {
     <AuthorizeView>
       <div className="min-h-screen bg-black">
         {/* Main content */}
-        <div className="px-4 md:px-8 pb-8 pt-2">
+        <div className="px-4 md:px-8 pb-8 pt-20">
           {loading && (
             <div className="text-white text-center py-8">Loading movies...</div>
           )}
