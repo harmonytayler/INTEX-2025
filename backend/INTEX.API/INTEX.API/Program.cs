@@ -71,7 +71,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("ConnectFrontend", policy =>
     {
         policy.WithOrigins(
-                "http://localhost:3000", "https://intex-bougier.azurewebsites.net", "https://intex-2025.azurewebsites.net")
+                "http://localhost:3000", "https://intex-bougier.azurewebsites.net", "https://kind-water-03db1f21e.6.azurestaticapps.net")
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials();
