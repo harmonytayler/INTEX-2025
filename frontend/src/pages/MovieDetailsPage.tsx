@@ -94,28 +94,30 @@ const MovieDetailsPage: React.FC = () => {
       if (!movieId) return;
 
       try {
-        // Get user ID from movies_users table
-        const movieUserId = await getMovieUserId();
-        console.log('Movie User ID from movies_users table:', movieUserId);
-
-        if (!movieUserId) {
-          console.error('No movie user ID found for the current user');
-          return;
+        // Get user ID from auth context first
+        if (user && user.userId) {
+          setUserId(user.userId);
+          
+          // Get user's rating for this movie
+          const rating = await getUserRating(movieId, user.userId);
+          console.log('User rating for movie:', rating);
+          setUserRating(rating);
+        } else {
+          // If no user ID in auth context, try to get it from movies_users table
+          const movieUserId = await getMovieUserId();
+          if (movieUserId) {
+            setUserId(movieUserId);
+            const rating = await getUserRating(movieId, movieUserId);
+            setUserRating(rating);
+          }
         }
-
-        setUserId(movieUserId);
-
-        // Get user's rating for this movie
-        const rating = await getUserRating(movieId, movieUserId);
-        console.log('User rating for movie:', rating);
-        setUserRating(rating);
       } catch (error) {
         console.error('Error loading user data:', error);
       }
     };
 
     loadUserData();
-  }, [movieId]);
+  }, [movieId, user]);
 
   // Load average rating and review count
   useEffect(() => {
@@ -223,6 +225,33 @@ const MovieDetailsPage: React.FC = () => {
     setShowRatingPopup(true);
     // Store in cookies that the movie was watched
     document.cookie = `watched_${movieId}=true; path=/; max-age=31536000`; // Expires in 1 year
+  };
+
+  const handleRatingChange = async (rating: number) => {
+    if (!movieId || !userId) {
+      console.error('Missing movieId or userId:', { movieId, userId });
+      setError('Please log in to rate this movie.');
+      return;
+    }
+
+    try {
+      // Submit the rating directly
+      await submitRating(movieId, userId, rating);
+
+      // Update the user's rating in state
+      setUserRating(rating);
+
+      // Refresh the average rating and review count
+      const { averageRating, reviewCount } = await getAverageRating(movieId);
+      setAverageRating(averageRating);
+      setReviewCount(reviewCount);
+
+      // Show success message
+      setError(null);
+    } catch (error) {
+      console.error('Error submitting rating:', error);
+      setError('Failed to submit rating. Please try again.');
+    }
   };
 
   const handleRatingSubmit = async () => {
@@ -459,55 +488,56 @@ const MovieDetailsPage: React.FC = () => {
                   </div>
                 )}
 
+                {/* Rating Section */}
+                <div className="movie-rating-container">
+                  <h3 className="rating-label">Rate {movie.title}</h3>
+                  <div className="flex items-center gap-4">
+                    <StarRating
+                      rating={userRating}
+                      onRatingChange={handleRatingChange}
+                    />
+                    {error && (
+                      <div className="text-red-500 text-sm">{error}</div>
+                    )}
+                  </div>
+                  <div className="detail-item mt-2">
+                    Average Rating: {averageRating.toFixed(1)} out of 5 (
+                    {reviewCount} {reviewCount === 1 ? 'review' : 'reviews'})
+                  </div>
+                  {!userId && (
+                    <div className="mt-2 text-yellow-400 text-sm">
+                      Please log in to rate this movie.
+                    </div>
+                  )}
+                </div>
+
                 {/* Rating Popup */}
                 {showRatingPopup && (
-                  <div className="popup-overlay">
-                    <div className="popup-content">
-                      <div className="popup-header">
-                        <h3>Rate {movie.title}</h3>
+                  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-gray-800 p-6 rounded-lg max-w-md w-full">
+                      <h3 className="text-xl font-semibold text-white mb-4">Rate this movie</h3>
+                      <StarRating 
+                        rating={tempRating} 
+                        onRatingChange={setTempRating}
+                        isPopup={true}
+                      />
+                      <div className="mt-4 flex justify-end gap-2">
                         <button
-                          className="close-button"
                           onClick={() => setShowRatingPopup(false)}
+                          className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
                         >
-                          ×
+                          Cancel
                         </button>
-                      </div>
-                      <div className="popup-body">
-                        <div className="popup-actions">
-                          <p className="popup-description">
-                            {watchedMovie
-                              ? "We'd love to know how much you enjoyed this movie! Give it a star rating to help us find more movies you'll absolutely love."
-                              : "We noticed you didn't watch this movie. That's okay! Could you give it a star rating anyway? This helps us understand what kinds of movies you prefer."}
-                          </p>
-                          <StarRating
-                            rating={tempRating}
-                            onRatingChange={setTempRating}
-                          />
-                          <div className="popup-buttons">
-                            <button
-                              className="popup-button submit-button"
-                              onClick={handleRatingSubmit}
-                            >
-                              Submit Rating
-                            </button>
-                          </div>
-                        </div>
+                        <button
+                          onClick={handleRatingSubmit}
+                          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                        >
+                          Submit Rating
+                        </button>
                       </div>
                     </div>
                   </div>
                 )}
-
-                <h3 className="rating-label">Rate {movie.title}</h3>
-                <div className="movie-rating-container">
-                  <StarRating
-                    rating={userRating}
-                    onRatingChange={setUserRating}
-                  />
-                  <div className="detail-item">
-                    Average Rating: {averageRating.toFixed(1)} out of 5 (
-                    {reviewCount} {reviewCount === 1 ? 'review' : 'reviews'})
-                  </div>
-                </div>
               </div>
             </div>
             {/* Recommendations Section */}

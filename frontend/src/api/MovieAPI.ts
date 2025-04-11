@@ -224,16 +224,19 @@ export const submitRating = async (
       throw new Error('User ID must be a number');
     }
 
+    const headers = {
+      ...getHeaders(),
+      'Content-Type': 'application/json',
+    };
+
     const response = await fetch(`${API_URL}/SubmitRating`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       credentials: 'include',
       body: JSON.stringify({
         showId,
-        userId: Number(userId), // Explicitly convert to number
-        rating: Number(rating), // Explicitly convert to number
+        userId: Number(userId),
+        rating: Number(rating),
       }),
     });
 
@@ -242,13 +245,20 @@ export const submitRating = async (
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Rating submission error response:', errorText);
-      throw new Error(
-        `Failed to submit rating: ${response.status} ${response.statusText} - ${errorText}`
-      );
+      
+      if (response.status === 401) {
+        throw new Error('Please log in to submit a rating');
+      } else if (response.status === 404) {
+        throw new Error('Movie not found');
+      } else {
+        throw new Error(
+          `Failed to submit rating: ${response.status} ${response.statusText} - ${errorText}`
+        );
+      }
     }
 
     const responseData = await response.json();
-    console.log('Rating submission success:', responseData);
+    console.log('Rating submission successful:', responseData);
   } catch (error) {
     console.error('Error in submitRating:', error);
     throw error;
