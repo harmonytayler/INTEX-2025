@@ -54,6 +54,7 @@ const SearchResultsPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
+  const [tempSelectedGenres, setTempSelectedGenres] = useState<string[]>([]);
   const [isGenreFilterOpen, setIsGenreFilterOpen] = useState(false);
   const [searchResults, setSearchResults] = useState<Movie[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -137,8 +138,13 @@ const SearchResultsPage: React.FC = () => {
     navigate('/home');
   };
 
+  const handleGenreFilter = () => {
+    setTempSelectedGenres(selectedGenres);
+    setIsGenreFilterOpen(true);
+  };
+
   const handleGenreSelect = (genre: string) => {
-    setSelectedGenres((prev) => {
+    setTempSelectedGenres((prev) => {
       const newGenres = prev.includes(genre)
         ? prev.filter((g) => g !== genre)
         : [...prev, genre];
@@ -147,7 +153,18 @@ const SearchResultsPage: React.FC = () => {
   };
 
   const clearGenres = () => {
-    setSelectedGenres([]);
+    setTempSelectedGenres([]);
+  };
+
+  const applyGenreFilters = () => {
+    setSelectedGenres(tempSelectedGenres);
+    setIsGenreFilterOpen(false);
+    fetchSearchResults(searchQuery, tempSelectedGenres);
+  };
+
+  const cancelGenreFilters = () => {
+    setTempSelectedGenres(selectedGenres);
+    setIsGenreFilterOpen(false);
   };
 
   const handleSearch = async (query: string) => {
@@ -263,87 +280,22 @@ const SearchResultsPage: React.FC = () => {
               </div>
             </div>
           </div>
-
+          <h1 className="text-xl font-semibold text-white mb-6">
+            Search Results for "{searchQuery}"
+          </h1>
           {/* Genre Filter */}
           <div className="w-full md:w-1/3">
-            <div className="relative">
-              <button
-                onClick={() => setIsGenreFilterOpen(!isGenreFilterOpen)}
-                className="w-full flex items-center justify-between px-4 py-3 bg-gray-900/50 text-white rounded-lg border border-gray-700 hover:border-cineniche-orange transition-all duration-200"
-              >
-                <div className="flex items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-                  </svg>
-                  <span className="text-gray-300">
-                    {selectedGenres.length > 0 
-                      ? `${selectedGenres.length} Genre${selectedGenres.length > 1 ? 's' : ''} Selected`
-                      : 'Filter by Genre'}
-                  </span>
-                </div>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className={`h-5 w-5 transform transition-transform duration-200 ${isGenreFilterOpen ? 'rotate-180' : ''} text-gray-400`}
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </button>
-
-              {isGenreFilterOpen && (
-                <div className="absolute z-10 w-full mt-2 p-4 bg-gray-900/95 rounded-lg border border-gray-700 shadow-lg backdrop-blur-sm max-h-96 overflow-y-auto">
-                  <div className="space-y-2">
-                    {AVAILABLE_GENRES.map((genre) => (
-                      <label
-                        key={genre}
-                        className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-800/50 transition-colors duration-200 cursor-pointer"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={selectedGenres.includes(genre)}
-                          onChange={() => handleGenreSelect(genre)}
-                          className="form-checkbox h-4 w-4 text-cineniche-orange border-gray-600 rounded focus:ring-cineniche-orange"
-                        />
-                        <span className="text-gray-300">{genre}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {selectedGenres.length > 0 && (
-              <div className="mt-3 flex flex-wrap gap-2">
-                {selectedGenres.map((genre) => (
-                  <span
-                    key={genre}
-                    className="px-3 py-1 bg-cineniche-orange/90 text-white text-sm rounded-full flex items-center gap-2 hover:bg-cineniche-orange transition-colors duration-200"
-                  >
-                    {genre}
-                    <button
-                      onClick={() => handleGenreSelect(genre)}
-                      className="text-white hover:text-gray-200 transition-colors duration-200"
-                    >
-                      ×
-                    </button>
-                  </span>
-                ))}
-              </div>
-            )}
+            <button
+              onClick={handleGenreFilter}
+              className="w-full px-4 py-3 bg-gray-900/50 text-white rounded-lg border border-gray-700 hover:border-cineniche-orange transition-all duration-200"
+            >
+              Change Filter
+            </button>
           </div>
         </div>
 
         {/* Search Results */}
         <div className="mt-8">
-          <h1 className="text-xl font-semibold text-white mb-6">
-            Search Results for "{searchQuery}"
-          </h1>
-
           {loading ? (
             <div className="flex justify-center items-center h-64">
               <div className="text-xl text-white">Loading search results...</div>
@@ -366,6 +318,52 @@ const SearchResultsPage: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Genre Filter Modal */}
+      {isGenreFilterOpen && (
+        <div className="modal-overlay">
+          <div className="modal-content genre-filter-modal">
+            <div className="modal-header">
+              <h2>Filter by Genres</h2>
+              <button
+                className="close-button"
+                onClick={cancelGenreFilters}
+              >
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
+            <div className="modal-body">
+              <div className="genre-grid">
+                {AVAILABLE_GENRES.map((genre) => (
+                  <label key={genre} className="genre-checkbox">
+                    <input
+                      type="checkbox"
+                      checked={tempSelectedGenres.includes(genre)}
+                      onChange={() => handleGenreSelect(genre)}
+                    />
+                    {genre}
+                  </label>
+                ))}
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button
+                className="modal-button clear-button"
+                onClick={clearGenres}
+                disabled={tempSelectedGenres.length === 0}
+              >
+                Clear Filters
+              </button>
+              <button
+                className="modal-button apply-button"
+                onClick={applyGenreFilters}
+              >
+                Apply Filters
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
