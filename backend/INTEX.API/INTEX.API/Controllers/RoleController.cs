@@ -9,7 +9,7 @@ namespace INTEX.API.Controllers;
 [Route("[controller]")]
 [ApiController]
 // Comment out the controller-level restriction to make endpoints accessible
-// [Authorize(Roles = "Administrator")]
+[Authorize(Roles = "Administrator")]
 public class RoleController : Controller
 {
     private readonly RoleManager<IdentityRole> _roleManager;

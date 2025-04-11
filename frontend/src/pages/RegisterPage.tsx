@@ -33,6 +33,8 @@ const RegisterPage: React.FC = () => {
       setError('Please fill in all fields.');
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       setError('Please enter a valid email address.');
+    } else if (password.length < 12) {
+      setError('Password must be at least 12 characters long.');
     } else if (password !== confirmPassword) {
       setError('Passwords do not match.');
     } else {

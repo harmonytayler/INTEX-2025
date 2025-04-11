@@ -44,3 +44,45 @@ export interface Movie {
   talkShowsTVComedies: number;
   thrillers: number;
 }
+
+export interface EssentialMovie {
+  showId: string;
+  title: string;
+  averageStarRating?: number;
+  duration: string | null;
+  releaseYear: number;
+  country: string | null;
+  director: string | null;
+  action?: number;
+  adventure?: number;
+  animeSeriesInternationalTVShows?: number;
+  britishTVShowsDocuseriesInternationalTVShows?: number;
+  children?: number;
+  comedies?: number;
+  comediesDramasInternationalMovies?: number;
+  comediesInternationalMovies?: number;
+  comediesRomanticMovies?: number;
+  crimeTVShowsDocuseries?: number;
+  documentaries?: number;
+  documentariesInternationalMovies?: number;
+  docuseries?: number;
+  dramas?: number;
+  dramasInternationalMovies?: number;
+  dramasRomanticMovies?: number;
+  familyMovies?: number;
+  fantasy?: number;
+  horrorMovies?: number;
+  internationalMoviesThrillers?: number;
+  internationalTVShowsRomanticTVShowsTVDramas?: number;
+  kidsTV?: number;
+  languageTVShows?: number;
+  musicals?: number;
+  natureTV?: number;
+  realityTV?: number;
+  spirituality?: number;
+  tVAction?: number;
+  tVComedies?: number;
+  tVDramas?: number;
+  talkShowsTVComedies?: number;
+  thrillers?: number;
+}

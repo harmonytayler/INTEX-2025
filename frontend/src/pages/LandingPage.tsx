@@ -4,7 +4,6 @@ import { Movie } from '../types/Movie';
 import { fetchMovies } from '../api/MovieAPI';
 import '../style/identity.css';
 import '@fortawesome/fontawesome-free/css/all.css';
-import CookieConsent from "react-cookie-consent";
 import '../style/header.css';
 import '../style/LandingPage.css';
 import MovieCard from '../components/MovieCard';
@@ -154,21 +153,6 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
-
-      {/* COOKIE CONSENT */}
-      <CookieConsent
-        location="bottom"
-        buttonText="I understand"
-        cookieName="cineNicheConsent"
-        style={{ background: "#2B373B" }}
-        buttonStyle={{ color: "#ffffff", backgroundColor: "#4CAF50", fontSize: "14px", border: "none", padding: "0.5rem 1rem" }}
-        expires={150}
-      >
-        This website uses cookies to enhance the user experience. By continuing, you consent to the use of cookies.{" "}
-        <Link to="/privacy" className="text-yellow-400 underline">
-          Learn more
-        </Link>
-      </CookieConsent>
     </div>
   );
 }

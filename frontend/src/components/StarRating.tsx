@@ -5,9 +5,15 @@ interface StarRatingProps {
   rating: number;
   onRatingChange: (rating: number) => void;
   readOnly?: boolean;
+  isPopup?: boolean;
 }
 
-const StarRating: React.FC<StarRatingProps> = ({ rating, onRatingChange, readOnly = false }) => {
+const StarRating: React.FC<StarRatingProps> = ({ 
+  rating, 
+  onRatingChange, 
+  readOnly = false,
+  isPopup = false 
+}) => {
   const [hoverRating, setHoverRating] = useState<number>(0);
 
   const handleMouseEnter = (value: number) => {
@@ -29,7 +35,7 @@ const StarRating: React.FC<StarRatingProps> = ({ rating, onRatingChange, readOnl
   };
 
   return (
-    <div className="star-rating">
+    <div className={`star-rating ${isPopup ? 'popup-rating' : ''}`}>
       {[1, 2, 3, 4, 5].map((star) => (
         <button
           key={star}
@@ -50,6 +56,11 @@ const StarRating: React.FC<StarRatingProps> = ({ rating, onRatingChange, readOnl
           </svg>
         </button>
       ))}
+      {!readOnly && (
+        <div className="rating-text">
+          {rating > 0 ? `Your rating: ${rating} star${rating !== 1 ? 's' : ''}` : 'Click a star to rate'}
+        </div>
+      )}
     </div>
   );
 };
