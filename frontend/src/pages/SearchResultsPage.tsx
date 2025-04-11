@@ -3,6 +3,44 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Movie } from '../types/Movie';
 import { fetchMovies } from '../api/MovieAPI';
 
+// Define genre mapping between display names and actual property names
+const GENRE_MAPPING: { [key: string]: keyof Movie } = {
+  'Action': 'action',
+  'Adventure': 'adventure',
+  'Anime Series': 'animeSeriesInternationalTVShows',
+  'British TV Shows': 'britishTVShowsDocuseriesInternationalTVShows',
+  'Children': 'children',
+  'Comedies': 'comedies',
+  'Comedies & Dramas': 'comediesDramasInternationalMovies',
+  'International Comedies': 'comediesInternationalMovies',
+  'Romantic Comedies': 'comediesRomanticMovies',
+  'Crime TV Shows': 'crimeTVShowsDocuseries',
+  'Documentaries': 'documentaries',
+  'International Documentaries': 'documentariesInternationalMovies',
+  'Docuseries': 'docuseries',
+  'Dramas': 'dramas',
+  'International Dramas': 'dramasInternationalMovies',
+  'Romantic Dramas': 'dramasRomanticMovies',
+  'Family Movies': 'familyMovies',
+  'Fantasy': 'fantasy',
+  'Horror Movies': 'horrorMovies',
+  'International Thrillers': 'internationalMoviesThrillers',
+  'International TV Shows': 'internationalTVShowsRomanticTVShowsTVDramas',
+  'Kids TV': 'kidsTV',
+  'Language TV Shows': 'languageTVShows',
+  'Musicals': 'musicals',
+  'Nature TV': 'natureTV',
+  'Reality TV': 'realityTV',
+  'Spirituality': 'spirituality',
+  'TV Action': 'tVAction',
+  'TV Comedies': 'tVComedies',
+  'TV Dramas': 'tVDramas',
+  'Talk Shows': 'talkShowsTVComedies',
+  'Thrillers': 'thrillers'
+};
+
+const AVAILABLE_GENRES = Object.keys(GENRE_MAPPING);
+
 const SearchResultsPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -10,6 +48,8 @@ const SearchResultsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
+  const [isGenreFilterOpen, setIsGenreFilterOpen] = useState(false);
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
@@ -17,64 +57,56 @@ const SearchResultsPage: React.FC = () => {
     
     if (query) {
       setSearchQuery(query);
-      fetchSearchResults(query);
+      fetchSearchResults(query, selectedGenres);
     } else {
       setLoading(false);
     }
-  }, [location.search]);
+  }, [location.search, selectedGenres]);
 
-  const fetchSearchResults = async (query: string) => {
+  const fetchSearchResults = async (query: string, displayGenres: string[]) => {
     setLoading(true);
     setError(null);
     
     try {
-      const response = await fetchMovies(100, 1, [], query, []);
+      // Convert display genres to actual genre property names
+      const actualGenres = displayGenres.map(genre => GENRE_MAPPING[genre]);
+      const response = await fetchMovies(100, 1, actualGenres, query, []);
+      
       if (response && Array.isArray(response.movies)) {
-        // Filter out movies without poster URLs and log the results
+        // Filter movies based on selected genres
+        const filteredMovies = response.movies.filter(movie => {
+          if (actualGenres.length === 0) return true;
+          
+          // Check if movie has any of the selected genres
+          return actualGenres.some(genre => movie[genre] === 1);
+        });
+
+        // Filter out movies without poster URLs
         const moviesWithPosters = await Promise.all(
-          response.movies.map(async (movie) => {
+          filteredMovies.map(async (movie) => {
             if (!movie.posterUrl || 
                 movie.posterUrl.trim() === '' || 
                 movie.posterUrl === 'null' || 
                 movie.posterUrl === 'undefined' ||
                 movie.posterUrl.includes('placeholder')) {
-              console.log('Filtered out movie with invalid poster URL:', {
-                title: movie.title,
-                posterUrl: movie.posterUrl
-              });
               return null;
             }
 
             try {
-              // Create a new image to test if it loads
               const img = new Image();
               await new Promise((resolve, reject) => {
                 img.onload = resolve;
                 img.onerror = reject;
                 img.src = movie.posterUrl as string;
               });
-              
-              console.log('Movie with valid poster:', {
-                title: movie.title,
-                posterUrl: movie.posterUrl
-              });
               return movie;
             } catch (err) {
-              console.log('Filtered out movie with non-existent poster:', {
-                title: movie.title,
-                posterUrl: movie.posterUrl
-              });
               return null;
             }
           })
         );
 
         const validMovies = moviesWithPosters.filter((movie): movie is Movie => movie !== null);
-        
-        console.log('Total movies:', response.movies.length);
-        console.log('Movies with valid posters:', validMovies.length);
-        console.log('Filtered movies:', validMovies);
-        
         setMovies(validMovies);
       } else {
         setMovies([]);
@@ -93,6 +125,19 @@ const SearchResultsPage: React.FC = () => {
 
   const handleBackClick = () => {
     navigate('/home');
+  };
+
+  const handleGenreSelect = (genre: string) => {
+    setSelectedGenres((prev) => {
+      const newGenres = prev.includes(genre)
+        ? prev.filter((g) => g !== genre)
+        : [...prev, genre];
+      return newGenres;
+    });
+  };
+
+  const clearGenres = () => {
+    setSelectedGenres([]);
   };
 
   return (
@@ -120,6 +165,77 @@ const SearchResultsPage: React.FC = () => {
           <h1 className="text-2xl font-bold">
             Search Results for "{searchQuery}"
           </h1>
+        </div>
+
+        {/* Genre Filter */}
+        <div className="mb-6 w-full max-w-4xl">
+          <div className="flex items-center justify-between">
+            <button
+              onClick={() => setIsGenreFilterOpen(!isGenreFilterOpen)}
+              className="flex items-center text-green-700 hover:text-green-500 transition-colors"
+            >
+              <span className="mr-2">Filter by Genre</span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className={`h-5 w-5 transform transition-transform ${isGenreFilterOpen ? 'rotate-180' : ''}`}
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
+            {selectedGenres.length > 0 && (
+              <button
+                onClick={clearGenres}
+                className="text-sm text-gray-400 hover:text-gray-300"
+              >
+                Clear Filters
+              </button>
+            )}
+          </div>
+
+          {isGenreFilterOpen && (
+            <div className="mt-4 p-4 bg-gray-800 rounded-lg">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                {AVAILABLE_GENRES.map((genre) => (
+                  <button
+                    key={genre}
+                    onClick={() => handleGenreSelect(genre)}
+                    className={`px-3 py-2 rounded text-sm ${
+                      selectedGenres.includes(genre)
+                        ? 'bg-green-700 text-white'
+                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                    }`}
+                  >
+                    {genre}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {selectedGenres.length > 0 && (
+            <div className="mt-2 flex flex-wrap gap-2">
+              {selectedGenres.map((genre) => (
+                <span
+                  key={genre}
+                  className="px-2 py-1 bg-green-700 text-white text-sm rounded-full flex items-center"
+                >
+                  {genre}
+                  <button
+                    onClick={() => handleGenreSelect(genre)}
+                    className="ml-2 text-white hover:text-gray-300"
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
         </div>
 
         {loading ? (
@@ -169,7 +285,7 @@ const SearchResultsPage: React.FC = () => {
                         <div className="flex justify-center">
                           <div style={{ width: '48px', height: '72px' }}>
                             <img
-                              src={movie.posterUrl}
+                              src={movie.posterUrl || ''}
                               alt={movie.title}
                               style={{ width: '48px', height: '72px', objectFit: 'contain' }}
                               className="rounded"

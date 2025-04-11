@@ -1,4 +1,5 @@
-import { Movie as Movie } from '../types/Movie';
+import { Movie } from '../types/Movie';
+import { GENRE_MAPPING } from '../constants/genres';
 
 interface FetchMoviesResponse {
   movies: Movie[];
@@ -53,10 +54,15 @@ export const fetchMovies = async (
     // Get all movie IDs for batch processing
     const movieIds = movies.map((movie) => movie.showId);
 
-    // Fetch all ratings in bulk
-    const ratings = await getBulkAverageRatings(movieIds);
+    // Fetch all ratings in bulk with error handling
+    let ratings: { [key: string]: { averageRating: number; reviewCount: number } } = {};
+    try {
+      ratings = await getBulkAverageRatings(movieIds);
+    } catch (err) {
+      console.warn('Failed to fetch ratings, continuing without ratings:', err);
+    }
 
-    // Fetch all poster URLs in parallel
+    // Fetch all poster URLs in parallel with error handling
     const posterPromises = movieIds.map(async (showId) => {
       try {
         const posterRes = await fetch(`${API_URL}/PosterUrl/${showId}`, {
@@ -67,6 +73,7 @@ export const fetchMovies = async (
         }
         return { showId, posterUrl: null };
       } catch (err) {
+        console.warn(`Failed to fetch poster for ${showId}:`, err);
         return { showId, posterUrl: null };
       }
     });
@@ -298,28 +305,40 @@ export const getBulkAverageRatings = async (
   [key: string]: { averageRating: number; reviewCount: number };
 }> => {
   try {
-    const response = await fetch(
-      `${API_URL}/BulkAverageRatings?${showIds.map((id) => `showIds=${encodeURIComponent(id)}`).join('&')}`,
-      {
-        credentials: 'include',
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error('Failed to get bulk average ratings');
-    }
-
-    const data = await response.json();
+    const BATCH_SIZE = 100; // Process 100 IDs at a time
     const ratings: {
       [key: string]: { averageRating: number; reviewCount: number };
     } = {};
 
-    data.forEach((item: any) => {
-      ratings[item.showId] = {
-        averageRating: item.averageRating,
-        reviewCount: item.reviewCount,
-      };
-    });
+    // Process IDs in batches
+    for (let i = 0; i < showIds.length; i += BATCH_SIZE) {
+      const batch = showIds.slice(i, i + BATCH_SIZE);
+      const batchUrl = `${API_URL}/BulkAverageRatings?${batch
+        .map((id) => `showIds=${encodeURIComponent(id)}`)
+        .join('&')}`;
+
+      try {
+        const response = await fetch(batchUrl, {
+          credentials: 'include',
+        });
+
+        if (!response.ok) {
+          console.warn(`Failed to fetch ratings for batch ${i / BATCH_SIZE + 1}`);
+          continue;
+        }
+
+        const data = await response.json();
+        data.forEach((item: any) => {
+          ratings[item.showId] = {
+            averageRating: item.averageRating,
+            reviewCount: item.reviewCount,
+          };
+        });
+      } catch (err) {
+        console.warn(`Error processing batch ${i / BATCH_SIZE + 1}:`, err);
+        continue;
+      }
+    }
 
     return ratings;
   } catch (error) {
@@ -532,7 +551,7 @@ export const fetchMovieById = async (showId: string): Promise<Movie> => {
 
     return movie;
   } catch (error) {
-    console.error('Error fetching movie by ID:', error);
+    console.error('Error fetching movie details:', error);
     throw error;
   }
 };
@@ -619,5 +638,135 @@ export const areCookiesEnabled = (): boolean => {
     return cookiesEnabled;
   } catch (e) {
     return false;
+  }
+};
+
+export const fetchAllMovies = async (
+  searchTerm: string = '',
+  filters: string[] = []
+): Promise<{ movies: Movie[]; total: number }> => {
+  try {
+    const BATCH_SIZE = 1000;
+    let allMovies: Movie[] = [];
+    let currentPage = 1;
+    let hasMore = true;
+
+    while (hasMore) {
+      const response = await fetchMovies(
+        BATCH_SIZE,
+        currentPage,
+        [],
+        searchTerm,
+        filters
+      );
+
+      if (response.movies.length === 0) {
+        hasMore = false;
+      } else {
+        allMovies = [...allMovies, ...response.movies];
+        currentPage++;
+      }
+    }
+
+    return {
+      movies: allMovies,
+      total: allMovies.length
+    };
+  } catch (error) {
+    console.error('Error fetching all movies:', error);
+    throw error;
+  }
+};
+
+export interface AdminMoviesResponse {
+  movies: Movie[];
+  total: number;
+  currentPage: number;
+  totalPages: number;
+}
+
+export const fetchAdminMovies = async (
+  page: number = 1,
+  pageSize: number = 10,
+  searchTerm: string = '',
+  genres: string[] = [],
+  sortField: string = 'title',
+  sortOrder: 'asc' | 'desc' = 'asc'
+): Promise<AdminMoviesResponse> => {
+  try {
+    // Fetch all movies in batches
+    let allMovies: Movie[] = [];
+    let currentPage = 1;
+    const BATCH_SIZE = 1000;
+    let hasMore = true;
+
+    while (hasMore) {
+      const response = await fetch(`${API_URL}/AllMovies?pageSize=${BATCH_SIZE}&pageNum=${currentPage}`, {
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch admin movies');
+      }
+
+      const data = await response.json();
+      allMovies = [...allMovies, ...data.movies];
+
+      // If we received fewer movies than the batch size, we've reached the end
+      if (data.movies.length < BATCH_SIZE) {
+        hasMore = false;
+      } else {
+        currentPage++;
+      }
+    }
+
+    // Apply search filter if searchTerm exists
+    if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase();
+      allMovies = allMovies.filter((movie: Movie) => 
+        movie.title.toLowerCase().includes(searchLower)
+      );
+    }
+
+    // Apply genre filters if genres are selected
+    if (genres.length > 0) {
+      const actualGenres = genres.map(genre => GENRE_MAPPING[genre]);
+      allMovies = allMovies.filter((movie: Movie) => 
+        actualGenres.some(genre => movie[genre as keyof Movie] === 1)
+      );
+    }
+
+    // Apply sorting
+    allMovies.sort((a: Movie, b: Movie) => {
+      const aValue = a[sortField as keyof Movie];
+      const bValue = b[sortField as keyof Movie];
+      
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
+        return sortOrder === 'asc' 
+          ? aValue.localeCompare(bValue)
+          : bValue.localeCompare(aValue);
+      }
+      
+      return sortOrder === 'asc' 
+        ? (Number(aValue) - Number(bValue))
+        : (Number(bValue) - Number(aValue));
+    });
+
+    // Calculate pagination
+    const total = allMovies.length;
+    const totalPages = Math.ceil(total / pageSize);
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedMovies = allMovies.slice(startIndex, endIndex);
+
+    return {
+      movies: paginatedMovies,
+      total,
+      currentPage: page,
+      totalPages
+    };
+  } catch (error) {
+    console.error('Error fetching admin movies:', error);
+    throw error;
   }
 };

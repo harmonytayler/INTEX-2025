@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Movie } from '../types/Movie';
-import { fetchMovies, deleteMovie } from '../api/MovieAPI';
+import { Movie, EssentialMovie } from '../types/Movie';
+import { fetchMovies, deleteMovie, fetchMovieById, fetchAdminMovies } from '../api/MovieAPI';
 import './AdminPage.css';
 import Pagination from '../components/Pagination';
 import EditMovieForm from '../components/EditMovieForm';
 import NewMovieForm from '../components/NewMovieForm';
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { GENRE_MAPPING, AVAILABLE_GENRES } from '../constants/genres';
 
 const AdminPage: React.FC = () => {
-  const [movies, setMovies] = useState<Movie[]>([]);
+  const [movies, setMovies] = useState<EssentialMovie[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -26,43 +27,8 @@ const AdminPage: React.FC = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isGenreFilterOpen, setIsGenreFilterOpen] = useState(false);
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
-  const [deleteConfirmMovie, setDeleteConfirmMovie] = useState<Movie | null>(null);
-
-  // List of all possible genres
-  const allGenres = [
-    'Action',
-    'Adventure',
-    'Anime Series',
-    'British TV Shows',
-    'Children',
-    'Comedies',
-    'Comedies & Dramas',
-    'International Comedies',
-    'Romantic Comedies',
-    'Crime TV Shows',
-    'Documentaries',
-    'International Documentaries',
-    'Docuseries',
-    'Dramas',
-    'International Dramas',
-    'Romantic Dramas',
-    'Family Movies',
-    'Fantasy',
-    'Horror Movies',
-    'International Thrillers',
-    'International TV Shows',
-    'Kids TV',
-    'Language TV Shows',
-    'Musicals',
-    'Nature TV',
-    'Reality TV',
-    'Spirituality',
-    'TV Action',
-    'TV Comedies',
-    'TV Dramas',
-    'Talk Shows',
-    'Thrillers',
-  ];
+  const [appliedGenres, setAppliedGenres] = useState<string[]>([]);
+  const [deleteConfirmMovie, setDeleteConfirmMovie] = useState<EssentialMovie | null>(null);
 
   const handleSort = (field: string) => {
     if (field === sortField) {
@@ -89,41 +55,53 @@ const AdminPage: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log('AdminPage mounted');
-    console.log('isAdmin:', isAdmin);
     if (!isAdmin) {
-      console.log('Not admin, redirecting...');
       navigate('/');
       return;
     }
-    loadMovies();
-  }, [isAdmin, navigate]);
+    
+    const loadMovies = async () => {
+      try {
+        setLoading(true);
+        const response = await fetchAdminMovies(
+          currentPage,
+          itemsPerPage,
+          searchTerm,
+          appliedGenres,
+          sortField,
+          sortOrder
+        );
 
-  // Load movies with pagination and filters
-  const loadMovies = async () => {
-    try {
-      setLoading(true);
-      console.log('Loading movies...');
-      const response = await fetchMovies(
-        itemsPerPage,
-        currentPage,
-        selectedGenres,
-        searchTerm,
-        [sortField, sortOrder]
-      );
-      
-      console.log('Movies loaded:', response);
-      setMovies(response.movies);
-      setTotalResults(response.total);
-      setTotalPages(Math.ceil(response.total / itemsPerPage));
-      setError(null);
-    } catch (err) {
-      console.error('Error loading movies:', err);
-      setError('Failed to fetch movies. Please try again later.');
-    } finally {
-      setLoading(false);
-    }
-  };
+        // Convert to EssentialMovie type for the table view
+        const essentialMovies: EssentialMovie[] = response.movies.map(movie => ({
+          showId: movie.showId,
+          title: movie.title,
+          averageStarRating: movie.averageStarRating,
+          duration: movie.duration,
+          releaseYear: movie.releaseYear,
+          country: movie.country,
+          director: movie.director,
+          // Include all genre fields as they're needed for filtering
+          ...Object.keys(GENRE_MAPPING).reduce((acc, genre) => {
+            acc[GENRE_MAPPING[genre]] = movie[GENRE_MAPPING[genre]];
+            return acc;
+          }, {} as Record<string, any>)
+        }));
+
+        setMovies(essentialMovies);
+        setTotalResults(response.total);
+        setTotalPages(response.totalPages);
+        setError(null);
+      } catch (err) {
+        console.error('Error loading movies:', err);
+        setError('Failed to fetch movies. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadMovies();
+  }, [isAdmin, navigate, currentPage, itemsPerPage, sortField, sortOrder, appliedGenres, searchTerm]);
 
   const handleGenreFilter = () => {
     setIsGenreFilterOpen(true);
@@ -134,18 +112,36 @@ const AdminPage: React.FC = () => {
       const newGenres = prev.includes(genre)
         ? prev.filter((g) => g !== genre)
         : [...prev, genre];
-      setCurrentPage(1);
       return newGenres;
     });
   };
 
-  const handleEditMovie = (movie: Movie) => {
-    setEditingMovie(movie);
-    setIsEditModalOpen(true);
-    setIsModalOpen(false);
+  const clearGenres = () => {
+    setSelectedGenres([]);
   };
 
-  const handleDeleteMovie = (movie: Movie) => {
+  const applyGenreFilters = () => {
+    setAppliedGenres(selectedGenres);
+    setCurrentPage(1);
+    setIsGenreFilterOpen(false);
+  };
+
+  const handleEditMovie = async (movie: EssentialMovie) => {
+    try {
+      setLoading(true);
+      const fullMovieDetails = await fetchMovieById(movie.showId);
+      setEditingMovie(fullMovieDetails);
+      setIsEditModalOpen(true);
+      setIsModalOpen(false);
+    } catch (err) {
+      console.error('Error loading movie details:', err);
+      setError('Failed to load movie details. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteMovie = (movie: EssentialMovie) => {
     setDeleteConfirmMovie(movie);
   };
 
@@ -153,7 +149,7 @@ const AdminPage: React.FC = () => {
     if (deleteConfirmMovie) {
       try {
         await deleteMovie(deleteConfirmMovie.showId);
-        loadMovies(); // Reload current page after deletion
+        applyGenreFilters();
         setDeleteConfirmMovie(null);
         setIsModalOpen(false);
       } catch (err) {
@@ -172,9 +168,18 @@ const AdminPage: React.FC = () => {
     setCurrentPage(1);
   };
 
-  const handleViewMovie = (movie: Movie) => {
-    setSelectedMovie(movie);
-    setIsModalOpen(true);
+  const handleViewMovie = async (movie: EssentialMovie) => {
+    try {
+      setLoading(true);
+      const fullMovieDetails = await fetchMovieById(movie.showId);
+      setSelectedMovie(fullMovieDetails);
+      setIsModalOpen(true);
+    } catch (err) {
+      console.error('Error loading movie details:', err);
+      setError('Failed to load movie details. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const closeModal = () => {
@@ -187,9 +192,9 @@ const AdminPage: React.FC = () => {
     return duration;
   };
 
-  const getGenres = (movie: Movie): string => {
-    const genres = allGenres.filter(
-      (genre) => movie[genre.toLowerCase() as keyof Movie] === 1
+  const getGenres = (movie: EssentialMovie): string => {
+    const genres = AVAILABLE_GENRES.filter(
+      (genre) => movie[GENRE_MAPPING[genre] as keyof EssentialMovie] === 1
     );
     return genres.join(', ') || '-';
   };
@@ -209,7 +214,7 @@ const AdminPage: React.FC = () => {
     return (
       <div className="admin-container">
         <div className="error-message">{error}</div>
-        <button onClick={loadMovies} className="retry-button">
+        <button onClick={applyGenreFilters} className="retry-button">
           Retry
         </button>
       </div>
@@ -224,7 +229,7 @@ const AdminPage: React.FC = () => {
         <form onSubmit={(e) => {
           e.preventDefault();
           setCurrentPage(1);
-          loadMovies();
+          applyGenreFilters();
         }} className="search-form">
           <input
             type="text"
@@ -503,7 +508,7 @@ const AdminPage: React.FC = () => {
                   movie={editingMovie}
                   onSuccess={() => {
                     setIsEditModalOpen(false);
-                    loadMovies();
+                    applyGenreFilters();
                   }}
                   onCancel={() => {
                     setIsEditModalOpen(false);
@@ -515,7 +520,7 @@ const AdminPage: React.FC = () => {
                   onSuccess={() => {
                     setIsEditModalOpen(false);
                     setIsAddingMovie(false);
-                    loadMovies();
+                    applyGenreFilters();
                   }}
                   onCancel={() => {
                     setIsEditModalOpen(false);
@@ -543,7 +548,7 @@ const AdminPage: React.FC = () => {
             </div>
             <div className="modal-body">
               <div className="genre-grid">
-                {allGenres.map((genre) => (
+                {AVAILABLE_GENRES.map((genre) => (
                   <label key={genre} className="genre-checkbox">
                     <input
                       type="checkbox"
@@ -557,8 +562,15 @@ const AdminPage: React.FC = () => {
             </div>
             <div className="modal-footer">
               <button
+                className="modal-button clear-button"
+                onClick={clearGenres}
+                disabled={selectedGenres.length === 0}
+              >
+                Clear Filters
+              </button>
+              <button
                 className="modal-button apply-button"
-                onClick={() => setIsGenreFilterOpen(false)}
+                onClick={applyGenreFilters}
               >
                 Apply Filters
               </button>
