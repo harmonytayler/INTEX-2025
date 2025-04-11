@@ -1,10 +1,25 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import '../style/account.css';
+import '../style/header.css';
+import '../style/LandingPage.css';
 
 const PrivacyPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-black text-white flex flex-col">
+      {/* HEADER */}
+      <header>
+        <div className="container">
+          <div className="logo-container">
+            <Link to="/" className="logo">
+              <img src="/CineNiche_Logo.png" alt="CineNiche Logo" className="logo-image" />
+            </Link>
+            <Link to="/" className="site-title">CineNiche</Link>
+          </div>
+          
+        </div>
+      </header>
+
       <div className="account-container flex-grow">
         <h1 className="account-header">Privacy Policy</h1>
 
