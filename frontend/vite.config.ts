@@ -9,16 +9,14 @@ export default defineConfig({
     headers: {
       'Content-Security-Policy': 
       "default-src 'self'; " +
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com; " +
-      "style-src 'self' 'unsafe-inline' fonts.googleapis.com https://accounts.google.com; " +
-      "img-src 'self' data: https://intexmovieposters.blob.core.windows.net https://*.blob.core.windows.net; " +
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
+      "img-src 'self' data: https://intexmovieposters.blob.core.windows.net; " +
+      "font-src 'self' https://fonts.gstatic.com; " +
+      "connect-src 'self' https://intex-bougier.azurewebsites.net; " +
       "frame-ancestors 'none'; " +
-      "font-src 'self' fonts.gstatic.com data:; " +
-      "connect-src 'self' https://localhost:5001 https://intex-2025.azurewebsites.net https://accounts.google.com https://oauth2.googleapis.com; " +
-      "object-src 'none'; " +
       "base-uri 'self'; " +
-      "form-action 'self'; " +
-      "frame-src 'self' https://accounts.google.com https://oauth2.googleapis.com;",
+      "form-action 'self'",
     },
     cors: {
       origin: 'http://localhost:3000',
