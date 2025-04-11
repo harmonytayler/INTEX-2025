@@ -45,7 +45,7 @@ function LoginPage() {
       return;
     }
 
-    const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://localhost:5001';
+    const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://intex-backend.azurewebsites.net';
     const loginUrl = rememberme
       ? `${baseUrl}/login?useCookies=true`
       : `${baseUrl}/login?useSessionCookies=true`;
