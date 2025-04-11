@@ -80,11 +80,7 @@ function App() {
               />
               <Route
                 path="/privacy"
-                element={
-                  <ProtectedRoute>
-                    <PrivacyPage />
-                  </ProtectedRoute>
-                }
+                element={<PrivacyPage />}
               />
               <Route
                 path="/bookmarks"
