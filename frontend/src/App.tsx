@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import './App.css';
 import './style/movies.css';
 import LoginPage from './pages/LoginPage';
@@ -16,6 +16,7 @@ import LandingPage from './pages/LandingPage';
 import PrivacyPage from './pages/PrivacyPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import BookmarkedMoviesPage from './pages/BookmarkedMoviesPage';
+import CookieConsent from "react-cookie-consent";
 
 function App() {
   return (
@@ -29,8 +30,22 @@ function App() {
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/register/userinfo" element={<NewUserForm />} />
-              <Route path="/home" element={<HomePage />} />
-              <Route path="/movie/:movieId" element={<MovieDetailsPage />} />
+              <Route
+                path="/home"
+                element={
+                  <ProtectedRoute>
+                    <HomePage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/movie/:movieId"
+                element={
+                  <ProtectedRoute>
+                    <MovieDetailsPage />
+                  </ProtectedRoute>
+                }
+              />
               <Route
                 path="/admin"
                 element={
@@ -39,16 +54,68 @@ function App() {
                   </ProtectedRoute>
                 }
               />
-              <Route path="/account" element={<AccountsPage />} />
-              <Route path="/account/edit" element={<EditingPage />} />
-              <Route path="/search" element={<SearchResultsPage />} />
-              <Route path="/privacy" element={<PrivacyPage />} />
-              <Route path="/bookmarks" element={<BookmarkedMoviesPage />} />
+              <Route
+                path="/account"
+                element={
+                  <ProtectedRoute>
+                    <AccountsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/account/edit"
+                element={
+                  <ProtectedRoute>
+                    <EditingPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/search"
+                element={
+                  <ProtectedRoute>
+                    <SearchResultsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/privacy"
+                element={
+                  <ProtectedRoute>
+                    <PrivacyPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/bookmarks"
+                element={
+                  <ProtectedRoute>
+                    <BookmarkedMoviesPage />
+                  </ProtectedRoute>
+                }
+              />
             </Routes>
           </main>
         </div>
       </Router>
+      <CookieConsent
+        location="bottom"
+        buttonText="I Accept"
+        declineButtonText="I Decline"
+        enableDeclineButton
+        cookieName="cineNicheConsent"
+        style={{ background: "#2B373B" }}
+        buttonStyle={{ color: "#fff", backgroundColor: "#4CAF50", fontSize: "14px", border: "none", padding: "0.5rem 1rem" }}
+        declineButtonStyle={{ background: "#ccc", color: "#000", fontSize: "14px", padding: "0.5rem 1rem", marginLeft: "1rem" }}
+        expires={150}
+      >
+        This website uses cookies to create the user experience. Without accepting, you cannot effectively use the site.{" "}
+        <Link to="/privacy" className="text-yellow-400 underline">
+          Learn more
+        </Link>
+      </CookieConsent>
     </AuthProvider>
+    
   );
 }
 
