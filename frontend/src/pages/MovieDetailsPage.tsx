@@ -43,7 +43,7 @@ const MovieDetailsPage: React.FC = () => {
         setError(null);
 
         const baseUrl =
-          import.meta.env.VITE_API_BASE_URL || 'https://localhost:5001';
+          import.meta.env.VITE_API_BASE_URL || 'https://intex-bougier.azurewebsites.net';
         const response = await fetch(`${baseUrl}/Movie/GetMovie/${movieId}`, {
           credentials: 'include',
           headers: {

@@ -71,7 +71,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("ConnectFrontend", policy =>
     {
         policy.WithOrigins(
-                "http://localhost:3000", "http://localhost:5000", "http://localhost:5001", "https://localhost:5001", "https://intex-2025.azurewebsites.net")
+                "http://localhost:3000", "https://intex-bougier.azurewebsites.net")
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials();
@@ -106,8 +106,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("ConnectFrontend");
-// Remove HTTPS redirection for local development
-// app.UseHttpsRedirection();
+
+app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
@@ -179,7 +179,4 @@ app.MapGet("/pingauth", (ClaimsPrincipal user) =>
     return Results.Json(new { email });
 }).RequireAuthorization();
 
-// Explicitly set the ports to avoid conflicts
-app.Urls.Add("http://localhost:5000");
-app.Urls.Add("https://localhost:5001");
 app.Run();

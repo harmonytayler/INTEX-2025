@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 
 function Logout(props: { children: React.ReactNode }) {
   const navigate = useNavigate();
-  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://localhost:5001';
+  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://intex-bougier.azurewebsites.net';
 
   const handleLogout = async (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
