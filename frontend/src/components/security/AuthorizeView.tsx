@@ -43,7 +43,7 @@ function AuthorizeView(props: { children: React.ReactNode }) {
       }
     }
 
-    const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://localhost:5001';
+    const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://intex-bougier.azurewebsites.net';
     fetchWithRetry(`${baseUrl}/pingauth`, {
       method: 'GET',
       credentials: 'include',

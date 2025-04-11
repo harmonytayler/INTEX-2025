@@ -1,7 +1,7 @@
 import { MovieUser } from '../types/MovieUser'; // Adjust the path if necessary
 import { getHeaders } from './MovieAPI';
 
-const API_URL = 'https://localhost:5001/MovieUser';
+const API_URL = 'https://intex-bougier.azurewebsites.net';
 
 // Function to add a new movie user
 export const addMovieUser = async (newUser: MovieUser): Promise<MovieUser> => {
