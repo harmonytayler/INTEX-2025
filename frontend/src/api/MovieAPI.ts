@@ -540,13 +540,13 @@ export const fetchMovieById = async (showId: string): Promise<Movie> => {
 export const getMovieUserId = async (): Promise<number> => {
   try {
     console.log('Fetching movie user ID from API...');
-    const response = await fetch(`${API_URL}/MovieUser/GetUserIdByEmail`, {
+    const response = await fetch(`${baseUrl}/MovieUser/GetUserByEmail`, {
       credentials: 'include',
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Error response from GetUserIdByEmail:', errorText);
+      console.error('Error response from GetUserByEmail:', errorText);
       throw new Error('Failed to get movie user ID');
     }
 

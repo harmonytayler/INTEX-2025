@@ -14,14 +14,14 @@ export default defineConfig({
       "img-src 'self' data: https://intexmovieposters.blob.core.windows.net https://*.blob.core.windows.net; " +
       "frame-ancestors 'none'; " +
       "font-src 'self' fonts.gstatic.com data:; " +
-      "connect-src 'self' https://localhost:5001 https://intex-2025.azurewebsites.net https://accounts.google.com https://oauth2.googleapis.com; " +
+      "connect-src 'self' https://localhost:5001 https://intex-backend.azurewebsites.net https://accounts.google.com https://oauth2.googleapis.com; " +
       "object-src 'none'; " +
       "base-uri 'self'; " +
       "form-action 'self'; " +
       "frame-src 'self' https://accounts.google.com https://oauth2.googleapis.com;",
     },
     cors: {
-      origin: 'http://localhost:3000',
+      origin: 'https://red-tree-077b9461e.6.azurestaticapps.net',
       credentials: true,
     },
   },
