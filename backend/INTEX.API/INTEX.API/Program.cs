@@ -81,6 +81,17 @@ builder.Services.AddCors(options =>
 // Optional: No-op email sender for roles
 builder.Services.AddSingleton<IEmailSender<IdentityUser>, NoOpEmailSender<IdentityUser>>();
 
+builder.Services.Configure<IdentityOptions>(options =>
+{
+    // More secure Password settings.
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireNonAlphanumeric = true;
+    options.Password.RequireUppercase = true;
+    options.Password.RequiredLength = 12;
+    options.Password.RequiredUniqueChars = 1;
+});
+
 var app = builder.Build();
 
 // HTTP request pipeline
