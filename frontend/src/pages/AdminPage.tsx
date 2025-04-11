@@ -29,6 +29,7 @@ const AdminPage: React.FC = () => {
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [appliedGenres, setAppliedGenres] = useState<string[]>([]);
   const [deleteConfirmMovie, setDeleteConfirmMovie] = useState<EssentialMovie | null>(null);
+  const [searchInput, setSearchInput] = useState('');
 
   const handleSort = (field: string) => {
     if (field === sortField) {
@@ -199,6 +200,22 @@ const AdminPage: React.FC = () => {
     return genres.join(', ') || '-';
   };
 
+  const handleSearchInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchInput(e.target.value);
+  };
+
+  const handleSearch = () => {
+    // If the search input is empty, set searchTerm to an empty string to show all movies
+    setSearchTerm(searchInput.trim() || '');
+    setCurrentPage(1); // Reset to first page when searching
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
   if (loading) {
     return (
       <div className="admin-container">
@@ -228,15 +245,15 @@ const AdminPage: React.FC = () => {
       <div className="admin-actions">
         <form onSubmit={(e) => {
           e.preventDefault();
-          setCurrentPage(1);
-          applyGenreFilters();
+          handleSearch();
         }} className="search-form">
           <input
             type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            value={searchInput}
+            onChange={handleSearchInput}
             placeholder="Search movies..."
             className="search-input"
+            onKeyDown={handleKeyDown}
           />
           <button type="submit" className="search-button">
             <i className="fas fa-search"></i>
