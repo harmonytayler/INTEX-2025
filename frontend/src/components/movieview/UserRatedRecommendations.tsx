@@ -6,13 +6,15 @@ import MovieRow from '../MovieRow';
 import './Recommendations.css';
 import '../../style/MovieDetails.css';
 
-interface ContentBasedRecommendationsProps {
+interface UserRatedRecommendationsProps {
   showId: string;
+  movieTitle: string;
 }
 
-const ContentBasedRecommendations: React.FC<
-  ContentBasedRecommendationsProps
-> = ({ showId }) => {
+const UserRatedRecommendations: React.FC<UserRatedRecommendationsProps> = ({ 
+  showId,
+  movieTitle 
+}) => {
   const [recommendations, setRecommendations] = useState<Movie[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -74,7 +76,7 @@ const ContentBasedRecommendations: React.FC<
   return (
     <div>
       <MovieRow
-        genre="Similar Movies"
+        genre={`Since you like ${movieTitle}, you may also like...`}
         movies={recommendations}
         onMovieClick={handleMovieClick}
       />
@@ -82,4 +84,4 @@ const ContentBasedRecommendations: React.FC<
   );
 };
 
-export default ContentBasedRecommendations;
+export default UserRatedRecommendations; 

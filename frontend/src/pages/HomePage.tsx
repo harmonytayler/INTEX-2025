@@ -8,10 +8,14 @@ import {
   getBulkAverageRatings,
   fetchMovieById,
   getWatchedMovies,
+  getUserRating,
 } from '../api/MovieAPI';
+import { getMovieUserByEmail } from '../api/MovieUserAPI';
 import MovieRow from '../components/MovieRow';
 import AuthorizeView from '../components/security/AuthorizeView';
 import MovieCard from '../components/MovieCard';
+import UserRatedRecommendations from '../components/movieview/UserRatedRecommendations';
+import { useAuth } from '../contexts/AuthContext';
 
 // Define main genres for the rows
 const MAIN_GENRES = [
@@ -91,7 +95,11 @@ function HomePage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [bookmarkedMovies, setBookmarkedMovies] = useState<Movie[]>([]);
   const [watchedMovies, setWatchedMovies] = useState<Movie[]>([]);
+  const [ratedMovies, setRatedMovies] = useState<Movie[]>([]);
+  const [selectedRatedMovie, setSelectedRatedMovie] = useState<Movie | null>(null);
+  const [movieUserId, setMovieUserId] = useState<number | null>(null);
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   // Cache for movie ratings to avoid duplicate API calls
   const ratingsCache = useRef<{
@@ -368,6 +376,92 @@ function HomePage() {
     loadWatchedMovies();
   }, []);
 
+  // Get the user's movie user ID
+  useEffect(() => {
+    const loadMovieUserId = async () => {
+      if (!user?.email) {
+        console.log('No user email found');
+        return;
+      }
+      
+      try {
+        console.log('Fetching movie user for email:', user.email);
+        const movieUser = await getMovieUserByEmail(user.email);
+        console.log('Movie user found:', movieUser);
+        // Use the correct property from the movie user object
+        if (movieUser && movieUser.userId) {
+          console.log('Setting movie user ID:', movieUser.userId);
+          setMovieUserId(movieUser.userId);
+        } else {
+          console.log('No valid movie user ID found in response');
+        }
+      } catch (err) {
+        console.error('Error loading movie user ID:', err);
+      }
+    };
+
+    loadMovieUserId();
+  }, [user]);
+
+  // Fetch user's rated movies
+  useEffect(() => {
+    const loadRatedMovies = async () => {
+      if (!movieUserId) {
+        console.log('No movie user ID found');
+        return;
+      }
+      
+      try {
+        console.log('Fetching rated movies for user ID:', movieUserId);
+        // Get all movies first
+        const response = await fetchMovies(100, 1, [], '', []);
+        if (response && Array.isArray(response.movies)) {
+          const allMovies = response.movies;
+          console.log('Total movies found:', allMovies.length);
+          
+          // Check each movie for user's rating
+          const ratedMoviesPromises = allMovies.map(async (movie) => {
+            try {
+              const rating = await getUserRating(movie.showId, movieUserId);
+              if (rating > 0) {
+                console.log('Found rated movie:', movie.title, 'with rating:', rating);
+                return movie;
+              }
+              return null;
+            } catch (err) {
+              console.error('Error getting rating for movie:', movie.title, err);
+              return null;
+            }
+          });
+          
+          const ratedMoviesResults = await Promise.all(ratedMoviesPromises);
+          const validRatedMovies = ratedMoviesResults.filter((movie): movie is Movie => movie !== null);
+          
+          console.log('Total rated movies found:', validRatedMovies.length);
+          setRatedMovies(validRatedMovies);
+          
+          // Select a random rated movie for recommendations
+          if (validRatedMovies.length > 0) {
+            const randomIndex = Math.floor(Math.random() * validRatedMovies.length);
+            const selectedMovie = validRatedMovies[randomIndex];
+            console.log('Selected movie for recommendations:', selectedMovie.title, 'with ID:', selectedMovie.showId);
+            setSelectedRatedMovie(selectedMovie);
+          } else {
+            console.log('No rated movies found to select from');
+            setSelectedRatedMovie(null);
+          }
+        }
+      } catch (err) {
+        console.error('Error loading rated movies:', err);
+        setSelectedRatedMovie(null);
+      }
+    };
+
+    if (movieUserId) {
+      loadRatedMovies();
+    }
+  }, [movieUserId]);
+
   return (
     <AuthorizeView>
       <div className="min-h-screen bg-black">
@@ -398,9 +492,20 @@ function HomePage() {
                   onMovieClick={handleMovieClick}
                 />
               )}
+
+              {/* Content-based recommendations based on a rated movie */}
+              {selectedRatedMovie && (
+                <div>
+                  <UserRatedRecommendations 
+                    showId={selectedRatedMovie.showId}
+                    movieTitle={selectedRatedMovie.title}
+                  />
+                </div>
+              )}
+
               {topMovies.length > 0 && (
                 <MovieRow
-                  genre="Top 10 Trending Movies"
+                  genre="Trending Movies"
                   movies={topMovies}
                   onMovieClick={handleMovieClick}
                   isTopTen={true}
